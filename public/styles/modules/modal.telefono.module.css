@@ -1,0 +1,33 @@
+.btnEliminar{
+    padding: 2px 8px;
+    color: white;
+    font-size: 12px;
+    font-weight: 500;
+    background-color: black;
+    border-radius: 5px;
+    border: none;
+}
+
+.agregarTel{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+.agregarTel button{
+    padding: 6px 10px;
+    margin: 0 10px;
+    border-radius: 10px;
+    background-color: black;
+    color: white;
+    font-weight: 500;
+}
+.agregarTel button:disabled{
+    background-color: rgb(97, 97, 97);
+}
+
+.agregarTel input{
+    margin: 10px;
+    padding: 6px;
+    border-radius: 9px;
+    border: solid 1px;
+}

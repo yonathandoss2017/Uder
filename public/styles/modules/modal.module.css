@@ -1,0 +1,65 @@
+.modalContent table {
+    width: 100%;
+    text-align: center;
+    display: inline-table;
+}
+
+.modalContent li {
+    text-align: center;
+    text-decoration: none;
+    list-style: none;
+    font-weight: 500;
+    margin: 5px;
+    border-bottom: solid 2px gray;
+}
+
+.modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modalContent {
+    background: white;
+    padding: 15px;
+    border-radius: 8px;
+    max-height: 95%;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.modalContentSidebarPosition {
+    margin-left: 250px;
+}
+
+.modalClose {
+    position: absolute;
+    top: 0;
+    right: 5px;
+    padding: 0;
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: black;
+}
+
+.btnModal {
+    padding: 7px;
+    margin: 5px;
+    background-color: black;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-weight: 600;
+}

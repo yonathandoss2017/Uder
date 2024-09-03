@@ -1,0 +1,108 @@
+
+.userForm {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+}
+
+.userDetails {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    width: 100%;
+}
+
+.columna {
+    width: 50%;
+}
+
+
+.inputBox {
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+    margin: 10px;
+}
+
+.inputBox input {
+    height: 39px;
+    border-radius: 13px;
+    padding: 5px;
+    color: black;
+    border: solid 2px black;
+}
+
+.inputBox select {
+    height: 39px;
+    border-radius: 13px;
+    padding: 5px;
+    color: black;
+    border: solid 2px black;
+}
+
+.inputBox option {
+    color: black;
+}
+
+.inputBox .error {
+    border-color: #ff3860;
+    color: red;
+}
+
+.requiredField {
+    color: red;
+    font-weight: bold;
+    font-size: 18px;
+}
+
+.details {
+    display: block;
+    font-weight: 500;
+    margin-bottom: 3px;
+}
+
+
+.insitBtn select {
+    height: 39px;
+    border-radius: 13px;
+    padding: 5px;
+    color: black;
+    border: solid 2px black;
+}
+
+.insitBtn option {
+    color: black;
+}
+
+.insitBtn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 10px;
+}
+
+.buttom input {
+    padding: 12px;
+    border-radius: 10px;
+    background-color: white;
+    color: black;
+    font-weight: 500;
+    border: solid 1px black;
+    margin: 9px;
+}
+
+.register {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border: solid 1px #0000000f;
+    border-radius: 30px;
+    width: 500px;
+    z-index: 9999;
+    max-height: 660px;
+    padding: 25px 30px;
+    -webkit-backdrop-filter: blur(5px);
+    backdrop-filter: blur(5px);
+
+}

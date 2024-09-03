@@ -1,0 +1,154 @@
+.sidebarContainer {
+    position: fixed;
+    top: 0;
+    width: 250px;
+    height: 100%;
+    background: #1b1b1b;
+    transition: left 0.4s ease;
+    z-index: 1;
+}
+
+.sidebarList {
+    width: 100%;
+    height: 70%;
+    background: #1b1b1b;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.sidebarListItem {
+    line-height: 60px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.sidebarListItem:last-child {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.sidebarTitle {
+    color: white;
+    font-size: 21px;
+    font-weight: 600;
+    line-height: 65px;
+    text-align: center;
+    background: #1e1e1e;
+    letter-spacing: 1px;
+}
+
+.sidebarOption {
+    width: 100%;
+    padding-left: 15px;
+    color: white;
+    font-size: 18px;
+    font-weight: 500;
+    line-height: 60px;
+    background: #1e1e1e;
+    letter-spacing: 1px;
+    text-decoration: none;
+    border-left: 3px solid transparent;
+    box-sizing: border-box;
+    display: block;
+    text-align: left;
+}
+
+.sidebarOption:hover {
+    background: #1a1a1a !important;
+}
+
+.activeOption .sidebarOption {
+    color: cyan !important;
+    background: #1e1e1e !important;
+    border-left-color: cyan !important;
+}
+
+.sidebarButton {
+    display: block;
+    position: relative;
+    z-index: 2;
+}
+
+.subMenuButton {
+    background: #252525 !important;
+}
+
+.subMenuTitleOpen,
+.subMenuTitleClosed {
+    color: #68e0e1 !important;
+    background: #1e1e1e !important;
+}
+
+.subMenuTitleClosed {
+    border-left: 3px solid transparent !important;
+    border-left-color: #68e0e1 !important;
+}
+
+.subMenuListItem {
+    line-height: 70px;
+    border-top: none;
+}
+
+.subMenuOption {
+    font-size: 17px;
+    color: #e6e6e6;
+    padding-left: 15px;
+}
+
+.subMenuOption:hover {
+    color: cyan !important;
+    background: #1a1a1a !important;
+}
+
+.subMenuActive .subMenuOption {
+    color: #e6e6e6;
+    background: #252525;
+    border-left-color: transparent;
+}
+
+.subMenuContainer {
+    display: block;
+    position: relative;
+    animation: slideInSubMenu 0.8s forwards;
+}
+
+@keyframes slideInSubMenu {
+    0% {
+        opacity: 0;
+        top: -62px;
+    }
+    100% {
+        opacity: 1;
+        top: 0;
+    }
+}
+
+.userInfo {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.userInfoTitle {
+    color: white;
+}
+
+.userInfoImage {
+    width: 50px;
+    border-radius: 50%;
+}
+
+.userInfoLink {
+    color: white;
+    text-decoration: none;
+    transition: 0.5s;
+}
+
+.userInfoLink:hover {
+    color: cyan;
+    font-weight: 600;
+    font-size: 20px;
+}
+
+.sidebarListItem button {
+    border: none;
+}

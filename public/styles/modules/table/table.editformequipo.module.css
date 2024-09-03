@@ -1,0 +1,261 @@
+
+.container {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    z-index: 0;
+    margin-top: 10px;
+}
+
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        bottom: 180px;
+    }
+    to {
+        opacity: 1;
+        bottom: 0px;
+    }
+}
+
+.aparecer {
+    animation: fadeIn 1s forwards;
+}
+
+.detailsContainer {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    margin-bottom: 5px;
+    justify-content: space-between; /* Distribuye las cajas de entrada */
+}
+
+/* Estilo para cada caja de entrada */
+.detailsContainer .inputBox {
+    flex: 0 0 48%; /* Hace que cada caja de entrada ocupe el 48% del ancho */
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin-bottom: 8px; /* Añade espacio entre las filas */
+}
+
+.inputimg{
+    display: flex;
+    justify-content: space-evenly;
+    margin-top: 20px;
+    align-items: center;
+}
+
+.detailsContainer .inputBox input,
+.detailsContainer .inputBox select {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    border-radius: 10px;
+    border: 2px solid #ddd;
+    box-sizing: border-box;
+}
+
+.detailsContainer .inputBox label {
+    font-weight: bold;
+    margin-bottom: 5px;
+    display: block;
+    text-align: left;
+}
+
+.detailsContainer .inputBox label input {
+    padding: 5px;
+    border: solid 2px rgb(87, 87, 87);
+    border-radius: 10px;
+    width: 100%;
+}
+
+.detailsContainer .inputBox select {
+    padding: 8px;
+    border-radius: 9px;
+    color: white;
+    background-color: black;
+    font-weight: 500;
+}
+
+.detailsContainer .inputBox option {
+    color: white;
+}
+
+.detailsContainer .inputBox .error {
+    border-color: #ff3860;
+    color: #eb5d5d !important;
+    font-weight: 100;
+    font-size: 12px;
+    margin: 0 auto;
+}
+
+.details {
+    display: block;
+    font-weight: 500;
+    margin-bottom: 3px;
+}
+
+.buttomM button {
+    padding: 6px 10px;
+    margin: 0 10px;
+    border-radius: 10px;
+    background-color: black;
+    color: white;
+    font-weight: 500;
+}
+
+.requiredField {
+    color: red;
+    font-weight: bold;
+    font-size: 18px;
+}
+
+.buttomBaja {
+    padding: 7px;
+    background-color: black;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-weight: 600;
+}
+
+.modalCarousel img {
+    height: 150px;
+    margin: 0 auto;
+    border: dotted 2px rgb(128, 128, 128) !important;
+    padding: 5px;
+}
+
+.modalCarousel {
+    margin-bottom: 15px;
+    overflow: hidden;
+    width: 150px;
+}
+
+
+.modalButtonGroup {
+    margin-top: 20px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.formContainer {
+    background-color: white;
+    border-radius: 20px;
+    padding: 20px;
+    width: 42vw;
+    margin: 0 auto;
+    z-index: 10;
+}
+
+.formTitle {
+    font-size: 1.5rem;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.formLabel {
+    font-weight: bold;
+    margin-bottom: 5px;
+    display: block;
+    text-align: left;
+}
+
+.formInput {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border-radius: 10px;
+    border: 2px solid #ddd;
+    box-sizing: border-box;
+}
+
+.formButton {
+    width: 100%;
+    padding: 10px;
+    margin-top: 10px;
+    background-color: #000;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+
+.garantiaContainer {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+}
+
+
+.garantiaContainer .inputBox {
+    flex: 1;
+    margin-right: 10px;
+}
+
+.garantiaContainer .inputBox:last-child {
+    margin-right: 0;
+}
+
+
+@media screen and (resolution: 120dpi), screen and (max-width: 1390px) {
+   
+    .formContainer{
+        font-size: 0.85rem;
+        padding: 0;
+        box-shadow: none;
+    }
+    .detailsContainer .inputBox select{
+        padding: 7px;
+    }
+    .detailsContainer .inputBox input{
+        padding: 7px;
+    }
+    .inputBox{
+        margin-bottom: 2px !important;
+    }
+    .inputBoxIMG{
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        margin: 5px 0;
+    }
+    .modalCarousel img{
+        width: 150px !important;
+    }
+  }
+
+  @media screen and (max-width: 1280px) {
+   
+    .formContainer{
+        font-size: 0.65rem;
+        padding: 0;
+        box-shadow: none;
+    }
+    .detailsContainer .inputBox select{
+        padding: 4px;
+        font-size: 0.65rem;
+    }
+    .detailsContainer .inputBox input{
+        padding: 4px;
+        font-size: 0.65rem;
+    }
+    .inputBox{
+        margin-bottom: 2px !important;
+    }
+    .inputBoxIMG{
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        margin: 5px 0;
+    }
+    .modalCarousel img{
+        width: 130px !important;
+    }
+  }

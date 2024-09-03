@@ -1,0 +1,150 @@
+/*PANEL PRINCIPAL*/
+.panelPrincipal {
+    display: flex;
+    margin-left: 250px;
+    justify-content: center;
+    flex-direction: column;
+}
+
+.panelPrincipal h2 {
+    font-size: 2.2vw;
+    text-align: center;
+    margin: 15px 15px 0 15px;
+}
+
+.tarjetasEquipos {
+    /*text-wrap: nowrap;*/
+    display: flex;
+    background-color: #ffffff;
+    border: 0;
+    border-radius: 9px;
+    box-shadow: 4px 4px 9px #0000001c;
+    width: 30%;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(4px);
+    transition: 0.7s;
+    padding: 8px 12px;
+}
+
+.tarjetasEquipos:hover {
+    background-color: rgb(36, 36, 36);
+    width: 34%;
+
+}
+
+.infoTarjetasEquipos {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    justify-content: center;
+
+}
+
+.tarjetasEquipos:hover .infoTarjetasEquipos h3,
+.tarjetasEquipos:hover .infoTarjetasEquipos p,
+.tarjetasEquipos:hover .icon path {
+    color: white;
+    fill: white;
+    transition: 0.5s;
+}
+
+.tarjetas {
+    display: flex;
+    justify-content: space-between;
+
+}
+
+.tarjetasEquipos .icon {
+    font-size: 2vw;
+    margin: 14px;
+}
+
+.tarjetasEquipos h3 {
+    font-size: 0.9vw;
+    font-weight: 500;
+}
+
+.tarjetasEquipos p {
+    font-size: 2.4vw;
+    font-weight: 700;
+}
+
+.datos {
+    width: 60%;
+}
+
+
+.grafico {
+    background: white;
+    border-radius: 17px;
+    width: 100%;
+    margin: 18px 0 17px 0;
+    box-shadow: 5px 5px 9px rgba(0, 0, 0, 0.096);
+}
+
+.myChart {
+    margin: 0 auto;
+    width: 50% !important;
+    height: 95% !important;
+}
+
+.tituloPP h4 {
+    text-align: center;
+    margin: 0px 0px 10px;
+    font-weight: 500;
+    font-size: 1.8vw;
+    color: #413f3f;
+}
+
+.asideAuditoria {
+    overflow-y: scroll;
+    background-color: white;
+    width: 100%;
+    height: 93%;
+    padding: 0 18px 18px 18px;
+    border-radius: 18px;
+    box-shadow: 5px 5px 9px rgba(0, 0, 0, 0.096);
+}
+
+.auditoria {
+    text-align: center;
+    background-color: white;
+    box-shadow: 5px 5px 9px rgba(0, 0, 0, 0.096);
+    width: 20%;
+    border-radius: 18px;
+    margin-left: 40px;
+}
+
+.divAuditoria {
+    margin: 12px 0 12px 0;
+
+    border-bottom: solid 1px #0000002e;
+}
+
+.auditoria h3 {
+    font-size: 1.5vw;
+    text-align: center;
+    padding: 9px 9px 2px 9px;
+}
+
+.contenidoPP {
+    display: flex;
+    justify-content: center;
+}
+
+.auditoriaCambios {
+    font-size: 0.8vw;
+}
+
+.auditoriaFecha {
+    font-size: 0.9vw;
+    font-weight: bold;
+}
+
+.auditoriaOperacion {
+    font-size: 0.85vw;
+    font-weight: bold;
+}
+

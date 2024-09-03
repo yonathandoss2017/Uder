@@ -1,0 +1,181 @@
+.containerPage {
+    display: flex;
+    height: 100vh;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+/*==================== TABLA ====================*/
+.containerTable {
+    margin-left: 250px;
+    background-color: #e5e5e533;
+    padding: 30px 30px 0 30px;
+    border-radius: 20px;
+    box-shadow: 5px 4px 10px 0 #00000017;
+    backdrop-filter: blur(7px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    z-index: 0;
+}
+.containerTable h3 {
+    padding-bottom: 30px;
+}
+
+.containerTable table {
+    border-collapse: collapse;
+}
+
+.containerTable tbody {
+    text-align: center;
+    font-size: 0.9vw;
+}
+
+.containerTable tbody tr td {
+    padding: 8px 15px;
+    color: #1b1b1b;
+    font-weight: 500;
+}
+
+.containerTable tbody tr td button {
+    color: white;
+    background: black;
+    padding: 7px 12px;
+    border-radius: 10px;
+    border: none;
+    font-size: 0.9vw;
+    font-weight: 600;
+
+}
+
+.containerTable tbody tr {
+    border-bottom: solid 1px #0000002e;
+}
+
+.containerTable tbody td input:checked {
+    appearance: none;
+    border-radius: 50%;
+    transition: 0.2s all linear;
+    border: solid 9px #00e930;
+}
+
+.containerTable tbody td input {
+    appearance: none;
+    border-radius: 50%;
+    transition: 0.2s all linear;
+    border: solid 9px #ff0000;
+}
+
+/*==================== SCROLL ====================*/
+.scroll {
+    width: 100%;
+    overflow-y: auto;
+    max-height: 350px;
+    padding: 8px;
+    border-bottom: solid 1px #8080804d;
+}
+
+/*==================== FILTROS ====================*/
+
+.filtersContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    padding: 10px;
+    border-radius: 0 0 20px 20px;
+}
+
+.filtersContainerInputs select {
+    padding: 5px;
+    border-radius: 10px;
+    color: white;
+    background: black;
+    width: auto;
+    font-weight: 500;
+}
+
+.filtersContainerInputs option {
+    color: white;
+}
+
+.filtersContainerInputs input {
+    margin: 0 10px;
+    padding: 5px;
+    border: solid 2px #808080ab;
+    border-radius: 5px;
+    font-weight: 500;
+}
+
+.filtersContainerButtons {
+    display: flex;
+    flex-direction: row;
+}
+
+.filtersContainerButtons label {
+    margin: 5px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+}
+
+.filtersContainerButtons input {
+    margin: 5px;
+    height: 20px;
+    width: 20px;
+}
+
+/*Estilos paginacion*/
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.pagination button {
+    background-color: #0000002e;
+    border: none;
+    color: white;
+    padding: 8px 13px;
+    margin: 0 5px;
+    cursor: pointer;
+    border-radius: 5px;
+    font-size: 14px;
+    transition: background-color 0.3s ease;
+}
+
+
+.pagination button:disabled {
+    background-color: #c0c0c0;
+    cursor: not-allowed;
+}
+
+.pagination button:hover:not(:disabled) {
+    background-color: black;
+}
+
+.pagination .activePage {
+    background-color: black;
+}
+
+.pagination button:focus {
+    outline: none;
+}
+
+.pagination span {
+    font-size: 2rem;
+    color: #8e8e8e;
+}
+
+
+/* MEDIA QUERY */
+@media (max-width: 1400px) {
+    .containerTable tbody tr td {
+        padding: 8px 4px;
+
+    }
+}
