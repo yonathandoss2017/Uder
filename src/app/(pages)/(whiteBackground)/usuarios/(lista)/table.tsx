@@ -1,7 +1,7 @@
 "use client";  // Este es un componente del lado del cliente
 
 // Importa los estilos de la tabla
-import stylesTable from "@public/styles/modules/table/table.module.css";
+import stylesTable from "@public/styles/modules/table/table.usuarios.module.css";
 // Importa los módulos necesarios
 import UsuarioDTO from '@/types/dtos/UsuarioDTO';
 import FormModificar from '@/app/(pages)/(whiteBackground)/usuarios/(lista)/formEdit';

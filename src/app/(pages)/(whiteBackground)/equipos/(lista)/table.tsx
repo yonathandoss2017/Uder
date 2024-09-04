@@ -1,7 +1,7 @@
 "use client";  // Este es un componente del lado del cliente
 
 // Importa los estilos de la tabla
-import stylesTable from "@public/styles/modules/table/table.module.css";
+import stylesTable from "@public/styles/modules/table/table.equipos.module.css";
 // Importa los módulos necesarios
 import React, {ChangeEvent, MutableRefObject, ReactElement, useEffect, useRef, useState} from 'react';
 import EquipoDTO from '@/types/dtos/EquipoDTO';

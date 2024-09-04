@@ -9,6 +9,7 @@
 /*==================== TABLA ====================*/
 .containerTable {
     margin-left: 280px;
+    margin-right: auto;
     background-color: #e5e5e533;
     padding: 30px 30px 0 30px;
     border-radius: 20px;
@@ -88,35 +89,29 @@
     border-radius: 0 0 20px 20px;
 }
 
-.filtersContainerInputs{
+.filtersContainerInputs {
     display: flex;
     flex-wrap: wrap;
-    justify-content: space-around;
+    justify-content: space-between;
+    gap: 20px; /* Añadir más espacio entre los elementos */
     width: 100%;
     margin-bottom: 20px;
 }
 
-.filtersContainerInputs input {
-    width: 250px; /* Ancho fijo para todos */
-    margin: 5px 10px; /* Espaciado entre los elementos */
-    padding: 10px; /* Asegura que tengan el mismo padding */
+.filtersContainerInputs input, .filtersContainerInputs select {
+    flex: 1 1 200px; /* Cambiar el ancho mínimo */
+    max-width: 250px; /* Limitar el ancho máximo para evitar que crezcan demasiado */
+    padding: 5px;
     border-radius: 5px;
     border: solid 2px #808080ab;
     font-size: 14px;
     font-weight: 500;
 }
 
-
 .filtersContainerInputs select {
-    min-width: 250px; /* Ajusta según sea necesario */
-    padding: 5px;
-    border-radius: 10px;
     color: white;
     background: black;
     font-weight: 500;
-    width: 250px; /* Ancho fijo para todos */
-    margin: 5px 10px; /* Espaciado entre los elementos */
-    padding: 10px;
 }
 
 .filtersContainerInputs option {
@@ -124,8 +119,6 @@
     flex: 1 1 200px;
     margin: 10px;
 }
-
-
 
 .filtersContainerButtons {
     display: flex;
