@@ -20,9 +20,10 @@ import UsuarioFilter from "@/types/filters/UsuarioFilter";
 import {useModal} from "@/app/hooks/modals/useModal";
 import {ModalButtonsType} from "@/components/ModalFC";
 import UsuarioFieldSortEnum from "@/types/enums/UsuarioFieldSortEnum";
-import {buscarPerfilPorId} from "@/services/PerfilService";
+import {buscarPerfilPorId, listarPerfiles} from "@/services/PerfilService";
 import LoadingPage from "@/app/(pages)/loading";
 import {ModalInstance} from "@/app/hooks/modals/ModalProvider";
+import ComboBoxFC from "@/components/ComboBoxFC";
 
 /**
  * Propiedades del componente Table
@@ -35,6 +36,7 @@ import {ModalInstance} from "@/app/hooks/modals/ModalProvider";
 interface TableUsersFCProps {
     sessionAPIToken: string;
     clientID: number;
+    client: UsuarioDTO;
     perfilCliente?: PerfilDTO;
     idAdministrador?: number;
     hasPermissionEdit: boolean;
@@ -103,6 +105,7 @@ function TableUsersFC(props: Readonly<TableUsersFCProps>): ReactElement {
     // (Ejecuta una acción después de un tiempo determinado)
     const refSearchTermsTimer: MutableRefObject<NodeJS.Timeout | null> = useRef<NodeJS.Timeout | null>(null);
 
+
     // Efecto que se ejecuta cuando cambian los términos de búsqueda introducidos por el usuario
     // Reinicia el temporizador para actualizar los términos de búsqueda aplicados con los introducidos por el usuario
     // (Esto evita que se realicen múltiples actualizaciones en un corto período de tiempo, ósea por cada letra que se escribe o borra)
@@ -149,6 +152,7 @@ function TableUsersFC(props: Readonly<TableUsersFCProps>): ReactElement {
         })();
     }, [appliedSearchTerms]);
 
+
     // Efecto que se ejecuta cuando cambia la lista de usuarios.
     // Actualiza la lista de elementos de la tabla de usuarios
     useEffect((): void => {
@@ -181,12 +185,34 @@ function TableUsersFC(props: Readonly<TableUsersFCProps>): ReactElement {
                 newTableRows.push({usuario, perfil});
             }
 
+
+
             // Actualiza la lista de elementos de la tabla de usuarios
             setTableRows(newTableRows);
             calcularPaginas();
         })();
 
     }, [users]);
+
+    // ----------------------- Lista de perfiles -----------------------
+
+    //Define la lista de perfiles para el combobox
+    const perfiles: MutableRefObject<PerfilDTO[]> = useRef<PerfilDTO[]>([]);
+
+    useEffect(() => {
+
+        (async (): Promise<void> => {
+            //Obtener perfiles
+            await listarPerfiles(props.client.idInstitucion).then((response: PerfilDTO[] | FetchAPIError): void => {
+                if (isFetchAPIError(response)) {
+                    console.error("ERROR - lista de usuarios - table.tsx - listarPerfiles", response.errorMessage);
+                    return;
+                }
+                // Actualiza la lista de perfiles
+                perfiles.current = response;
+            });
+        })();
+    }, [props]);
 
     //Metodo para calcular páginas disponibles
     function calcularPaginas(): void {
@@ -622,7 +648,7 @@ function TableUsersFC(props: Readonly<TableUsersFCProps>): ReactElement {
                         <input
                             type="text"
                             name="primerNombre"
-                            placeholder="Buscar por nombre"
+                            placeholder="Buscar por primer nombre"
                             value={searchTerms.filter.primerNombre ? searchTerms.filter.primerNombre : ""}
                             onChange={(event: ChangeEvent<HTMLInputElement>): void => {
                                 setSearchTerms({
@@ -636,8 +662,23 @@ function TableUsersFC(props: Readonly<TableUsersFCProps>): ReactElement {
                         />
                         <input
                             type="text"
+                            name="segundoNombre"
+                            placeholder="Buscar por segundo nombre"
+                            value={searchTerms.filter.segundoNombre ? searchTerms.filter.segundoNombre : ""}
+                            onChange={(event: ChangeEvent<HTMLInputElement>): void => {
+                                setSearchTerms({
+                                    ...searchTerms,
+                                    filter: {
+                                        ...searchTerms.filter,
+                                        segundoNombre: event.target.value ? event.target.value : undefined
+                                    }
+                                });
+                            }}
+                        />
+                        <input
+                            type="text"
                             name="primerApellido"
-                            placeholder="Buscar por apellido"
+                            placeholder="Buscar por primer apellido"
                             value={searchTerms.filter.primerApellido ? searchTerms.filter.primerApellido : ""}
                             onChange={(event: ChangeEvent<HTMLInputElement>): void => {
                                 setSearchTerms({
@@ -645,6 +686,43 @@ function TableUsersFC(props: Readonly<TableUsersFCProps>): ReactElement {
                                     filter: {
                                         ...searchTerms.filter,
                                         primerApellido: event.target.value ? event.target.value : undefined
+                                    }
+                                });
+                            }}
+                        />
+                        <input
+                            type="text"
+                            name="segundoApellido"
+                            placeholder="Buscar por segundo apellido"
+                            value={searchTerms.filter.segundoApellido ? searchTerms.filter.segundoApellido : ""}
+                            onChange={(event: ChangeEvent<HTMLInputElement>): void => {
+                                setSearchTerms({
+                                    ...searchTerms,
+                                    filter: {
+                                        ...searchTerms.filter,
+                                        segundoApellido: event.target.value ? event.target.value : undefined
+                                    }
+                                });
+                            }}
+                        />
+
+                        <ComboBoxFC
+                            message={"Todos los perfiles"}
+                            messageSelectable={true}
+                            elements={perfiles.current.map((perfil: PerfilDTO): {
+                                key: number,
+                                value: string
+                            } => ({
+                                key: perfil.id as number,
+                                value: perfil.nombre
+                            }))}
+                            onChange={(e: React.ChangeEvent<HTMLSelectElement>): void => {
+                                setSearchTerms({
+                                    ...searchTerms,
+                                    filter: {
+                                        ...searchTerms.filter,
+                                        perfil: e.target.value !== "" ? perfiles.current.find((perfil: PerfilDTO):
+                                        boolean => perfil.id === Number(e.target.value))?.nombre : undefined
                                     }
                                 });
                             }}

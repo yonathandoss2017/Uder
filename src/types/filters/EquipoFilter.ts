@@ -3,6 +3,7 @@ export default interface EquipoFilter {
     nombre?: string;
     tipoEquipo?: string;
     marca?: string;
+    modelo?: string;
     numSerie?: string;
     paisOrigen?: string;
     proveedor?: string;

@@ -41,6 +41,7 @@ export async function listarEquipos(
         ...(!!filter.nombre && {filter_nombre: filter.nombre}),
         ...(!!filter.tipoEquipo && {filter_tipoEquipo: filter.tipoEquipo}),
         ...(!!filter.marca && {filter_marca: filter.marca}),
+        ...(!!filter.modelo && {filter_modelo: filter.modelo}),
         ...(!!filter.numSerie && {filter_numSerie: filter.numSerie}),
         ...(!!filter.paisOrigen && {filter_paisOrigen: filter.paisOrigen}),
         ...(!!filter.proveedor && {filter_proveedor: filter.proveedor}),

@@ -12,7 +12,6 @@ import {buscarTipoEquipoPorId} from "@/services/TipoEquipoService";
 import {buscarProveedorPorId} from "@/services/ProveedorService";
 import {buscarMarcaPorId} from "@/services/MarcaService";
 import {buscarModeloPorId} from "@/services/ModeloService";
-import LoadingPage from "@/app/(pages)/loading";
 import {Carousel} from "react-responsive-carousel";
 import ImagenDTO from "@/types/dtos/ImagenDTO";
 import {listarImagenes} from "@/services/ImagenService";
@@ -112,15 +111,15 @@ const ModalViewEquipoFC = ({ equipo, sessionAPIToken }: ModalViewEquipoFC): Reac
                 }
             }
 
-            async function obtenerImagen(){
-              await listarImagenes(equipo.id as number).then((response: ImagenDTO[] | FetchAPIError): void => {
-                    if (isFetchAPIError(response)) {
-                        console.error("ERROR - Modificar Equipo - listarImagenes: ", response);
-                        setImages([]); // Limpia la lista de imágenes
-                        return;
-                    }
+            async function obtenerImagen() {
+                const response: ImagenDTO[] | FetchAPIError = await listarImagenes(equipo.id as number);
+                if (isFetchAPIError(response)) {
+                    console.error("ERROR - Modificar Equipo - listarImagenes: ", response);
+                    setImages([]); // Limpia la lista de imágenes
+                    return;
+                } else {
                     setImages(response); // Almacena las imágenes en el estado
-                });
+                }
             }
 
 
@@ -155,7 +154,7 @@ const ModalViewEquipoFC = ({ equipo, sessionAPIToken }: ModalViewEquipoFC): Reac
                 <div className={styles.inputBox}>
                     <label className={styles.details}>Fecha de Adquisición</label>
                     <p className={styles.detailsValue}>
-                        {new Date(equipo.fechaAdquisicion).toLocaleDateString('es-ES', {
+                        {new Date(equipo.fechaAdquisicion + 'T00:00:00').toLocaleDateString('es-ES', {
                             day: '2-digit',
                             month: '2-digit',
                             year: 'numeric'

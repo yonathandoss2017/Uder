@@ -18,6 +18,17 @@ import {ModalButtonsType} from "@/components/ModalFC";
 import EditEquipoForm from "@/app/(pages)/(whiteBackground)/equipos/(lista)/formEdit";
 import {ModalInstance} from "@/app/hooks/modals/ModalProvider";
 import ModalBajaEquipoFC from "@/components/ModalBajaEquipoFC";
+import MarcaDTO from "@/types/dtos/MarcaDTO";
+import {listarMarcas} from "@/services/MarcaService";
+import ModeloDTO from "@/types/dtos/ModeloDTO";
+import {listarModelos} from "@/services/ModeloService";
+import PaisDTO from "@/types/dtos/PaisDTO";
+import {listarPaises} from "@/services/PaisService";
+import ProveedorDTO from "@/types/dtos/ProveedorDTO";
+import {listarProveedores} from "@/services/ProveedorService";
+import UbicacionDTO from "@/types/dtos/UbicacionDTO";
+import {listarUbicaciones} from "@/services/UbicacionService";
+import LoadingPage from "@/app/(pages)/loading";
 
 /**
  * Propiedades del componente Table
@@ -61,6 +72,95 @@ function TableEquiposFC(props: Readonly<TableEquiposFCProps>): ReactElement {
     const [currentPage, setCurrentPage] = useState<number>(1);
     const [npage, setNpage] = useState<number>(1);
     const recordsPerPage: number = 5;
+
+    // ----------------------- Listas de filtros -----------------------
+
+    //Define si ha cargado
+    const [loading, setLoading] = useState<boolean>(false);
+
+    // Define el estado de los tipos de equipo existentes para mostrar en la tabla
+    const tiposEquipo: MutableRefObject<TipoEquipoDTO[]> = useRef<TipoEquipoDTO[]>([]);
+
+    // Define el estado de las marcas existentes para mostrar en la tabla
+    const marcas: MutableRefObject<MarcaDTO[]> = useRef<MarcaDTO[]>([]);
+
+    // Define el estado de los modelos existentes para mostrar en la tabla
+    const modelos: MutableRefObject<ModeloDTO[]> = useRef<ModeloDTO[]>([]);
+
+    // Define el estado de los países de origen existentes para mostrar en la tabla
+    const paisOrigen: MutableRefObject<PaisDTO[]> = useRef<PaisDTO[]>([]);
+
+    // Define el estado de los proveedores existentes para mostrar en la tabla
+    const proveedores: MutableRefObject<ProveedorDTO[]> = useRef<ProveedorDTO[]>([]);
+
+    // Define el estado de las ubicaciones existentes para mostrar en la tabla
+    const ubicaciones: MutableRefObject<UbicacionDTO[]> = useRef<UbicacionDTO[]>([]);
+
+    // Efecto que se ejecuta al montar el componente (Carga los combobox de filtros)
+    useEffect((): void => {
+
+        // Procedimiento asíncrono auto-ejecutable que actualiza la lista de tipos de equipo y la lista de equipos
+        (async (): Promise<void> => {
+            // Consulta los tipos de equipo y ejecuta un procedimiento con la respuesta
+            await listarTiposEquipo(props.idInstitucion).then((response: TipoEquipoDTO[] | FetchAPIError): void => {
+                if (isFetchAPIError(response)) {
+                    console.error("ERROR - lista de equipos - table.tsx - listarTiposEquipo", response.errorMessage);
+                    return;
+                }
+                // Actualiza la lista de tipos de equipo
+                tiposEquipo.current = response;
+            });
+
+            await listarMarcas(props.idInstitucion).then((response: MarcaDTO[] | FetchAPIError): void => {
+                if (isFetchAPIError(response)) {
+                    console.error("ERROR - lista de equipos - table.tsx - listarMarcas", response.errorMessage);
+                    return;
+                }
+                // Actualiza la lista de marcas
+                marcas.current = response;
+            });
+
+            await listarModelos(props.idInstitucion).then((response: ModeloDTO[] | FetchAPIError): void => {
+                if (isFetchAPIError(response)) {
+                    console.error("ERROR - lista de equipos - table.tsx - listarModelos", response.errorMessage);
+                    return;
+                }
+                // Actualiza la lista de modelos
+                modelos.current = response;
+            });
+
+            await listarPaises(props.idInstitucion).then((response: PaisDTO[] | FetchAPIError): void => {
+                if (isFetchAPIError(response)) {
+                    console.error("ERROR - lista de equipos - table.tsx - listarPaises", response.errorMessage);
+                    return;
+                }
+                // Actualiza la lista de países
+                paisOrigen.current = response;
+            });
+
+            await listarProveedores(props.idInstitucion).then((response: ProveedorDTO[] | FetchAPIError): void => {
+                if (isFetchAPIError(response)) {
+                    console.error("ERROR - lista de equipos - table.tsx - listarProveedores", response.errorMessage);
+                    return;
+                }
+                // Actualiza la lista de proveedores
+                proveedores.current = response;
+            });
+
+            await listarUbicaciones(props.sessionAPIToken).then((response: UbicacionDTO[] | FetchAPIError): void => {
+                if (isFetchAPIError(response)) {
+                    console.error("ERROR - lista de equipos - table.tsx - listarUbicaciones", response.errorMessage);
+                    return;
+                }
+                console.log(response)
+                // Actualiza la lista de ubicaciones
+                ubicaciones.current = response;
+            });
+
+            setLoading(true);
+        })();
+    }, [props]);
+
 
     // Define los términos de búsqueda introducidos por el usuario en tiempo real (searchTerms)
     // y la función para modificarlos (setSearchTerms)
@@ -127,7 +227,7 @@ function TableEquiposFC(props: Readonly<TableEquiposFCProps>): ReactElement {
     //Metodo para calcular paginas disponibles
     function calcularPaginas(): void {
         contarEquipos(props.sessionAPIToken, appliedSearchTerms.filter)
-            .then((response: Number | FetchAPIError) => {
+            .then((response: number | FetchAPIError) => {
                 if (isFetchAPIError(response)) { //Si hay error
                     console.error("ERROR: " + response.errorMessage)
                     return 0;
@@ -146,27 +246,6 @@ function TableEquiposFC(props: Readonly<TableEquiposFCProps>): ReactElement {
             });
     }
 
-    // ----------------------- Lista de tipos de equipo -----------------------
-
-    // Define el estado de los tipos de equipo existentes para mostrar en la tabla
-    const tiposEquipo: MutableRefObject<TipoEquipoDTO[]> = useRef<TipoEquipoDTO[]>([]);
-
-    // Efecto que se ejecuta al montar el componente (Carga los tipos de equipo)
-    useEffect((): void => {
-
-        // Procedimiento asíncrono auto-ejecutable que actualiza la lista de tipos de equipo y la lista de equipos
-        (async (): Promise<void> => {
-            // Consulta los tipos de equipo y ejecuta un procedimiento con la respuesta
-            await listarTiposEquipo(props.idInstitucion).then((response: TipoEquipoDTO[] | FetchAPIError): void => {
-                if (isFetchAPIError(response)) {
-                    console.error("ERROR - lista de equipos - table.tsx - listarTiposEquipo", response.errorMessage);
-                    return;
-                }
-                // Actualiza la lista de tipos de equipo
-                tiposEquipo.current = response;
-            });
-        })();
-    }, [props]);
 
 
     // ----------------------- Eventos de la tabla de equipos -----------------------
@@ -274,7 +353,7 @@ function TableEquiposFC(props: Readonly<TableEquiposFCProps>): ReactElement {
 
     }, [currentPage]); //Cuando cambia la página
 
-
+    if(!loading) return <LoadingPage/>
     return (
         <div className={stylesTable.containerPage}>
             <div className={stylesTable.containerTable}>
@@ -441,6 +520,81 @@ function TableEquiposFC(props: Readonly<TableEquiposFCProps>): ReactElement {
                                 });
                             }}
                         />
+                        <div>
+                            <label>Fecha desde
+                            <input
+                                type="date"
+                                name="fecha_desde"
+                                value={searchTerms.filter.fechaAdquisicionDesde ? searchTerms.filter.fechaAdquisicionDesde.toISOString().split('T')[0] : ''}
+                                onChange={(event: ChangeEvent<HTMLInputElement>): void => {
+                                    setSearchTerms({
+                                        ...searchTerms,
+                                        filter: {
+                                            ...searchTerms.filter,
+                                            fechaAdquisicionDesde: event.target.value ? new Date(event.target.value) : undefined
+                                        }
+                                    });
+                                }}
+                            />
+                            </label>
+                            <label>Fecha hasta
+                                <input type="date"
+                                       name="fecha_hasta"
+                                       value={searchTerms.filter.fechaAdquisicionHasta ? searchTerms.filter.fechaAdquisicionHasta.toISOString().split('T')[0] : ''}
+                                       onChange={(event: ChangeEvent<HTMLInputElement>): void => {
+                                           setSearchTerms({
+                                               ...searchTerms,
+                                               filter: {
+                                                   ...searchTerms.filter,
+                                                   fechaAdquisicionHasta: event.target.value ? new Date(event.target.value) : undefined
+                                               }
+                                           });
+                                       }}
+                                />
+                            </label>
+                        </div>
+                        <ComboBoxFC
+                            message={"Todas las marcas"}
+                            messageSelectable={true}
+                            elements={marcas.current.map((marca: MarcaDTO): {
+                                key: number,
+                                value: string
+                            } => ({
+                                key: marca.id as number,
+                                value: marca.nombre
+                            }))}
+                            onChange={(e: React.ChangeEvent<HTMLSelectElement>): void => {
+                                setSearchTerms({
+                                    ...searchTerms,
+                                    filter: {
+                                        ...searchTerms.filter,
+                                        marca: e.target.value !== "" ? marcas.current.find((marca: MarcaDTO):
+                                        boolean => marca.id === Number(e.target.value))?.nombre : undefined
+                                    }
+                                });
+                            }}
+                        />
+                        <ComboBoxFC
+                            message={"Todos los modelos"}
+                            messageSelectable={true}
+                            elements={modelos.current.map((modelo: ModeloDTO): {
+                                key: number,
+                                value: string
+                            } => ({
+                                key: modelo.id as number,
+                                value: modelo.nombre
+                            }))}
+                            onChange={(e: React.ChangeEvent<HTMLSelectElement>): void => {
+                                setSearchTerms({
+                                    ...searchTerms,
+                                    filter: {
+                                        ...searchTerms.filter,
+                                        modelo: e.target.value !== "" ? modelos.current.find((modelo: ModeloDTO):
+                                        boolean => modelo.id === Number(e.target.value))?.nombre : undefined
+                                    }
+                                });
+                            }}
+                        />
                         <ComboBoxFC
                             message={"Todos los tipos de equipo"}
                             messageSelectable={true}
@@ -458,6 +612,69 @@ function TableEquiposFC(props: Readonly<TableEquiposFCProps>): ReactElement {
                                         ...searchTerms.filter,
                                         tipoEquipo: e.target.value !== "" ? tiposEquipo.current.find((tipo: TipoEquipoDTO):
                                         boolean => tipo.id === Number(e.target.value))?.nombre : undefined
+                                    }
+                                });
+                            }}
+                        />
+                        <ComboBoxFC
+                            message={"Todos los países"}
+                            messageSelectable={true}
+                            elements={paisOrigen.current.map((pais: PaisDTO): {
+                                key: number,
+                                value: string
+                            } => ({
+                                key: pais.id as number,
+                                value: pais.nombre
+                            }))}
+                            onChange={(e: React.ChangeEvent<HTMLSelectElement>): void => {
+                                setSearchTerms({
+                                    ...searchTerms,
+                                    filter: {
+                                        ...searchTerms.filter,
+                                        paisOrigen: e.target.value !== "" ? paisOrigen.current.find((pais: PaisDTO):
+                                        boolean => pais.id === Number(e.target.value))?.nombre : undefined
+                                    }
+                                });
+                            }}
+                        />
+                        <ComboBoxFC
+                            message={"Todos los proveedores"}
+                            messageSelectable={true}
+                            elements={proveedores.current.map((proveedor: ProveedorDTO): {
+                                key: number,
+                                value: string
+                            } => ({
+                                key: proveedor.id as number,
+                                value: proveedor.nombre
+                            }))}
+                            onChange={(e: React.ChangeEvent<HTMLSelectElement>): void => {
+                                setSearchTerms({
+                                    ...searchTerms,
+                                    filter: {
+                                        ...searchTerms.filter,
+                                        proveedor: e.target.value !== "" ? proveedores.current.find((proveedor: ProveedorDTO):
+                                        boolean => proveedor.id === Number(e.target.value))?.nombre : undefined
+                                    }
+                                });
+                            }}
+                        />
+                        <ComboBoxFC
+                            message={"Todas las ubicaciones"}
+                            messageSelectable={true}
+                            elements={ubicaciones.current.map((ubicacion: UbicacionDTO): {
+                                key: number,
+                                value: string
+                            } => ({
+                                key: ubicacion.id as number,
+                                value: ubicacion.nombre
+                            }))}
+                            onChange={(e: React.ChangeEvent<HTMLSelectElement>): void => {
+                                setSearchTerms({
+                                    ...searchTerms,
+                                    filter: {
+                                        ...searchTerms.filter,
+                                        ubicacionActual: e.target.value !== "" ? ubicaciones.current.find((ubicacion: UbicacionDTO):
+                                        boolean => ubicacion.id === Number(e.target.value))?.nombre : undefined
                                     }
                                 });
                             }}

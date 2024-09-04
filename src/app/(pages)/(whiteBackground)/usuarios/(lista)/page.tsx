@@ -69,6 +69,7 @@ const UsuariosPage = async (): Promise<ReactElement> => {
             <Table
                 sessionAPIToken={sessionAPIToken}
                 clientID={clientData.id}
+                client={clientData}
                 perfilCliente={perfilCliente}
                 hasPermissionBaja={hasPermissionBaja}
                 hasPermissionEdit={hasPermissionEdit}
