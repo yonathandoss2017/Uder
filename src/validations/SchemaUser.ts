@@ -83,6 +83,10 @@ const SchemaUser: ZodObject<any> = z.object({
         .email("Ingrese un email válido")
         .max(60, "El tamaño del email no es válido"),
 
+    //Validación del campo perfil
+    idPerfil: z.preprocess(((val): string => val ? String(val) : ''),
+        z.string().optional()),
+
 });
 
 // Exporta el esquema de validación

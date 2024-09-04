@@ -102,6 +102,7 @@ const RegisterUserForm = (props: RegisterUserFormProps) => {
             idInstitucion: props.clientData.idInstitucion,
         };
 
+        console.log(formValues.idPerfil)
         await registrarUsuario(usuario, contrasenia, telefono).then((response: UsuarioDTO | FetchAPIError): void => {
             if (isFetchAPIError(response)) {
                 console.error("ERROR - registro de usuario - form.tsx - registrarUsuario - error: ", response.errorMessage);
@@ -217,7 +218,7 @@ const RegisterUserForm = (props: RegisterUserFormProps) => {
 
                     {errors.telefono && <label className={styles.error}>{errors.telefono.message}</label>}
                 </div>
-                <div className={styles.inputBox} id="Perfil">
+                <div className={styles.inputBox}>
                     <label className={styles.details}>
                         <span>Perfil <span className={styles.requiredField}>*</span></span>
                         <ComboBoxFC
