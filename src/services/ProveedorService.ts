@@ -45,3 +45,64 @@ export async function buscarProveedorPorId (id: number): Promise<ProveedorDTO | 
     // Realiza la petición a la API y retorna el resultado
     return await fetchBodyWithErrorHandling<ProveedorDTO>(url, options);
 }
+
+/**
+ * @param proveedor
+ * @param token
+ * @returns Promise<ProveedorDTO>
+ * @returns Promise<FetchAPIError>
+ */
+export async function agregarProveedor (proveedor: ProveedorDTO, token: string): Promise<ProveedorDTO | FetchAPIError> {
+
+    const url: string = `${SERVICE_PATH}/agregar`;
+    const options: RequestInit = {
+        method: 'POST',
+        headers: {
+            'Authorization': 'Bearer ' + token,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(proveedor)
+    };
+    return await fetchBodyWithErrorHandling<ProveedorDTO>(url, options);
+}
+
+/**
+ * @param proveedor
+ * @param token
+ * @returns Promise<void>
+ * @returns Promise<FetchAPIError>
+ */
+export async function modificarProveedor (proveedor: ProveedorDTO, token: string): Promise<ProveedorDTO | FetchAPIError> {
+    const url: string = `${SERVICE_PATH}/modificar`;
+    const options: RequestInit = {
+        method: 'POST',
+        headers: {
+            'Authorization': 'Bearer ' + token,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(proveedor)
+    };
+    return await fetchBodyWithErrorHandling<ProveedorDTO>(url, options);
+}
+
+/**
+ * @param proveedor
+ * @param token
+ * @returns Promise<void>
+ * @returns Promise<FetchAPIError>
+ */
+export async function darBajaProveedor (proveedor: ProveedorDTO, token: string): Promise<ProveedorDTO | FetchAPIError> {
+    const url: string = `${SERVICE_PATH}/baja`;
+    const options: RequestInit = {
+        method: 'POST',
+        headers: {
+            'Authorization': 'Bearer ' + token,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(proveedor)
+    }
+    return await fetchBodyWithErrorHandling(url, options)
+}
+
+
+
