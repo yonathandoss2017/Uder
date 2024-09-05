@@ -85,7 +85,7 @@ export async function agregarMarca(marca: MarcaDTO, token: String): Promise<Marc
  */
 export async function listarMarcas(
     token: string,
-    size: number = 0,
+    size?: MarcaFilter,
     page: number = 1,
     fieldSort: MarcaFieldSortEnum = MarcaFieldSortEnum.NOMBRE,
     sortDirectionAsc: boolean = true,

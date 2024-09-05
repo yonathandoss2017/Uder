@@ -1,7 +1,6 @@
 
 // Importa zod para la validación de los datos
 import {z, ZodObject} from "zod";
-import SchemaEquipo from "@/validations/SchemaEquipo";
 
 const SchemaMarca: ZodObject<any> = z.object({
 
@@ -14,4 +13,4 @@ const SchemaMarca: ZodObject<any> = z.object({
             }),
 });
 
-export default SchemaEquipo;
+export default SchemaMarca;
