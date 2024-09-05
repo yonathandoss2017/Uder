@@ -39,6 +39,18 @@ const sidebarConfig = [
             },
         ]
     },
+    {
+        title: "Gestiòn de Marca",
+        key: "marcas",
+        submenus: [
+            {
+                title: "Ingreso de Marca", path: "/marcas/agregar", permission: PermisoEnum.ALTA_MARCA
+            },
+            {
+                title: "Listado de Marcas", path: "/marcas", permission: PermisoEnum.OBTENER_MARCA
+            },
+        ]
+    },
 ];
 
 const Sidebar = (): ReactElement | null => {
