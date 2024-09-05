@@ -4,6 +4,8 @@
 import {fetchBodyWithErrorHandling} from "@/utils/ServiceMethods";
 import TipoEquipoDTO from "@/types/dtos/TipoEquipoDTO";
 import FetchAPIError from "@/types/errors/FetchAPIError";
+import EquipoFieldSortEnum from "@/types/enums/EquipoFieldSortEnum";
+import EquipoFilter from "@/types/filters/EquipoFilter";
 
 // URL base de la API REST de la API para los tipos de equipo
 const SERVICE_PATH: string = process.env.NEXT_PUBLIC_BACKEND_API_URL + "/equipos/tipos";
@@ -27,17 +29,24 @@ export async function agregarTipoEquipo(tipoEquipo: TipoEquipoDTO, token: String
 
 /**
  * Función para listar todos los tipos de equipo.
- * @param idInstitucion - ID de la institución a la que pertenecen los tipos de equipo
  * @returns Promise<TipoEquipoDTO[]> - Lista de tipos de equipo
  * @returns Promise<FetchAPIError> - Si ocurre un error en la solicitud o en el procesamiento de la respuesta.
  */
-export async function listarTiposEquipo(idInstitucion: number): Promise<TipoEquipoDTO[] | FetchAPIError> {
-    const url: string = `${SERVICE_PATH}/listar/${idInstitucion}`; // URL de la petición a la API
+export async function listarTiposEquipo(token: string, filter: EquipoFilter = {}): Promise<TipoEquipoDTO[] | FetchAPIError> {
+    // Parámetros de la URL de la petición a la API
+    const queryParams: URLSearchParams = new URLSearchParams({
+        // Parámetros de búsqueda adicionales de filtrado (si existen)
+        ...(!!filter.id && {filter_id: filter.id.toString()}),
+        ...(!!filter.nombre && {filter_nombre: filter.nombre}),
+        ...(filter.activo != undefined && {filter_activo: filter.activo.toString()})
+    });
+    const url: string = `${SERVICE_PATH}/listar?${queryParams}`; // URL de la petición a la API
 
     // Opciones de la petición
     const options: RequestInit = {
         method: 'GET',
         headers: {
+            'Authorization': 'Bearer ' + token, // Cabecera de autorización con el token de sesión
             'Content-Type': 'application/json' // Tipo de contenido JSON
         }
     };

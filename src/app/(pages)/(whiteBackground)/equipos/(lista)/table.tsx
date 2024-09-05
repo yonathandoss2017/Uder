@@ -36,6 +36,7 @@ import LoadingPage from "@/app/(pages)/loading";
  * @property {boolean} hasPermissionEdit Indica si el cliente tiene permisos para modificar equipos
  * @property {boolean} hasPermissionBaja Indica si el cliente tiene permisos para dar de baja equipos
  * @property {boolean} hasPermissionView Indica si el cliente tiene permisos de ver equipos
+ * @property {number} idInstitucion ID de la institución del cliente
  */
 interface TableEquiposFCProps {
     sessionAPIToken: string;
@@ -102,7 +103,7 @@ function TableEquiposFC(props: Readonly<TableEquiposFCProps>): ReactElement {
         // Procedimiento asíncrono auto-ejecutable que actualiza la lista de tipos de equipo y la lista de equipos
         (async (): Promise<void> => {
             // Consulta los tipos de equipo y ejecuta un procedimiento con la respuesta
-            await listarTiposEquipo(props.idInstitucion).then((response: TipoEquipoDTO[] | FetchAPIError): void => {
+            await listarTiposEquipo(props.sessionAPIToken).then((response: TipoEquipoDTO[] | FetchAPIError): void => {
                 if (isFetchAPIError(response)) {
                     console.error("ERROR - lista de equipos - table.tsx - listarTiposEquipo", response.errorMessage);
                     return;
@@ -173,7 +174,7 @@ function TableEquiposFC(props: Readonly<TableEquiposFCProps>): ReactElement {
         filter: {activo: true}
     });
 
-    // Define los términos de búsqueda aplicados en la tabla de usuarios (appliedSearchTerms)
+    // Define los términos de búsqueda aplicados en la tabla de equipos (appliedSearchTerms)
     // y la función para modificarlos (setAppliedSearchTerms)
     const [appliedSearchTerms, setAppliedSearchTerms]: [TableSearchTermsProps, (value: TableSearchTermsProps) => void]
         = useState<TableSearchTermsProps>(searchTerms);
@@ -184,7 +185,7 @@ function TableEquiposFC(props: Readonly<TableEquiposFCProps>): ReactElement {
 
     // Efecto que se ejecuta cuando cambian los términos de búsqueda introducidos por el usuario
     // Reinicia el temporizador para actualizar los términos de búsqueda aplicados con los introducidos por el usuario
-    // (Esto evita que se realicen múltiples actualizaciones en un corto período de tiempo, ósea por cada letra que se escribe o borra)
+    // (Esto evita que se realicen múltiples actualizaciones en un corto período de tiempo, por ejemplo por cada letra que se escribe o borra)
     useEffect((): void => {
         // Si hay un temporizador en ejecución, lo cancela para evitar múltiples ejecuciones
         if (refSearchTermsTimer.current !== null) {
@@ -194,7 +195,7 @@ function TableEquiposFC(props: Readonly<TableEquiposFCProps>): ReactElement {
         // Crea un nuevo temporizador usando requestIdleCallback
         refSearchTermsTimer.current = setTimeout((): void => {
             setAppliedSearchTerms(searchTerms); // Actualiza los términos de búsqueda
-        }, 500); // Establece un temporizador de 0.5 segundo
+        }, 500); // Establece un temporizador de 0.5 segundos
 
     }, [searchTerms]);
 

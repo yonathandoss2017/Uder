@@ -125,7 +125,7 @@ const RegisterEquipoForm: React.FC<RegisterEquipoFormProps> = (props: RegisterEq
 
             // ------------------- Cargar tipos de equipo -------------------
 
-            setTiposEquipo(await listarTiposEquipo(props.clientData.idInstitucion).then((response: TipoEquipoDTO[] | FetchAPIError): TipoEquipoDTO[] => {
+            setTiposEquipo(await listarTiposEquipo(props.sessionAPIToken).then((response: TipoEquipoDTO[] | FetchAPIError): TipoEquipoDTO[] => {
                 if (isFetchAPIError(response)) return [];
                 return response;
             }));
