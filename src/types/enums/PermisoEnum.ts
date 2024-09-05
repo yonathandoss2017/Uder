@@ -33,7 +33,9 @@ enum PermisoEnum {
     OBTENER_UBICACIONES = 30,
     MODIFICAR_UBICACIONES = 31,
     ALTA_MARCA = 32,
-    OBTENER_MARCA = 33,
+    OBTENER_MARCAS = 33,
+    ALTA_PROVEEDOR = 34,
+    OBTENER_PROVEEDORES = 35,
 }
 
 export default PermisoEnum;

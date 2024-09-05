@@ -40,14 +40,26 @@ const sidebarConfig = [
         ]
     },
     {
-        title: "Gestiòn de Marca",
+        title: "Gestión de Marca",
         key: "marcas",
         submenus: [
             {
                 title: "Ingreso de Marca", path: "/marcas/agregar", permission: PermisoEnum.ALTA_MARCA
             },
             {
-                title: "Listado de Marcas", path: "/marcas", permission: PermisoEnum.OBTENER_MARCA
+                title: "Listado de Marcas", path: "/marcas", permission: PermisoEnum.OBTENER_MARCAS
+            },
+        ]
+    },
+    {
+        title: "Gestión de Proveedores",
+        key: "proveedores",
+        submenus: [
+            {
+                title: "Ingreso de Proveedor", path: "/proveedores/agregar", permission: PermisoEnum.ALTA_PROVEEDOR
+            },
+            {
+                title: "Listado de Marcas", path: "/proveedores", permission: PermisoEnum.OBTENER_PROVEEDORES
             },
         ]
     },
