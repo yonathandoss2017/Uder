@@ -16,26 +16,38 @@ import FetchAPIError, {isFetchAPIError} from "@/types/errors/FetchAPIError";
 const sidebarConfig = [
     {title: "Panel Principal", path: "/"},
     {
-        title: "Gestión de Usuarios",
+        title: "Gestión Usuarios",
         key: "usuarios",
         submenus: [
             {
-                title: "Registro de Usuarios", path: "/usuarios/registrar", permission: PermisoEnum.REACTIVAR_USUARIO
+                title: "Registro Usuarios", path: "/usuarios/registrar", permission: PermisoEnum.REACTIVAR_USUARIO
             },
             {
-                title: "Listado de Usuarios", path: "/usuarios", permission: PermisoEnum.OBTENER_USUARIOS
+                title: "Listado Usuarios", path: "/usuarios", permission: PermisoEnum.OBTENER_USUARIOS
             },
         ]
     },
     {
-        title: "Gestión de Equipos",
+        title: "Gestión Equipos",
         key: "equipos",
         submenus: [
             {
-                title: "Ingreso de Equipo", path: "/equipos/agregar", permission: PermisoEnum.ALTA_EQUIPO
+                title: "Registro Equipos", path: "/equipos/agregar", permission: PermisoEnum.ALTA_EQUIPO
             },
             {
-                title: "Listado de Equipos", path: "/equipos", permission: PermisoEnum.OBTENER_EQUIPOS
+                title: "Listado Equipos", path: "/equipos", permission: PermisoEnum.OBTENER_EQUIPOS
+            },
+        ]
+    },
+    {
+        title: "Gestión Tipos Equipo",
+        key: "tiposEquipo",
+        submenus: [
+            {
+                title: "Registro Tipos Equipo", path: "/tiposEquipos/agregar", permission: PermisoEnum.ALTA_TIPO_EQUIPO
+            },
+            {
+                title: "Listado Tipos Equipo", path: "/tiposEquipos", permission: PermisoEnum.OBTENER_TIPO_EQUIPOS
             },
         ]
     },
