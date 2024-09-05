@@ -8,6 +8,23 @@ import FetchAPIError from "@/types/errors/FetchAPIError";
 // URL base de la API REST de la API para los tipos de equipo
 const SERVICE_PATH: string = process.env.NEXT_PUBLIC_BACKEND_API_URL + "/equipos/tipos";
 
+export async function agregarTipoEquipo(tipoEquipo: TipoEquipoDTO, token: String): Promise<TipoEquipoDTO | FetchAPIError> {
+    const url: string = `${SERVICE_PATH}/agregar`; // URL de la petición a la API
+
+    // Opciones de la petición
+    const options: RequestInit = {
+        method: 'POST',
+        headers: {
+            'Authorization': 'Bearer ' + token, // Token de autenticación
+            'Content-Type': 'application/json' // Tipo de contenido JSON
+        },
+        body: JSON.stringify(tipoEquipo) // Cuerpo de la petición, datos del tipo de equipo
+    };
+
+    // Realiza la petición a la API y retorna el resultado
+    return await fetchBodyWithErrorHandling<TipoEquipoDTO>(url, options);
+}
+
 /**
  * Función para listar todos los tipos de equipo.
  * @param idInstitucion - ID de la institución a la que pertenecen los tipos de equipo

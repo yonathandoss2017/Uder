@@ -32,6 +32,11 @@ enum PermisoEnum {
     BAJA_UBICACION = 29,
     OBTENER_UBICACIONES = 30,
     MODIFICAR_UBICACIONES = 31,
+    ALTA_TIPO_EQUIPO = 32,
+    OBTENER_TIPO_EQUIPOS = 33,
+    MODIFICAR_TIPO_EQUIPO = 34,
+    BAJA_TIPO_EQUIPO = 35
+
 }
 
 export default PermisoEnum;
