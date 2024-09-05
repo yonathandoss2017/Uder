@@ -1,3 +1,5 @@
+"use client";  // Este es un componente del lado del cliente
+
 import React from "react";
 import { useForm, SubmitHandler, UseFormReturn } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -5,7 +7,7 @@ import MarcaDTO from "@/types/dtos/MarcaDTO";
 import UsuarioDTO from "@/types/dtos/UsuarioDTO";
 import { useModal } from "@/app/hooks/modals/useModal";
 import { agregarMarca } from "@/services/MarcaService";
-import { isFetchAPIError } from "@/types/errors/FetchAPIError";
+import FetchAPIError, { isFetchAPIError } from "@/types/errors/FetchAPIError";
 import { ModalButtonsType } from "@/components/ModalFC";
 import SchemaMarca from "@/validations/SchemaMarca";
 import styles from "@public/styles/modules/register.equipo.module.css";
@@ -32,14 +34,17 @@ const RegisterMarcaForm: React.FC<RegisterMarcaFormProps> = (props: RegisterMarc
     const { createModal } = useModal();
 
     // -------------------- Formulario de registro de marca --------------------
+
     // Obtenemos los métodos y propiedades necesarios del hook useForm para el formulario
     const {
         register,               // Método para registrar los inputs del formulario
         handleSubmit,           // Método para manejar el envío del formulario
         formState: { errors },  // Propiedad que contiene los errores del formulario
+        reset
     }: UseFormReturn<FormValues> = useForm<FormValues>({
         resolver: zodResolver(SchemaMarca), // Usamos zodResolver para la validación del formulario
         mode: "all", // Validación en cada cambio de valor y al salir del campo
+        defaultValues: {}
     });
 
     // Función que se ejecuta al enviar el formulario
@@ -51,7 +56,7 @@ const RegisterMarcaForm: React.FC<RegisterMarcaFormProps> = (props: RegisterMarc
         };
 
         // Se registra la marca en la API
-        const response = await agregarMarca(nuevoMarcaDTO, props.sessionAPIToken);
+        const response: MarcaDTO | FetchAPIError = await agregarMarca(nuevoMarcaDTO, props.sessionAPIToken);
 
         // Se verifica si hay un error en la respuesta
         if (isFetchAPIError(response)) {
@@ -99,7 +104,6 @@ const RegisterMarcaForm: React.FC<RegisterMarcaFormProps> = (props: RegisterMarc
                         <label className={styles.error}>{errors.nombre.message}</label>
                     )}
                 </div>
-
                 <div className={styles.buttomAe}>
                     <button type="submit">Guardar</button>
                 </div>
