@@ -17,6 +17,8 @@ import {darBajaEquipo} from "@/services/EquiposService";
  * Propiedades del componente
  * @property {equipo} EquipoDTO Equipo a dar de baja
  * @property {string} sessionAPIToken Token de sesión del cliente en la API
+ * @property {function} onSave Función que se ejecuta al guardar los cambios
+ * @property {function} onCancel Función que se ejecuta al cancelar la baja
  */
 interface ModalBajaEquipoFCProps {
     equipo: EquipoDTO;

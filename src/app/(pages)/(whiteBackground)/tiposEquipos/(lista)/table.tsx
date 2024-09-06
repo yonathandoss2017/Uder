@@ -1,12 +1,15 @@
 "use client";
 
-import React, {MutableRefObject, ReactElement, useEffect, useRef, useState} from "react";
+import React, {ChangeEvent, MutableRefObject, ReactElement, useEffect, useRef, useState} from "react";
 import {useModal} from "@/app/hooks/modals/useModal";
 import TipoEquipoDTO from "@/types/dtos/TipoEquipoDTO";
 import FetchAPIError, {isFetchAPIError} from "@/types/errors/FetchAPIError";
-import {listarTiposEquipo} from "@/services/TipoEquipoService";
+import {darBajaTipoEquipo, listarTiposEquipo} from "@/services/TipoEquipoService";
 import TipoEquipoFilter from "@/types/filters/TipoEquipoFilter";
 import stylesTable from "@public/styles/modules/table/table.equipos.module.css";
+import {ModalInstance} from "@/app/hooks/modals/ModalProvider";
+import EditTipoEquipoForm from "@/app/(pages)/(whiteBackground)/tiposEquipos/(lista)/formEdit";
+import {ModalButtonsType} from "@/components/ModalFC";
 
 /**
  *  Propiedades del componente TableTiposEquiposFC
@@ -89,15 +92,129 @@ function TableTiposEquiposFC(props: Readonly<TableTiposEquipoFCProps>): ReactEle
 
             // Si ocurre un error en la solicitud, muestra un mensaje de error en la consola y no hace nada
             if (isFetchAPIError(response)) {
-                console.error("ERROR - lista de equipos - table.tsx - listarEquipos", response.errorMessage);
+                const errorMessage: string = response.errorMessage;
+                console.error("ERROR - lista de equipos - table.tsx - listarEquipos", errorMessage);
                 return;
             }
-
             // Guarda la lista de equipos
             setTiposEquipos(response);
         })();
 
     }, [appliedSearchTerms]);
+
+    // Procedimiento que se ejecuta al hacer clic en el botón 'Modificar'
+    async function handleEditClick (tipoEquipo: TipoEquipoDTO): Promise<void> {
+        if (!props.hasPermissionEdit) {return} // Si el cliente no tiene permisos para modificar, no hace nada
+
+        // Crea un modal para modificar el tipo de equipo
+         const modalModificar: ModalInstance = createModal({
+            children: (
+                <EditTipoEquipoForm
+                    sessionAPIToken={props.sessionAPIToken}
+                    idInstitucion={props.idInstitucion}
+                    editingTipoEquipo={tipoEquipo}
+                    onSave={(tipoEquipoModified: TipoEquipoDTO): void => {
+                        if (tiposEquipos) {
+                            // Actualiza el equipo en la lista
+                            setTiposEquipos(tiposEquipos.map((tipoEquipo: TipoEquipoDTO): TipoEquipoDTO => {
+                                if (tipoEquipoModified.id === tipoEquipo.id) {
+                                    return tipoEquipoModified;
+                                }
+                                return tipoEquipo;
+                            }));
+                        }
+
+                        modalModificar.close(); // Cierra el modal
+
+                        // Refresca la lista volviendo a cargar los términos de búsqueda después de 3 segundos
+                        refSearchTermsTimer.current = setTimeout((): void => {
+                            setAppliedSearchTerms({...appliedSearchTerms}); // Actualiza los términos de búsqueda
+                        }, 1000);
+                    }}
+                    onCancel={(): void => {
+                        createModal({
+                            children: (
+                                <p>¿Estás seguro de que deseas cancelar la modificación del equipo?</p>
+                            ),
+                            buttonsType: ModalButtonsType.CONFIRM_CANCEL,
+                            onConfirm: (): void => {
+                                modalModificar.close()
+                            }
+                        }).show();
+                    }}
+                />
+            ),
+            buttonsType: ModalButtonsType.NONE
+        });
+
+        modalModificar.show();
+    }
+
+    // Procedimiento que se ejecuta al hacer clic en el botón 'Eliminar'
+    const handleEliminarClick = (tipoEquipoSelected: TipoEquipoDTO): void => {
+        if (!props.hasPermissionBaja) { // Si el cliente no tiene permisos para dar de baja, muestra un mensaje de error
+            createModal({
+                children: (
+                    <p>No tienes permisos para dar de baja tipos de equipos</p>
+                ),
+                buttonsType: ModalButtonsType.CONFIRM
+            }).show();
+
+            return;
+        }
+
+        // Crea un modal para confirmar la baja del tipo de equipo
+        createModal({
+            title: "Dando de baja a \"" + tipoEquipoSelected.nombre + "\"",
+            children: (
+                <>
+                    <p>Estas por dar de baja el tipo de equipo <b>&quot;{tipoEquipoSelected.nombre}&quot;</b>.</p>
+                    <p>¿Desea continuar?</p>
+                </>
+            ),
+            buttonsType: ModalButtonsType.CONFIRM_CANCEL,
+            async onConfirm(): Promise<void> { //Acción al confirmar
+                // Realiza la baja del tipo de equipo en la API
+                const response: void | FetchAPIError = await darBajaTipoEquipo(tipoEquipoSelected.id as number, props.sessionAPIToken);
+                if (isFetchAPIError(response)){
+                    // Si ocurre un error en la solicitud, muestra un mensaje de error
+                    const errorMessage: string = response.errorMessage;
+                    createModal({
+                        children: (
+                            <p>Error al dar de baja el tipo de equipo: {errorMessage}</p>
+                        ),
+                        buttonsType: ModalButtonsType.CONFIRM
+                    }).show();
+                    console.error('ERROR - Dar de baja Tipo de Equipo - table.tsx - handleEliminarClick - darBajaTipoEquipo', response);
+                    return;
+                }
+
+                tipoEquipoSelected.activo = false; // Actualiza el estado del tipo de equipo a inactivo
+
+                // Muestra un mensaje de éxito al dar de baja el tipo de equipo
+                createModal({
+                    children: (
+                        <p>Tipo de equipo con nombre: &quot;{tipoEquipoSelected.nombre}&quot; dado de baja correctamente</p>
+                    ),
+                    buttonsType: ModalButtonsType.CONFIRM
+                }).show();
+
+                refSearchTermsTimer.current = setTimeout((): void => {
+                    setAppliedSearchTerms({...appliedSearchTerms}); // Actualiza los términos de búsqueda
+                }, 1000);
+            },
+            onCancel(): void { //Acción al cancelar
+                // Muestra un mensaje de cancelación
+                createModal({
+                    title: "Baja Cancelada",
+                    children: (
+                        <p>Baja cancelada</p>
+                    ),
+                    buttonsType: ModalButtonsType.CONFIRM
+                }).show();
+            }
+        }).show();
+    }
 
     return(
         <div className={stylesTable.containerPage}>
@@ -115,10 +232,93 @@ function TableTiposEquiposFC(props: Readonly<TableTiposEquipoFCProps>): ReactEle
                             {tiposEquipos.map((tiposEquipo: TipoEquipoDTO) => (
                                 <tr key={tiposEquipo.id}>
                                     <td>{tiposEquipo.nombre}</td>
+                                    {props.hasPermissionEdit ?
+                                        <td>
+                                            <button onClick={() => handleEditClick(tiposEquipo)}>Modificar</button>
+                                        </td>
+                                        :
+                                        <td></td>
+                                    }
+                                    {props.hasPermissionBaja ?
+                                        <td>
+                                            <button onClick={(): void => handleEliminarClick(tiposEquipo)}>Eliminar
+                                            </button>
+                                        </td>
+                                        :
+                                        <td></td>
+                                    }
                                 </tr>
+
                             ))}
                             </tbody>
                         </table>) : <h3>No se encontraron equipos</h3>}
+                </div>
+                <div className={stylesTable.filtersContainer}>
+                    <div className={stylesTable.filtersContainerInputs}>
+                        <input
+                            type="text"
+                            name="nombre"
+                            placeholder="Buscar por nombre"
+                            value={searchTerms.filter.nombre ? searchTerms.filter.nombre : ''}
+                            onChange={(event: ChangeEvent<HTMLInputElement>): void => {
+                                setSearchTerms({
+                                    ...searchTerms,
+                                    filter: {
+                                        ...searchTerms.filter,
+                                        nombre: event.target.value ? event.target.value : undefined
+                                    }
+                                });
+                            }}
+                        />
+                    </div>
+                </div>
+                <div className={stylesTable.filtersContainerButtons}>
+                    <label>
+                        <input
+                            type="radio"
+                            name="activo"
+                            value="true"
+                            checked={searchTerms.filter.activo === true}
+                            onChange={(): void => {
+                                setSearchTerms({
+                                    ...searchTerms,
+                                    filter: {
+                                        ...searchTerms.filter,
+                                        activo: true
+                                    }
+                                });
+                            }}/>Activos</label>
+                    <label>
+                        <input
+                            type="radio"
+                            name="activo"
+                            value="false"
+                            checked={searchTerms.filter.activo === false}
+                            onChange={(): void => {
+                                setSearchTerms({
+                                    ...searchTerms,
+                                    filter: {
+                                        ...searchTerms.filter,
+                                        activo: false
+                                    }
+                                });
+                            }}/>Dados de baja</label>
+                    <label>
+                        <input
+                            type="radio"
+                            name="activo"
+                            value="undefined"
+                            checked={searchTerms.filter.activo === undefined}
+                            onChange={(): void => {
+                                setSearchTerms({
+                                    ...searchTerms,
+                                    filter: {
+                                        ...searchTerms.filter,
+                                        activo: undefined
+                                    }
+                                });
+                            }}
+                        />Todos</label>
                 </div>
             </div>
         </div>

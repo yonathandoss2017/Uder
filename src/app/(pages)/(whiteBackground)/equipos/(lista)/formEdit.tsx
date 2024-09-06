@@ -180,7 +180,7 @@ function EditEquipoForm(props: Readonly<EditEquipoFormProps>): ReactElement {
 
             // ------------------- Cargar tipos de equipo -------------------
 
-            setTiposEquipo(await listarTiposEquipo(props.idInstitucion).then((response: TipoEquipoDTO[] | FetchAPIError): TipoEquipoDTO[] => {
+            setTiposEquipo(await listarTiposEquipo(props.sessionAPIToken).then((response: TipoEquipoDTO[] | FetchAPIError): TipoEquipoDTO[] => {
                 if (isFetchAPIError(response)) {
                     console.error("ERROR - Modificar Equipo - listarTiposEquipo: ", response);
                     return [];
@@ -344,7 +344,7 @@ function EditEquipoForm(props: Readonly<EditEquipoFormProps>): ReactElement {
                     });
                 }
 
-                // Muestra un mensaje de éxito al modificar el usuario
+                // Muestra un mensaje de éxito al modificar el equipo
                 createModal({
                     children: (
                         <p>Equipo con número de serie: &quot;{props.editingEquipo.numSerie}&quot; modificado
