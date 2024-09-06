@@ -4,34 +4,10 @@
 import {fetchBodyWithErrorHandling, fetchVoidWithErrorHandling} from "@/utils/ServiceMethods";
 import MarcaDTO from "@/types/dtos/MarcaDTO";
 import FetchAPIError from "@/types/errors/FetchAPIError";
-import MarcaFieldSortEnum from "@/types/enums/MarcaFieldSortEnum";
 import MarcaFilter from "@/types/filters/MarcaFilter";
-import EquipoDTO from "@/types/dtos/EquipoDTO";
-import EquipoFilter from "@/types/filters/EquipoFilter";
-import TipoEquipoDTO from "@/types/dtos/TipoEquipoDTO";
 
 // URL base de la API REST de la API para las marcas
 const SERVICE_PATH: string = process.env.NEXT_PUBLIC_BACKEND_API_URL + "/marcas";
-
-
-/**
- * Función para listar todas las marcas.
- * @param idInstitucion - ID de la institución a la que pertenecen las marcas
- * @returns Promise<MarcaDTO[]> - Lista de marcas
- * @returns Promise<FetchAPIError> - Si ocurre un error en la solicitud o en el procesamiento de la respuesta.
- */
-/*export async function listarMarcas(idInstitucion: number): Promise<MarcaDTO[] | FetchAPIError> {
-    const url: string = `${SERVICE_PATH}/listar/${idInstitucion}`; // URL de la petición a la API
-    const options: RequestInit = { // Opciones de la petición
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json' // Tipo de contenido JSON
-        }
-    };
-
-    // Realiza la petición a la API y retorna el resultado
-    return await fetchBodyWithErrorHandling<MarcaDTO[]>(url, options);
-}*/
 
 /**
  * Función para buscar por id.
@@ -129,20 +105,19 @@ export async function modificarMarca(marca: MarcaDTO, token: string): Promise<vo
 
 /**
  * Funciòn para dar baja marca
- * @param bajaMarca
+ * @param id
  * @param token
  * @returns Promise<void> - Si la solicitud se realiza correctamente.
  * @returns Promise<FetchAPIError> - Si ocurre un error en la solicitud o en el procesamiento de la respuesta.
  */
-export async function darBajaMarca(bajaMarca: MarcaDTO, token: string): Promise<void | FetchAPIError>{
-    const url: string = `${SERVICE_PATH}/baja`; // URL de la petición a la API
+export async function darBajaMarca(id: number, token: string): Promise<void | FetchAPIError> {
+    const url: string = `${SERVICE_PATH}/baja/${id}`; // URL de la petición a la API
     const options: RequestInit = { // Opciones de la petición
         method: 'POST',
         headers: {
             'Authorization': 'Bearer ' + token, // Cabecera de autorización con el token de sesión
             'Content-Type': 'application/json' // Tipo de contenido JSON
-        },
-        body: JSON.stringify(bajaMarca) // Cuerpo de la petición con los datos de baja del equipo
+        }
     };
 
     // Realiza la petición a la API y retorna el resultado

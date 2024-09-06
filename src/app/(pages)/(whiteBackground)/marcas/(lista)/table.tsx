@@ -1,13 +1,14 @@
+"use client";
+
 import MarcaFilter from "@/types/filters/MarcaFilter";
 import React, {ChangeEvent, MutableRefObject, ReactElement, useEffect, useRef, useState} from "react";
 import { useModal } from "@/app/hooks/modals/useModal";
 import MarcaDTO from "@/types/dtos/MarcaDTO";
 import FetchAPIError, { isFetchAPIError } from "@/types/errors/FetchAPIError";
-import { listarMarcas } from "@/services/MarcaService";
+import {darBajaMarca, listarMarcas} from "@/services/MarcaService";
 import stylesTable from "@public/styles/modules/table/table.equipos.module.css";
 import {ModalInstance} from "@/app/hooks/modals/ModalProvider";
 import {ModalButtonsType} from "@/components/ModalFC";
-import {darBajaTipoEquipo} from "@/services/TipoEquipoService";
 import EditMarcaForm from "@/app/(pages)/(whiteBackground)/marcas/(lista)/formEdit";
 
 
@@ -149,7 +150,7 @@ function TableMarcaFC(props: Readonly<TableMarcaFCProps>): ReactElement {
                 buttonsType: ModalButtonsType.CONFIRM_CANCEL,
                 async onConfirm(): Promise<void> { //Acción al confirmar
                     // Realiza la baja de marca en la API
-                    const response: void | FetchAPIError = await darBajaTipoEquipo(marcaSelected.id as number, props.sessionAPIToken);
+                    const response: void | FetchAPIError = await darBajaMarca(marcaSelected.id as number, props.sessionAPIToken);
                     if (isFetchAPIError(response)) {
                         // Si ocurre un error en la solicitud, muestra un mensaje de error
                         const errorMessage: string = response.errorMessage;
