@@ -6,6 +6,15 @@ import FetchAPIError, { isFetchAPIError } from "@/types/errors/FetchAPIError";
 import { listarMarcas } from "@/services/MarcaService";
 import stylesTable from "@public/styles/modules/table/table.equipos.module.css";
 
+/**
+ *  Propiedades del componente TableTiposEquiposFC
+ *  @interface TableMarcaFCProps
+ *  @property {string} sessionAPIToken - Token de la sesión del cliente en la API
+ *  @property {boolean} hasPermissionEdit - Indica si el cliente tiene permisos para editar
+ *  @property {boolean} hasPermissionBaja - Indica si el cliente tiene permisos para dar de baja
+ *  @property {boolean} hasPermissionView - Indica si el cliente tiene permisos para ver
+ *  @property {number} idInstitucion - ID de la institución del cliente
+ **/
 interface TableMarcaFCProps {
     sessionAPIToken: string;
     hasPermissionEdit: boolean;
@@ -19,13 +28,19 @@ interface TableSearchTermsProps {
 }
 
 function TableMarcaFC(props: Readonly<TableMarcaFCProps>): ReactElement {
+
+    // ----------------------- Modales -----------------------
     const {createModal} = useModal();
 
-    const [searchTerms] = useState<TableSearchTermsProps>({
-        filter: { activo: true },
+    // ----------------------- Términos de búsqueda  -----------------------
+    const [searchTerms, setSearchTerms]: [TableSearchTermsProps, (value: TableSearchTermsProps) => void]
+        = useState<TableSearchTermsProps>({
+        filter: {activo: true}
     });
 
-    const [appliedSearchTerms, setAppliedSearchTerms] = useState<TableSearchTermsProps>(searchTerms);
+    const [appliedSearchTerms, setAppliedSearchTerms]: [TableSearchTermsProps, (value: TableSearchTermsProps) => void]
+        = useState<TableSearchTermsProps>(searchTerms);
+
     const refSearchTermsTimer: MutableRefObject<NodeJS.Timeout | null> = useRef<NodeJS.Timeout | null>(null);
 
     useEffect((): void => {

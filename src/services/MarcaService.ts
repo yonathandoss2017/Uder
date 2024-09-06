@@ -7,6 +7,8 @@ import FetchAPIError from "@/types/errors/FetchAPIError";
 import MarcaFieldSortEnum from "@/types/enums/MarcaFieldSortEnum";
 import MarcaFilter from "@/types/filters/MarcaFilter";
 import EquipoDTO from "@/types/dtos/EquipoDTO";
+import EquipoFilter from "@/types/filters/EquipoFilter";
+import TipoEquipoDTO from "@/types/dtos/TipoEquipoDTO";
 
 // URL base de la API REST de la API para las marcas
 const SERVICE_PATH: string = process.env.NEXT_PUBLIC_BACKEND_API_URL + "/marcas";
@@ -75,41 +77,22 @@ export async function agregarMarca(marca: MarcaDTO, token: String): Promise<Marc
 /**
  * Función listar todas las marcas
  * @param token
- * @param size
- * @param page
- * @param fieldSort
- * @param sortDirectionAsc
  * @param filter
  * @returns Promise<MarcaDTO[]> - Lista de marcas recuperadas de la API
  * @returns Promise<FetchAPIError> - Si ocurre un error en la solicitud o en el procesamiento de la respuesta.
  */
-export async function listarMarcas(
-    token: string,
-    size?: MarcaFilter,
-    page: number = 1,
-    fieldSort: MarcaFieldSortEnum = MarcaFieldSortEnum.NOMBRE,
-    sortDirectionAsc: boolean = true,
-    filter: MarcaFilter = {}
-): Promise<MarcaDTO[] | FetchAPIError> { // Cambiado a MarcaDTO[] para coincidir con la documentación
-
+export async function listarMarcas(token: string, filter: MarcaFilter = {}): Promise<MarcaDTO[] | FetchAPIError> {
     // Parámetros de la URL de la petición a la API
     const queryParams: URLSearchParams = new URLSearchParams({
-        size: size.toString(),
-        page: page.toString(),
-        fieldSort: fieldSort,
-        sortDirectionAsc: sortDirectionAsc.toString(),
-
         // Parámetros de búsqueda adicionales de filtrado (si existen)
-        ...(filter.id !== undefined && { filter_id: filter.id.toString() }),
-        ...(filter.nombre && { filter_nombre: filter.nombre }),
-        ...(filter.activo !== undefined && { filter_activo: filter.activo.toString() }),
-        ...(filter.institucion && { filter_institucion: filter.institucion })
+        ...(!!filter.id && {filter_id: filter.id.toString()}),
+        ...(!!filter.nombre && {filter_nombre: filter.nombre}),
+        ...(filter.activo != undefined && {filter_activo: filter.activo.toString()})
     });
+    const url: string = `${SERVICE_PATH}/listar?${queryParams}`; // URL de la petición a la API
 
-    // URL de la petición a la API
-    const url: string = `${SERVICE_PATH}/listar?${queryParams}`;
-
-    const options: RequestInit = { // Opciones de la petición
+    // Opciones de la petición
+    const options: RequestInit = {
         method: 'GET',
         headers: {
             'Authorization': 'Bearer ' + token, // Cabecera de autorización con el token de sesión

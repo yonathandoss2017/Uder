@@ -19,7 +19,12 @@ interface FormValues {
     idInstitucion: number;
 }
 
-// Props del componente
+/**
+ * Propiedades del componente
+ *
+ * @property {string} sessionAPIToken Token de sesión del cliente en la API
+ * @property {UsuarioDTO} clientData Datos del usuario cliente (Usuario que está editando)
+ */
 interface RegisterMarcaFormProps {
     sessionAPIToken: string;
     clientData: UsuarioDTO;
@@ -87,14 +92,14 @@ const RegisterMarcaForm: React.FC<RegisterMarcaFormProps> = (props: RegisterMarc
 
     // ---------------------- Renderizado del formulario ----------------------
     return (
-        <form onSubmit={handleSubmit(onSubmit)} className={styles.marcaForm}>
+        <form onSubmit={handleSubmit(onSubmit)} className={styles.equipoForm}>
             <h2>Registro de Marca</h2>
             <div className={styles.userDetailsRe}>
                 <div className={styles.inputBoxRe}>
                     <label className={styles.details}>
                         <span>Nombre <span className={styles.requiredField}>*</span></span>
                         <input
-                            {...register("nombre", { required: "Este campo es requerido" })}
+                            {...register("nombre", {required: "Este campo es requerido"})}
                             type="text"
                             placeholder="Nombre Marca"
                         />
