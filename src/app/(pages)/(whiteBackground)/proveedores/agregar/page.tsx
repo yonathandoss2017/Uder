@@ -1,4 +1,4 @@
-import styles from "@public/styles/modules/register.user.module.css";
+import styles from "@public/styles/modules/register.equipo.module.css";
 import {Metadata} from "next";
 import {getServerSession, Session} from "next-auth";
 import authOptions from "@/utils/authOptions";

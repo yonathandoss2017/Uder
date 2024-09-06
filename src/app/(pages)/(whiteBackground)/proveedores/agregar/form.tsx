@@ -6,15 +6,12 @@ import ProveedorDTO from "@/types/dtos/ProveedorDTO";
 import {useModal} from "@/app/hooks/modals/useModal";
 import {SubmitHandler, useForm, UseFormReturn} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
-import styles from "@public/styles/modules/register.user.module.css";
-import SchemaProveedor from "@/validations/SchemaProveedor"; // Cambia a tu esquema Zod para Proveedor
+import styles from "@public/styles/modules/register.tiposequipo.module.css"; // Cambiar el archivo CSS para usar el mismo
+import SchemaProveedor from "@/validations/SchemaProveedor";
 import FetchAPIError, {isFetchAPIError} from "@/types/errors/FetchAPIError";
 import {agregarProveedor} from "@/services/ProveedorService";
 import {ModalButtonsType} from "@/components/ModalFC";
 
-/**
- * Propiedades del componente
- */
 interface RegisterProveedorFormProps {
     sessionAPIToken: string;
     clientData: UsuarioDTO;
@@ -22,9 +19,6 @@ interface RegisterProveedorFormProps {
 
 interface FormValues extends ProveedorDTO {}
 
-/**
- * Formulario de registro de proveedores
- */
 const RegisterProveedorForm: React.FC<RegisterProveedorFormProps> = (props: RegisterProveedorFormProps) => {
     const {createModal} = useModal();
 
@@ -34,7 +28,7 @@ const RegisterProveedorForm: React.FC<RegisterProveedorFormProps> = (props: Regi
         formState: {errors},
         reset
     }: UseFormReturn<FormValues> = useForm<FormValues>({
-        resolver: zodResolver(SchemaProveedor), // Cambia el esquema por el de Proveedor
+        resolver: zodResolver(SchemaProveedor),
         mode: 'all',
         defaultValues: {}
     });
