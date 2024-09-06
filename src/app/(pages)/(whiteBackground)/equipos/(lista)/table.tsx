@@ -265,7 +265,6 @@ function TableEquiposFC(props: Readonly<TableEquiposFCProps>): ReactElement {
     const handleEditClick = (equipo: EquipoDTO): void => {
         if (!props.hasPermissionEdit) return; // Si el cliente no tiene permisos para modificar, no hace nada
 
-
         const modalModificar: ModalInstance = createModal({
             children: (
                 <EditEquipoForm

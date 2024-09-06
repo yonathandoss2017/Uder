@@ -114,6 +114,10 @@ function EditUserForm(props: Readonly<EditUserFormProps>): ReactElement {
         if (formValues.segundoNombre === "") formValues.segundoNombre = undefined;
         if (formValues.segundoApellido === "") formValues.segundoApellido = undefined;
 
+        if (!formValues.idPerfil) {
+            formValues.idPerfil = undefined;
+        }
+
         const userModified: UsuarioDTO = {
             ...props.editingUser, // Copia los datos originales del usuario (id, nombreUsuario, etc.)
             ...formValues // Copia los datos modificados del usuario (primerNombre, segundoNombre, etc.)
