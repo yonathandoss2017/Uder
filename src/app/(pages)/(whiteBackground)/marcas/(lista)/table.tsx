@@ -1,3 +1,5 @@
+"use client";
+
 import MarcaFilter from "@/types/filters/MarcaFilter";
 import React, {ChangeEvent, MutableRefObject, ReactElement, useEffect, useRef, useState} from "react";
 import { useModal } from "@/app/hooks/modals/useModal";
