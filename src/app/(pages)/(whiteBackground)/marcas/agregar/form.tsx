@@ -56,7 +56,7 @@ const RegisterMarcaForm: React.FC<RegisterMarcaFormProps> = (props: RegisterMarc
     const onSubmit: SubmitHandler<FormValues> = async (formValues: FormValues): Promise<void> => {
         const nuevoMarcaDTO: MarcaDTO = {
             nombre: formValues.nombre,
-            activo: formValues.activo,
+            activo: true,
             idInstitucion: props.clientData.idInstitucion,
         };
 
@@ -88,6 +88,8 @@ const RegisterMarcaForm: React.FC<RegisterMarcaFormProps> = (props: RegisterMarc
             ),
             buttonsType: ModalButtonsType.CONFIRM,
         }).show();
+
+        reset();
     };
 
     // ---------------------- Renderizado del formulario ----------------------

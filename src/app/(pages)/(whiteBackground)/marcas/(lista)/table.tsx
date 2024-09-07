@@ -59,6 +59,7 @@ function TableMarcaFC(props: Readonly<TableMarcaFCProps>): ReactElement {
         }, 500);
     }, [searchTerms]);
 
+    // ----------------------- Lista de marcas -----------------------
     const [marcas, setMarca] = useState<MarcaDTO[]>([]);
 
     useEffect((): void => {
