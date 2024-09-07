@@ -11,6 +11,11 @@ enum OperacionEnum {
     BAJA_USUARIO = 7,
     REACTIVAR_USUARIO = 8,
     MODIFICAR_USUARIO_PROPIO = 9,
+    ALTA_USUARIO =10,
+    ALTA_TIPO_EQUIPO = 11,
+    MODIFICAR_TIPO_EQUIPO =12,
+    BAJA_TIPO_EQUIPO = 13
+
 }
 
 /**
@@ -38,6 +43,14 @@ export function translateOperacionEnum(operacionEnum: OperacionEnum | string): s
             return "Reactivación de usuario";
         case OperacionEnum.MODIFICAR_USUARIO_PROPIO:
             return "Modificación de usuario propio";
+        case OperacionEnum.ALTA_USUARIO:
+            return "Alta de usuario";
+        case OperacionEnum.ALTA_TIPO_EQUIPO:
+            return "Alta de tipo de equipo";
+        case OperacionEnum.MODIFICAR_TIPO_EQUIPO:
+            return "Modificación de tipo de equipo";
+        case OperacionEnum.BAJA_TIPO_EQUIPO:
+            return "Baja de tipo de equipo";
         default:
             return "-";
     }
