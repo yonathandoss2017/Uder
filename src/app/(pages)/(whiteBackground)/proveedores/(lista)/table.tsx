@@ -69,12 +69,13 @@ function TableProveedoresFC(props: Readonly<TableProveedoresFCProps>): ReactElem
 
     useEffect((): void => {
         (async (): Promise<void> => {
-            const response: ProveedorDTO[] | FetchAPIError = await listarProveedores(props.sessionAPIToken);
+            const response: ProveedorDTO[] | FetchAPIError = await listarProveedores(props.sessionAPIToken, appliedSearchTerms.filter);
 
             if (isFetchAPIError(response)) {
                 console.error("ERROR - lista de proveedores - table.tsx - listarProveedores", response.errorMessage);
                 return;
             }
+            console.log(response);
             setProveedores(response);
         })();
 
@@ -140,7 +141,7 @@ function TableProveedoresFC(props: Readonly<TableProveedoresFCProps>): ReactElem
             ),
             buttonsType: ModalButtonsType.CONFIRM_CANCEL,
             async onConfirm(): Promise<void> {
-                const response: ProveedorDTO | FetchAPIError = await darBajaProveedor(proveedorSelected.id as number, props.sessionAPIToken);
+                const response: void | FetchAPIError = await darBajaProveedor(proveedorSelected.id as number, props.sessionAPIToken);
                 if (isFetchAPIError(response)) {
                     createModal({
                         children: (

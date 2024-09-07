@@ -52,7 +52,7 @@ const sidebarConfig = [
         ]
     },
     {
-        title: "Gestión de Marca",
+        title: "Gestión Marca",
         key: "marcas",
         submenus: [
             {
@@ -64,14 +64,14 @@ const sidebarConfig = [
         ]
     },
     {
-        title: "Gestión de Proveedores",
+        title: "Gestión Proveedores",
         key: "proveedores",
         submenus: [
             {
                 title: "Ingreso de Proveedor", path: "/proveedores/agregar", permission: PermisoEnum.ALTA_PROVEEDOR
             },
             {
-                title: "Listado de Proveedores", path: "/proveedores", permission: PermisoEnum.OBTENER_PROVEEDORES
+                title: "Listado Proveedores", path: "/proveedores", permission: PermisoEnum.OBTENER_PROVEEDORES
             },
         ]
     },
