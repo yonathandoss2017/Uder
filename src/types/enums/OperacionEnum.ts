@@ -14,7 +14,13 @@ enum OperacionEnum {
     ALTA_USUARIO =10,
     ALTA_TIPO_EQUIPO = 11,
     MODIFICAR_TIPO_EQUIPO =12,
-    BAJA_TIPO_EQUIPO = 13
+    BAJA_TIPO_EQUIPO = 13,
+    ALTA_MARCA = 14,
+    MODIFICAR_MARCA = 15,
+    BAJA_MARCA = 16,
+    ALTA_PROVEEDOR = 17,
+    MODIFICAR_PROVEEDOR = 18,
+    BAJA_PROVEEDOR = 19
 
 }
 
@@ -51,6 +57,18 @@ export function translateOperacionEnum(operacionEnum: OperacionEnum | string): s
             return "Modificación de tipo de equipo";
         case OperacionEnum.BAJA_TIPO_EQUIPO:
             return "Baja de tipo de equipo";
+        case OperacionEnum.ALTA_MARCA:
+            return "Alta de marca";
+        case OperacionEnum.MODIFICAR_MARCA:
+            return "Modificación de marca";
+        case OperacionEnum.BAJA_MARCA:
+            return "Baja de marca";
+        case OperacionEnum.ALTA_PROVEEDOR:
+            return "Alta de proveedor";
+        case OperacionEnum.MODIFICAR_PROVEEDOR:
+            return "Modificación de proveedor";
+        case OperacionEnum.BAJA_PROVEEDOR:
+            return "Baja de proveedor";
         default:
             return "-";
     }

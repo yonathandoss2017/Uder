@@ -51,6 +51,30 @@ const sidebarConfig = [
             },
         ]
     },
+    {
+        title: "Gestión Marca",
+        key: "marcas",
+        submenus: [
+            {
+                title: "Ingreso de Marca", path: "/marcas/agregar", permission: PermisoEnum.ALTA_MARCA
+            },
+            {
+                title: "Listado de Marcas", path: "/marcas", permission: PermisoEnum.OBTENER_MARCAS
+            },
+        ]
+    },
+    {
+        title: "Gestión Proveedores",
+        key: "proveedores",
+        submenus: [
+            {
+                title: "Ingreso de Proveedor", path: "/proveedores/agregar", permission: PermisoEnum.ALTA_PROVEEDOR
+            },
+            {
+                title: "Listado Proveedores", path: "/proveedores", permission: PermisoEnum.OBTENER_PROVEEDORES
+            },
+        ]
+    },
 ];
 
 const Sidebar = (): ReactElement | null => {
@@ -65,19 +89,27 @@ const Sidebar = (): ReactElement | null => {
     // Estado para gestionar qué menú está abierto
     const [openMenu, setOpenMenu] = useState<string | null>(null);
 
+    // No renderiza nada si sessionData es null (usuario no autenticado)
+    if (!sessionData) return null;
+
+    // eslint-disable-next-line react-hooks/rules-of-hooks
     useEffect(() => {
+        // Solo obtener permisos si sessionData está disponible
         (async (): Promise<void> => {
-            const response: PermisoEnum[] | FetchAPIError = await obtenerPermisos(sessionData?.user.sessionAPIToken as string);
-            if (isFetchAPIError(response)) {
-                console.error("ERROR - obtenerPermisos: ", response);
-                setPermissions([]);
-                return;
+            if (sessionData) {
+                const response: PermisoEnum[] | FetchAPIError = await obtenerPermisos(sessionData.user.sessionAPIToken as string);
+                if (isFetchAPIError(response)) {
+                    console.error("ERROR - obtenerPermisos: ", response);
+                    setPermissions([]);
+                    return;
+                }
+
+                setPermissions(response);
             }
-
-            setPermissions(response);
         })();
-    }, []);
+    }, [sessionData]); // Agrego sessionData como dependencia
 
+    // eslint-disable-next-line react-hooks/rules-of-hooks
     useEffect(() => {
         // Encuentra la sección cuyo submenú está siendo visualizado actualmente
         const matchedSection = sidebarConfig.find(section =>
@@ -130,7 +162,7 @@ const Sidebar = (): ReactElement | null => {
                                     {/* Submenús que se muestran si el menú está abierto */}
                                     {openMenu === section.key && (
                                         <ul className={styles.subMenuContainer}>
-                                            {section.submenus.map((submenu) => (
+                                            {visibleSubmenus?.map((submenu) => (
                                                 <li
                                                     key={submenu.path}
                                                     className={`${pathname === submenu.path ? styles.activeOption : ""}`}
