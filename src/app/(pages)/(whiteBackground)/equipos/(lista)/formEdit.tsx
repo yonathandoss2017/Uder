@@ -155,7 +155,7 @@ function EditEquipoForm(props: Readonly<EditEquipoFormProps>): ReactElement {
 
             // ------------------- Cargar marcas -------------------
 
-            setMarcas(await listarMarcas(props.idInstitucion).then((response: MarcaDTO[] | FetchAPIError): MarcaDTO[] => {
+            setMarcas(await listarMarcas(props.sessionAPIToken).then((response: MarcaDTO[] | FetchAPIError): MarcaDTO[] => {
                 if (isFetchAPIError(response)) {
                     console.error("ERROR - Modificar Equipo - listarMarcas: ", response);
                     return [];
@@ -190,7 +190,7 @@ function EditEquipoForm(props: Readonly<EditEquipoFormProps>): ReactElement {
 
             // ------------------- Cargar proveedores -------------------
 
-            setProveedores(await listarProveedores(props.idInstitucion).then((response: ProveedorDTO[] | FetchAPIError): ProveedorDTO[] => {
+            setProveedores(await listarProveedores(props.sessionAPIToken).then((response: ProveedorDTO[] | FetchAPIError): ProveedorDTO[] => {
                 if (isFetchAPIError(response)) {
                     console.error("ERROR - Modificar Equipo - listarProveedores: ", response);
                     return [];

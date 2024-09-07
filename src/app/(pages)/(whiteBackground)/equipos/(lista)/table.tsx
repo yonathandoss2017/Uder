@@ -112,9 +112,9 @@ function TableEquiposFC(props: Readonly<TableEquiposFCProps>): ReactElement {
                 tiposEquipo.current = response;
             });
 
-            await listarMarcas(props.idInstitucion).then((response: MarcaDTO[] | FetchAPIError): void => {
+            await listarMarcas(props.sessionAPIToken).then((response: MarcaDTO[] | FetchAPIError): void => {
                 if (isFetchAPIError(response)) {
-                    console.error("ERROR - lista de equipos - table.tsx - listarMarcas", response.errorMessage);
+                    console.error("ERROR - marcas - table.tsx - listarMarcas", response.errorMessage);
                     return;
                 }
                 // Actualiza la lista de marcas
@@ -139,7 +139,7 @@ function TableEquiposFC(props: Readonly<TableEquiposFCProps>): ReactElement {
                 paisOrigen.current = response;
             });
 
-            await listarProveedores(props.idInstitucion).then((response: ProveedorDTO[] | FetchAPIError): void => {
+            await listarProveedores(props.sessionAPIToken).then((response: ProveedorDTO[] | FetchAPIError): void => {
                 if (isFetchAPIError(response)) {
                     console.error("ERROR - lista de equipos - table.tsx - listarProveedores", response.errorMessage);
                     return;

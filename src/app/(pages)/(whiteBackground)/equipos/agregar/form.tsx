@@ -111,7 +111,7 @@ const RegisterEquipoForm: React.FC<RegisterEquipoFormProps> = (props: RegisterEq
 
             // ------------------- Cargar marcas -------------------
 
-            setMarcas(await listarMarcas(props.clientData.idInstitucion).then((response: MarcaDTO[] | FetchAPIError): MarcaDTO[] => {
+            setMarcas(await listarMarcas(props.sessionAPIToken).then((response: MarcaDTO[] | FetchAPIError): MarcaDTO[] => {
                 if (isFetchAPIError(response)) return [];
                 return response;
             }));
@@ -132,7 +132,7 @@ const RegisterEquipoForm: React.FC<RegisterEquipoFormProps> = (props: RegisterEq
 
             // ------------------- Cargar proveedores -------------------
 
-            setProveedores(await listarProveedores(props.clientData.idInstitucion).then((response: ProveedorDTO[] | FetchAPIError): ProveedorDTO[] => {
+            setProveedores(await listarProveedores(props.sessionAPIToken).then((response: ProveedorDTO[] | FetchAPIError): ProveedorDTO[] => {
                 if (isFetchAPIError(response)) return [];
                 return response;
             }));
