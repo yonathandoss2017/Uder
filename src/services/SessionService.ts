@@ -32,9 +32,11 @@ export async function loginCredentials(username: string, password: string): Prom
         }
     };
 
-    // Realiza la petición a la API y retorna el resultado
-    // (token de sesión o error dado por la API)
-    return await fetchBodyWithErrorHandling<string>(url, options);
+    console.log("en el loginCredentials" + credentials);
+
+    const response = await fetchBodyWithErrorHandling<{ token: string }>(url, options);
+    if(isFetchAPIError(response)) return response;
+    return response.token;
 }
 
 /**
@@ -98,10 +100,12 @@ export async function buscarClientePorToken(token: string): Promise<UsuarioDTO |
     const options: RequestInit = {
         method: 'GET',
         headers: {
-            'Authorization': 'Bearer ' + token, // Cabecera de autorización con el token de sesión
+            'Authorization': `Bearer "${token}"`, // Cabecera de autorización con el token de sesión
             'Content-Type': 'application/json' // Tipo de contenido JSON
         }
     };
+
+    console.log("Options FETCH: ", options)
 
     // Realiza la petición a la API y retorna el resultado
     return await fetchBodyWithErrorHandling<UsuarioDTO>(url, options);

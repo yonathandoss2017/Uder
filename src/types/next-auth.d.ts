@@ -1,4 +1,5 @@
 import UsuarioDTO from "@/types/dtos/UsuarioDTO";
+import {JWT} from "next-auth/jwt";
 
 declare module "next-auth" {
     /**

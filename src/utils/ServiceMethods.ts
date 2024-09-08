@@ -11,11 +11,13 @@ import FetchAPIError, {isFetchAPIError} from "@/types/errors/FetchAPIError";
 async function fetchResponseWithErrorHandling(url: string, options: RequestInit): Promise<Response | FetchAPIError> {
     try {
         const response: Response = await fetch(url, options);
+        console.log("Response de la api: ", response);
         if (response.ok) {
             return response;
         }
 
         const errorBody = await response.json();
+        console.log("- Cuerpo: ", errorBody)
         const errorMessage: string = errorBody.message || `Error en la solicitud a ${url} - ${response.status} ${response.statusText}`;
         return {
             errorMessage,

@@ -36,13 +36,17 @@ const authOptions: NextAuthOptions = {
                 username: {label: "Username", type: "text"},       // Campo para el nombre de cliente
                 password: {label: "Password", type: "password"}    // Campo para la contraseña
             },
+
             async authorize(credentials) {
                 // Evento que se ejecuta cuando el cliente intenta iniciar sesión
+                console.log("antes")
                 if (!credentials) return null;
-
+                console.log("en el credentials provider", credentials);
                 // Enviamos las credenciales al backend para autenticar al cliente y obtener el token de sesión en la API
                 const response: string | FetchAPIError = await loginCredentials(credentials.username, credentials.password);
+                console.log("authOptions: ", response);
                 if (isFetchAPIError(response)) {
+                    console.log("en el api error", response, credentials.username);
                     console.error("ERROR - NextAuth_CredentialsProvider_authorize: ", response);
                     throw new Error(response.errorMessage);
                 }
@@ -52,6 +56,7 @@ const authOptions: NextAuthOptions = {
                 } as User;
 
             }
+
         })
     ],
     events: {
@@ -74,6 +79,7 @@ const authOptions: NextAuthOptions = {
         // Definimos los callbacks que se ejecutan después de ciertas acciones (autenticación, creación de token y sesión)
 
         async signIn({account}) {
+
             // Método que se ejecuta después de que el cliente se ha autenticado
             if (account?.provider === "google") {
                 const googleIdToken: string | undefined = account.id_token;
@@ -125,6 +131,7 @@ const authOptions: NextAuthOptions = {
         },
 
         async session({session, token}) {
+
             // Método que se ejecuta después de que se ha creado la sesión de cliente
 
             // Si el JWT (JSON Web Token) tiene los datos del cliente, los persistimos en la sesión de cliente
