@@ -5,9 +5,15 @@ import {fetchBodyWithErrorHandling, fetchVoidWithErrorHandling} from "@/utils/Se
 import FetchAPIError, {isFetchAPIError} from "@/types/errors/FetchAPIError";
 import UsuarioDTO from "@/types/dtos/UsuarioDTO";
 import PermisoEnum from "@/types/enums/PermisoEnum";
+import {encodeToBase64} from "next/dist/build/webpack/loaders/utils";
 
 // URL base de la API REST de la API para las sesiones
 const SERVICE_PATH: string = process.env.NEXT_PUBLIC_BACKEND_API_URL + "/session";
+
+// Interfaz de respuesta de la API para el token de autenticación
+interface TokenAPIResponse {
+    token: string;
+}
 
 /**
  * Función para autenticar a un usuario por medio de las credenciales (usuario y contraseña).
@@ -32,10 +38,8 @@ export async function loginCredentials(username: string, password: string): Prom
         }
     };
 
-    console.log("en el loginCredentials" + credentials);
-
-    const response = await fetchBodyWithErrorHandling<{ token: string }>(url, options);
-    if(isFetchAPIError(response)) return response;
+    const response: TokenAPIResponse | FetchAPIError = await fetchBodyWithErrorHandling<TokenAPIResponse>(url, options);
+    if (isFetchAPIError(response)) return response;
     return response.token;
 }
 
@@ -58,32 +62,33 @@ export async function loginGoogle(token: string): Promise<string | FetchAPIError
         }
     };
 
-    // Realiza la petición a la API y retorna el resultado
-    // (token de sesión o error dado por la API)
-    return await fetchBodyWithErrorHandling<string>(url, options);
+    const response: TokenAPIResponse | FetchAPIError = await fetchBodyWithErrorHandling<TokenAPIResponse>(url, options);
+    if (isFetchAPIError(response)) return response;
+    return response.token;
 }
 
 /**
- * Función para cerrar la sesión de un usuario en la API.
+ * Función para renovar el token de sesión de un usuario en la API.
  * @param token - Token de sesión del cliente en la API
- * @returns Promise<void> - Si la solicitud se realiza correctamente.
+ * @returns Promise<string> - Nuevo token de sesión del cliente en la API
  * @returns Promise<FetchAPIError> - Si ocurre un error en la solicitud o en el procesamiento de la respuesta.
  */
-export async function logoutCliente(token: string): Promise<void | FetchAPIError> {
+export async function renovarToken(token: string): Promise<string | FetchAPIError> {
     // URL del servicio de cierre de sesión
-    const url: string = `${SERVICE_PATH}/logout`;
+    const url: string = `${SERVICE_PATH}/renovar`;
 
     // Opciones de la petición
     const options: RequestInit = {
-        method: 'POST',
+        method: 'GET',
         headers: {
             'Authorization': 'Bearer ' + token, // Cabecera de autorización con el token de sesión
             'Content-Type': 'application/json' // Tipo de contenido JSON
         }
     };
 
-    // Realiza la petición a la API y retorna el resultado
-    return await fetchVoidWithErrorHandling(url, options);
+    const response: TokenAPIResponse | FetchAPIError = await fetchBodyWithErrorHandling<TokenAPIResponse>(url, options);
+    if (isFetchAPIError(response)) return response;
+    return response.token;
 }
 
 /**
@@ -100,12 +105,10 @@ export async function buscarClientePorToken(token: string): Promise<UsuarioDTO |
     const options: RequestInit = {
         method: 'GET',
         headers: {
-            'Authorization': `Bearer "${token}"`, // Cabecera de autorización con el token de sesión
+            'Authorization': `Bearer ${token}`, // Cabecera de autorización con el token de sesión
             'Content-Type': 'application/json' // Tipo de contenido JSON
         }
     };
-
-    console.log("Options FETCH: ", options)
 
     // Realiza la petición a la API y retorna el resultado
     return await fetchBodyWithErrorHandling<UsuarioDTO>(url, options);

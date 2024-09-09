@@ -48,6 +48,7 @@ const GoogleAuthPageRegister = () => {
 
                 // Obtiene el token de autenticación de Google
                 const sessionGoogleToken: string | undefined = sessionData.user.sessionGoogleToken as string;
+                console.log("google token" ,sessionGoogleToken);
 
                 // Si no se obtiene el token de Google, cierra la sesión y muestra un mensaje de error
                 if (!sessionGoogleToken) {
