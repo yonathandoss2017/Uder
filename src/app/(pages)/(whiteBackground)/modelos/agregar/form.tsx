@@ -51,16 +51,29 @@ const RegisterModeloForm: React.FC<RegisterModeloFormProps> = (props: RegisterMo
     }, [props.sessionAPIToken]);
 
     const onSubmit: SubmitHandler<FormValues> = async (formValues: FormValues): Promise<void> => {
+        if (!selectedMarcaId) {
+            // Mostrar error si no se selecciona una marca
+            createModal({
+                children: (
+                    <div>
+                        <h2>Error</h2>
+                        <p>Debe seleccionar una marca</p>
+                    </div>
+                ),
+                buttonsType: ModalButtonsType.CONFIRM,
+            }).show();
+            return;
+        }
+
         const nuevoModel: ModeloDTO = {
             nombre: formValues.nombre,
             activo: formValues.activo,
-            idMarca: formValues.idMarca,
+            idMarca: selectedMarcaId,
         };
 
         const response: ModeloDTO | FetchAPIError = await agregarModelo(nuevoModel, props.sessionAPIToken);
 
         if (isFetchAPIError(response)) {
-            console.error("ERROR - Registro de modelo - agregarModelo:", response);
             createModal({
                 children: (
                     <div>

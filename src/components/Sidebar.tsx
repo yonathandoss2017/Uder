@@ -84,10 +84,10 @@ const sidebarConfig = [
                 title: "Ingreso de Modelo", path: "/modelos/agregar", permission: PermisoEnum.ALTA_MODELO
             },
             {
-                title: "Listado Modelos", path: "/modelos", permission: PermisoEnum.OBTENER_MODELO
+                title: "Listado Modelos", path: "/modelos", permission: PermisoEnum.OBTENER_MODELOS
             },
         ]
-    },
+    }
 ];
 
 const Sidebar = (): ReactElement | null => {

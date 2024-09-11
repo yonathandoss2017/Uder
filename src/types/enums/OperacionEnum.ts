@@ -72,6 +72,12 @@ export function translateOperacionEnum(operacionEnum: OperacionEnum | string): s
             return "Modificación de proveedor";
         case OperacionEnum.BAJA_PROVEEDOR:
             return "Baja de proveedor";
+        case OperacionEnum.ALTA_MODELO:
+            return "Alta de modelo";
+        case OperacionEnum.MODIFICAR_MODELO:
+            return "Modificación de modelo";
+        case OperacionEnum.BAJA_MODELO:
+            return "Baja de modelo";
         default:
             return "-";
     }
