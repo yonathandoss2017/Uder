@@ -3,5 +3,4 @@ export default interface ModeloDTO {
     nombre: string;
     idMarca: number;
     activo: boolean;
-    idInstitucion: number;
 }

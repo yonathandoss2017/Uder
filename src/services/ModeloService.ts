@@ -45,3 +45,25 @@ export async function buscarModeloPorId(id: number): Promise<ModeloDTO | FetchAP
     // Realiza la petición a la API y retorna el resultado
     return await fetchBodyWithErrorHandling<ModeloDTO>(url, options);
 }
+
+/**
+ * Función para agregar un proveedor.
+ * @param modelo - Datos del modelo a agregar
+ * @param token - Token de autorización
+ * @returns Promise<ModeloDTO> - Proveedor agregado
+ * @returns Promise<FetchAPIError> - Si ocurre un error en la solicitud o en el procesamiento de la respuesta.
+ */
+export async function agregarModelo(modelo: ModeloDTO, token: string): Promise<ModeloDTO | FetchAPIError> {
+    const url: string = `${SERVICE_PATH}/agregar`; // URL de la petición a la API
+    const options: RequestInit = {
+        method: 'POST',
+        headers: {
+            'Authorization': 'Bearer ' + token, // Cabecera de autorización con el token de sesión
+            'Content-Type': 'application/json' // Tipo de contenido JSON
+        },
+        body: JSON.stringify(modelo)
+    };
+
+    // Realiza la petición a la API y retorna el resultado
+    return await fetchBodyWithErrorHandling<ModeloDTO>(url, options);
+}
