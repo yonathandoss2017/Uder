@@ -75,6 +75,19 @@ const sidebarConfig = [
             },
         ]
     },
+
+    {
+        title: "Gestión Modelos",
+        key: "modelos",
+        submenus: [
+            {
+                title: "Ingreso de Modelo", path: "/modelos/agregar", permission: PermisoEnum.ALTA_MODELO
+            },
+            {
+                title: "Listado Modelos", path: "/modelos", permission: PermisoEnum.OBTENER_MODELO
+            },
+        ]
+    },
 ];
 
 const Sidebar = (): ReactElement | null => {

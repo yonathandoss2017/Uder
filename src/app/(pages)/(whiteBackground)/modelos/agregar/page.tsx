@@ -8,7 +8,7 @@ import LoadingPage from "@/app/(pages)/loading";
 import {verificarPermiso} from "@/services/SessionService";
 import PermisoEnum from "@/types/enums/PermisoEnum";
 import ErrorFC from "@/components/ErrorFC";
-import RegisterProveedorForm from "@/app/(pages)/(whiteBackground)/proveedores/agregar/form";
+import RegisterModeloForm from "@/app/(pages)/(whiteBackground)/modelos/agregar/form";
 
 export const metadata: Metadata = {
     title: 'PInfra DD - Agregar modelo'
@@ -28,7 +28,7 @@ const RegisterModeloPage = async (): Promise<ReactElement> => {
     return (
         <main className={styles.page}>
             <div className={styles.container}>
-                <RegisterProveedorForm clientData={clientData} sessionAPIToken={sessionAPIToken}/>
+                <RegisterModeloForm clientData={clientData} sessionAPIToken={sessionAPIToken}/>
             </div>
         </main>
     );

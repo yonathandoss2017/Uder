@@ -1,16 +1,19 @@
 'use client';
 
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { useForm, SubmitHandler, UseFormReturn } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import UsuarioDTO from "@/types/dtos/UsuarioDTO";
-import ModeloDTO from "@/types/dtos/ModeloDTO"; // Importar el DTO del modelo
-import {useModal} from "@/app/hooks/modals/useModal";
-import {SubmitHandler, useForm, UseFormReturn} from "react-hook-form";
-import {zodResolver} from "@hookform/resolvers/zod";
-import styles from "@public/styles/modules/register.tiposequipo.module.css"; // Cambiar el archivo CSS si es necesario
-import SchemaModelo from "@/validations/SchemaModelo"; // Importar el esquema de validación para modelos
-import FetchAPIError, {isFetchAPIError} from "@/types/errors/FetchAPIError";
-import {agregarModelo} from "@/services/ModeloService"; // Importar el servicio de modelo
-import {ModalButtonsType} from "@/components/ModalFC";
+import ModeloDTO from "@/types/dtos/ModeloDTO";
+import MarcaDTO from "@/types/dtos/MarcaDTO";
+import { listarMarcas } from "@/services/MarcaService"; // Servicio para listar marcas
+import FetchAPIError, { isFetchAPIError } from "@/types/errors/FetchAPIError";
+import { agregarModelo } from "@/services/ModeloService";
+import { useModal } from "@/app/hooks/modals/useModal";
+import { ModalButtonsType } from "@/components/ModalFC";
+import SchemaModelo from "@/validations/SchemaModelo"; // Validación del formulario
+import styles from "@public/styles/modules/register.tiposequipo.module.css";
+import ComboBoxFC from "@/components/ComboBoxFC";
 
 interface RegisterModeloFormProps {
     sessionAPIToken: string;
@@ -20,30 +23,44 @@ interface RegisterModeloFormProps {
 interface FormValues extends ModeloDTO {}
 
 const RegisterModeloForm: React.FC<RegisterModeloFormProps> = (props: RegisterModeloFormProps) => {
-    const {createModal} = useModal();
-
+    const { createModal } = useModal();
+    const [marcas, setMarcas]: [MarcaDTO[], (value: MarcaDTO[]) => void] = useState<MarcaDTO[]>([]);
     const {
         register,
         handleSubmit,
-        formState: {errors},
-        reset
+        formState: { errors },
+        reset,
     }: UseFormReturn<FormValues> = useForm<FormValues>({
         resolver: zodResolver(SchemaModelo),
-        mode: 'all',
-        defaultValues: {}
+        mode: "all",
+        defaultValues: {},
     });
+
+    const [selectedMarcaId, setSelectedMarcaId]: [number | undefined, (value: number | undefined) => void] = useState<number | undefined>(undefined);
+    // Cargar las marcas al montar el componente
+    useEffect(() => {
+        (async (): Promise<void> => {
+
+            // ------------------- Cargar marcas -------------------
+
+            setMarcas(await listarMarcas(props.sessionAPIToken).then((response: MarcaDTO[] | FetchAPIError): MarcaDTO[] => {
+                if (isFetchAPIError(response)) return [];
+                return response;
+            }));
+        })();
+    }, [props.sessionAPIToken]);
 
     const onSubmit: SubmitHandler<FormValues> = async (formValues: FormValues): Promise<void> => {
         const nuevoModel: ModeloDTO = {
             nombre: formValues.nombre,
             activo: formValues.activo,
-            idMarca: formValues.idMarca // Cambiar idInstitucion por idMarca
+            idMarca: formValues.idMarca,
         };
 
         const response: ModeloDTO | FetchAPIError = await agregarModelo(nuevoModel, props.sessionAPIToken);
 
         if (isFetchAPIError(response)) {
-            console.error('ERROR - Registro de modelo - agregarModelo:', response);
+            console.error("ERROR - Registro de modelo - agregarModelo:", response);
             createModal({
                 children: (
                     <div>
@@ -51,18 +68,14 @@ const RegisterModeloForm: React.FC<RegisterModeloFormProps> = (props: RegisterMo
                         <p>{response.errorMessage}</p>
                     </div>
                 ),
-                buttonsType: ModalButtonsType.CONFIRM
+                buttonsType: ModalButtonsType.CONFIRM,
             }).show();
             return;
         }
 
         createModal({
-            children: (
-                <div>
-                    <h2>Modelo registrado correctamente</h2>
-                </div>
-            ),
-            buttonsType: ModalButtonsType.CONFIRM
+            children: <div> <h2>Modelo registrado correctamente</h2> </div>,
+            buttonsType: ModalButtonsType.CONFIRM,
         }).show();
 
         reset();
@@ -75,7 +88,7 @@ const RegisterModeloForm: React.FC<RegisterModeloFormProps> = (props: RegisterMo
                     <label className={styles.details}>
                         <span>Nombre <span className={styles.requiredField}>*</span></span>
                         <input
-                            {...register("nombre", {required: "Este campo es requerido"})}
+                            {...register("nombre", { required: "Este campo es requerido" })}
                             type="text"
                             placeholder="Nombre del Modelo"
                         />
@@ -84,14 +97,19 @@ const RegisterModeloForm: React.FC<RegisterModeloFormProps> = (props: RegisterMo
                 </div>
                 <div className={styles.inputBoxRe}>
                     <label className={styles.details}>
-                        <span>ID Marca <span className={styles.requiredField}>*</span></span>
-                        <input
-                            {...register("idMarca", {required: "Este campo es requerido"})}
-                            type="number"
-                            placeholder="ID de la Marca"
+                        <span>Marca <span className={styles.requiredField}>*</span></span>
+
+                        <ComboBoxFC
+                            message={"Seleccione una marca"}
+                            elements={marcas.map((marca: MarcaDTO): { key: number, value: string } => ({
+                                key: marca.id as number,
+                                value: marca.nombre
+                            }))}
+                            selectedKey={selectedMarcaId}
+                            onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setSelectedMarcaId(parseInt(e.target.value))}
                         />
                     </label>
-                    {errors.idMarca && <label className={styles.error}>{errors.idMarca.message}</label>}
+
                 </div>
                 <div className={styles.buttomAe}>
                     <button type="submit">Agregar</button>
