@@ -7,13 +7,12 @@
  */
 
 // Importamos los módulos necesarios
-import {AuthOptions, NextAuthOptions, User} from "next-auth";
+import {NextAuthOptions, User} from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import CredentialsProvider from "next-auth/providers/credentials";
 import FetchAPIError, {isFetchAPIError} from "@/types/errors/FetchAPIError";
 import UsuarioDTO from "@/types/dtos/UsuarioDTO";
 import {buscarClientePorToken, loginCredentials, renovarToken} from "@/services/SessionService";
-import {NextApiRequest} from "next";
 
 // Opciones de configuración para NextAuth
 const authOptions: NextAuthOptions = {
@@ -102,10 +101,10 @@ const authOptions: NextAuthOptions = {
                     const diff: number = exp - Date.now();
                     // Si expiro
                     if (diff < 1) {
-                        console.log("Expiro")
+                        console.log("Expiró")
                         // Indicamos un error en el JWT (JSON Web Token) de que expiró la sesión (El layout se encargará de redirigir al cliente a la página de inicio de sesión)
                         token.user.error = "expired_token";
-                    } else if (diff < 60000) { // Si no a expirado y faltan menos de 60 segundos para que expire se renueva
+                    } else if (diff < 60000) { // Si no ha expirado y faltan menos de 60 segundos para que expire se renueva
                         console.log("JWT - Token expirado, renovando token");
                         const response: string | FetchAPIError = await renovarToken(token.user.sessionAPIToken);
                         if (isFetchAPIError(response)) {
