@@ -9,7 +9,7 @@ import React, {ReactElement} from "react";
 import LoadingPage from "@/app/(pages)/loading";
 import {Metadata} from "next";
 import HomeGraphFC from "@/components/HomeGraphFC";
-import AuditoriaDTO, {translateNumberArrayToDate} from "@/types/dtos/AuditoriaDTO";
+import AuditoriaDTO from "@/types/dtos/AuditoriaDTO";
 import OperacionEnum, {translateOperacionEnum} from "@/types/enums/OperacionEnum";
 import FetchAPIError, {isFetchAPIError} from "@/types/errors/FetchAPIError";
 import {listarAuditorias} from "@/services/AuditoriaService";
@@ -42,8 +42,9 @@ const HomePage = async (): Promise<ReactElement> => {
         }
 
         return response.sort((a: AuditoriaDTO, b: AuditoriaDTO): number => {
-            const dateA: number = translateNumberArrayToDate(a.fechaHora).getTime(); // Convierte la fecha y hora a milisegundos
-            const dateB: number = translateNumberArrayToDate(b.fechaHora).getTime(); // Convierte la fecha y hora a milisegundos
+            console.log("Fecha A: ", a.fechaHora);
+            const dateA: number = new Date(a.fechaHora).getTime(); // Convierte la fecha y hora a milisegundos
+            const dateB: number = new Date(b.fechaHora).getTime(); // Convierte la fecha y hora a milisegundos
 
             if (dateA > dateB) { // Si la fecha y hora A es mayor que la fecha y hora B
                 return -1; // Retorna -1 (A va antes que B)
@@ -71,7 +72,7 @@ const HomePage = async (): Promise<ReactElement> => {
                             (auditorias.map((auditoria: AuditoriaDTO) => (
                                     <div key={auditoria.id} className={styles.divAuditoria}>
                                         <p className={styles.auditoriaFecha}>
-                                            {translateNumberArrayToDate(auditoria.fechaHora).toLocaleString('es-ES')}
+                                            {new Date(auditoria.fechaHora).toLocaleString('es-ES')}
                                         </p>
                                         <p className={styles.auditoriaOperacion}>{translateOperacionEnum(OperacionEnum[auditoria.operacion])}</p>
                                         <p className={styles.auditoriaCambios}>{auditoria.mensaje}</p>

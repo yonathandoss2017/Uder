@@ -50,7 +50,7 @@ const authOptions: NextAuthOptions = {
                 // Retornamos un objeto con el token de sesión en la API para persistirlo en el JWT (JSON Web Token)
                 return {
                     sessionAPIToken: response,
-                    exp: (Date.now() + 20000)
+                    exp: (Date.now() + 300000)
                 } as User;
 
             }
@@ -105,7 +105,7 @@ const authOptions: NextAuthOptions = {
                         console.log("Expiro")
                         // Indicamos un error en el JWT (JSON Web Token) de que expiró la sesión (El layout se encargará de redirigir al cliente a la página de inicio de sesión)
                         token.user.error = "expired_token";
-                    } else if (diff < 10000) { // Si no a expirado y faltan menos de 60 segundos para que expire se renueva
+                    } else if (diff < 60000) { // Si no a expirado y faltan menos de 60 segundos para que expire se renueva
                         console.log("JWT - Token expirado, renovando token");
                         const response: string | FetchAPIError = await renovarToken(token.user.sessionAPIToken);
                         if (isFetchAPIError(response)) {
@@ -113,7 +113,7 @@ const authOptions: NextAuthOptions = {
                             throw new Error(response.errorMessage);
                         }
                         token.user.sessionAPIToken = response;
-                        token.user.exp = (Date.now() + 20000);
+                        token.user.exp = (Date.now() + 300000);
                     }
                 }
             }
@@ -128,6 +128,11 @@ const authOptions: NextAuthOptions = {
 
 
             // Método que se ejecuta después de que se ha creado la sesión de cliente
+
+            if(token.user.sessionGoogleToken){
+                session.user.sessionGoogleToken = token.user.sessionGoogleToken;
+            }
+
             session.user.error = token.user.error;
             // Si el JWT (JSON Web Token) tiene el token de sesión del cliente en la API, lo guardamos en la sesión y obtenemos los datos del cliente
             if (token.user.sessionAPIToken) {
