@@ -64,6 +64,7 @@ function TableModeloFC(props: Readonly<TableModeloFCProps>): ReactElement {
 
     useEffect((): void => {
         (async (): Promise<void> => {
+
             const response: ModeloDTO[] | FetchAPIError = await listarModelos(props.sessionAPIToken, appliedSearchTerms.filter);
 
             if (isFetchAPIError(response)) {
