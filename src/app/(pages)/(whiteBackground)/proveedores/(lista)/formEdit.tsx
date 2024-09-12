@@ -59,7 +59,7 @@ function EditProveedorForm(props: Readonly<EditProveedorFormProps>): ReactElemen
             title: `Modificando proveedor "${props.editingProveedor.nombre}"`,
             children: ModalChangesFC(changes),
             async onConfirm(): Promise<void> {
-                const response: ProveedorDTO | FetchAPIError = await modificarProveedor(modifiedProveedor, props.sessionAPIToken);
+                const response: void | FetchAPIError = await modificarProveedor(modifiedProveedor, props.sessionAPIToken);
 
                 if (isFetchAPIError(response)) {
                     createModal({

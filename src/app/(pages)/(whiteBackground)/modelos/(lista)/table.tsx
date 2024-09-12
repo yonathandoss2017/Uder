@@ -72,16 +72,14 @@ function TableModeloFC(props: Readonly<TableModeloFCProps>): ReactElement {
                 console.error("ERROR - lista de modelos", errorMessage);
                 return;
             }
-
+            console.log(response);
             setModelos(response);
         })();
     }, [appliedSearchTerms]);
 
     // Procedimiento que se ejecuta al hacer clic en el botón 'Modificar'
     async function handleEditClick(modelo: ModeloDTO): Promise<void> {
-        if (!props.hasPermissionEdit) {
-            return
-        }
+        if (!props.hasPermissionEdit) { return; }
 
         // Crea un modal para modificar el tipo de equipo
         const modalModificar: ModalInstance = createModal({
@@ -91,18 +89,10 @@ function TableModeloFC(props: Readonly<TableModeloFCProps>): ReactElement {
                     idInstitucion={props.idInstitucion}
                     editingModelo={modelo}
                     onSave={(modeloModified: ModeloDTO): void => {
-                        if (modelos) {
-                            // Actualiza el equipo en la lista
                             setModelos(modelos.map((modelo: ModeloDTO): ModeloDTO => {
-                                if (modeloModified.id === modelo.id) {
-                                    return modeloModified;
-                                }
-                                return modelo;
+                                return modelo.id === modeloModified.id ? modeloModified : modelo;
                             }));
-                        }
-
                         modalModificar.close(); // Cierra el modal
-
                         // Refresca la lista volviendo a cargar los términos de búsqueda después de 3 segundos
                         refSearchTermsTimer.current = setTimeout((): void => {
                             setAppliedSearchTerms({ ...appliedSearchTerms }); // Actualiza los términos de búsqueda
@@ -136,7 +126,6 @@ function TableModeloFC(props: Readonly<TableModeloFCProps>): ReactElement {
                 ),
                 buttonsType: ModalButtonsType.CONFIRM
             }).show();
-
             return;
         }
 
@@ -235,7 +224,7 @@ function TableModeloFC(props: Readonly<TableModeloFCProps>): ReactElement {
                             type="text"
                             name="nombre"
                             placeholder="Buscar por nombre"
-                            value={searchTerms.filter.nombre ? searchTerms.filter.nombre : ''}
+                            value={searchTerms.filter.nombre || ''}
                             onChange={(event: ChangeEvent<HTMLInputElement>): void => {
                                 setSearchTerms({
                                     ...searchTerms,
@@ -247,6 +236,50 @@ function TableModeloFC(props: Readonly<TableModeloFCProps>): ReactElement {
                             }}
                         />
                     </div>
+                </div>
+                <div className={stylesTable.filtersContainerButtons}>
+                    <label>
+                        <input
+                            type="radio"
+                            name="activo"
+                            value="true"
+                            checked={searchTerms.filter.activo === true}
+                            onChange={(): void => {
+                                setSearchTerms({
+                                    ...searchTerms,
+                                    filter: { ...searchTerms.filter, activo: true }
+                                });
+                            }}
+                        />Activos
+                    </label>
+                    <label>
+                        <input
+                            type="radio"
+                            name="activo"
+                            value="false"
+                            checked={searchTerms.filter.activo === false}
+                            onChange={(): void => {
+                                setSearchTerms({
+                                    ...searchTerms,
+                                    filter: { ...searchTerms.filter, activo: false }
+                                });
+                            }}
+                        />Dados de baja
+                    </label>
+                    <label>
+                        <input
+                            type="radio"
+                            name="activo"
+                            value="undefined"
+                            checked={searchTerms.filter.activo === undefined}
+                            onChange={(): void => {
+                                setSearchTerms({
+                                    ...searchTerms,
+                                    filter: { ...searchTerms.filter, activo: undefined }
+                                });
+                            }}
+                        />Todos
+                    </label>
                 </div>
             </div>
         </div>

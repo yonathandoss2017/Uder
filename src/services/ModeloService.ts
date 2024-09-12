@@ -64,13 +64,13 @@ export async function buscarModeloPorId(id: number): Promise<ModeloDTO | FetchAP
  */
 export async function agregarModelo(modelo: ModeloDTO, token: string): Promise<ModeloDTO | FetchAPIError> {
     const url: string = `${SERVICE_PATH}/agregar`; // URL de la petición a la API
-    const options: RequestInit = {
+    const options: RequestInit = { // Opciones de la petición
         method: 'POST',
         headers: {
             'Authorization': 'Bearer ' + token, // Cabecera de autorización con el token de sesión
             'Content-Type': 'application/json' // Tipo de contenido JSON
         },
-        body: JSON.stringify(modelo)
+        body: JSON.stringify(modelo) // Cuerpo de la petición con los datos del equipo
     };
 
     // Realiza la petición a la API y retorna el resultado

@@ -49,7 +49,6 @@ enum PermisoEnum {
     MODIFICAR_MODELO = 46,
     BAJA_MODELO = 47,
 
-
 }
 
 export default PermisoEnum;

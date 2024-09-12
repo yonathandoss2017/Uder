@@ -24,7 +24,7 @@ interface FormValues extends ModeloDTO {}
 
 const RegisterModeloForm: React.FC<RegisterModeloFormProps> = (props: RegisterModeloFormProps) => {
     const { createModal } = useModal();
-    const [marcas, setMarcas]: [MarcaDTO[], (value: MarcaDTO[]) => void] = useState<MarcaDTO[]>([]);
+
     const {
         register,
         handleSubmit,
@@ -36,13 +36,18 @@ const RegisterModeloForm: React.FC<RegisterModeloFormProps> = (props: RegisterMo
         defaultValues: {},
     });
 
-    const [selectedMarcaId, setSelectedMarcaId]: [number | undefined, (value: number | undefined) => void] = useState<number | undefined>(undefined);
+    //Lista de marcas
+    const [marcas, setMarcas]: [MarcaDTO[], (value: MarcaDTO[]) => void] = useState<MarcaDTO[]>([]);
+
+    // Estado para almacenar la marca seleccionada
+     const [selectedMarcaId, setSelectedMarcaId]: [number | undefined, (value: number | undefined) => void] = useState<number | undefined>(undefined);
+
+
     // Cargar las marcas al montar el componente
     useEffect(() => {
         (async (): Promise<void> => {
 
             // ------------------- Cargar marcas -------------------
-
             setMarcas(await listarMarcas(props.sessionAPIToken).then((response: MarcaDTO[] | FetchAPIError): MarcaDTO[] => {
                 if (isFetchAPIError(response)) return [];
                 return response;

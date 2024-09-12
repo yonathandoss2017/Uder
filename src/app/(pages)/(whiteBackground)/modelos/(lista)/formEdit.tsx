@@ -63,7 +63,7 @@ function EditModeloForm(props: Readonly<EditModeloFormProps>): ReactElement {
 
         // Muestra un mensaje de confirmación antes de modificar y guarda la respuesta
         createModal({
-            title: "Modificando modelo \"" + props.editingModelo.nombre + "\"",
+            title: `Modificando modelo "${props.editingModelo.nombre}"`,
             children: ModalChangesFC(changes),
             async onConfirm(): Promise<void> {
                 // Realiza la modificación de modelo en la API
