@@ -34,7 +34,6 @@ import ModalChangesFC from "@/components/ModalChangesFC";
 import {modificarEquipo} from "@/services/EquiposService";
 import {imageToBase64} from "@/utils/Utils";
 import styles from "@public/styles/modules/table/table.editformequipo.module.css";
-import LoadingPage from "@/app/(pages)/loading";
 
 /**
  * Propiedades del componente
@@ -165,7 +164,7 @@ function EditEquipoForm(props: Readonly<EditEquipoFormProps>): ReactElement {
 
             // ------------------- Cargar modelos -------------------
 
-            setModelos(await listarModelos(props.idInstitucion).then((response: ModeloDTO[] | FetchAPIError): ModeloDTO[] => {
+            setModelos(await listarModelos(props.sessionAPIToken).then((response: ModeloDTO[] | FetchAPIError): ModeloDTO[] => {
                 if (isFetchAPIError(response)) {
                     console.error("ERROR - Modificar Equipo - listarModelos: ", response);
                     return [];

@@ -5,7 +5,7 @@
 // Importa los estilos de la página
 import styles from "@public/styles/modules/auth/authPage.module.css";
 // Importa los módulos necesarios
-import React from "react";
+import React, {ReactElement} from "react";
 import LoginForm from "./form";
 import {Metadata} from "next";
 

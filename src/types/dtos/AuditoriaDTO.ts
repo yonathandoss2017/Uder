@@ -4,7 +4,7 @@ export default interface AuditoriaDTO {
     id?: number;
     idUsuario: number;
     operacion: OperacionEnum;
-    fechaHora: Date;
+    fechaHora: string;
     idObjetivo: number;
     mensaje: string;
 }

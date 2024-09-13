@@ -426,8 +426,8 @@ async function obtenerCambios(editingUser: UsuarioDTO, originalData: UsuarioDTO)
     if (originalData.fechaNacimiento != editingUser.fechaNacimiento) {
         changes.push({
             field: "Fecha de nacimiento",
-            previousValue: originalData.fechaNacimiento,
-            nextValue: editingUser.fechaNacimiento
+            previousValue: new Date(originalData.fechaNacimiento).toISOString().split('T')[0],
+            nextValue: new Date(editingUser.fechaNacimiento).toISOString().split('T')[0]
         });
     }
 
