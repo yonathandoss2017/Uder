@@ -29,6 +29,7 @@ import {listarProveedores} from "@/services/ProveedorService";
 import UbicacionDTO from "@/types/dtos/UbicacionDTO";
 import {listarUbicaciones} from "@/services/UbicacionService";
 import LoadingPage from "@/app/(pages)/loading";
+import ModeloFilter from "@/types/filters/ModeloFilter";
 
 /**
  * Propiedades del componente Table
@@ -121,7 +122,7 @@ function TableEquiposFC(props: Readonly<TableEquiposFCProps>): ReactElement {
                 marcas.current = response;
             });
 
-            await listarModelos(props.idInstitucion).then((response: ModeloDTO[] | FetchAPIError): void => {
+            await listarModelos(props.sessionAPIToken).then((response: ModeloDTO[] | FetchAPIError): void => {
                 if (isFetchAPIError(response)) {
                     console.error("ERROR - lista de equipos - table.tsx - listarModelos", response.errorMessage);
                     return;
