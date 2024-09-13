@@ -104,6 +104,7 @@ const authOptions: NextAuthOptions = {
                         console.log("Expiró")
                         // Indicamos un error en el JWT (JSON Web Token) de que expiró la sesión (El layout se encargará de redirigir al cliente a la página de inicio de sesión)
                         token.user.error = "expired_token";
+                        token.user.sessionAPIToken = undefined;
                     } else if (diff < 60000) { // Si no ha expirado y faltan menos de 60 segundos para que expire se renueva
                         console.log("JWT - Token expirado, renovando token");
                         const response: string | FetchAPIError = await renovarToken(token.user.sessionAPIToken);
