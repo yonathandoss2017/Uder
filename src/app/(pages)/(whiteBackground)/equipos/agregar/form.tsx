@@ -118,7 +118,7 @@ const RegisterEquipoForm: React.FC<RegisterEquipoFormProps> = (props: RegisterEq
 
             // ------------------- Cargar modelos -------------------
 
-            setModelos(await listarModelos(props.clientData.idInstitucion).then((response: ModeloDTO[] | FetchAPIError): ModeloDTO[] => {
+            setModelos(await listarModelos(props.sessionAPIToken).then((response: ModeloDTO[] | FetchAPIError): ModeloDTO[] => {
                 if (isFetchAPIError(response)) return [];
                 return response;
             }));
