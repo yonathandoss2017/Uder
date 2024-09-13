@@ -6,7 +6,7 @@ import { useModal } from "@/app/hooks/modals/useModal";
 import MarcaDTO from "@/types/dtos/MarcaDTO";
 import FetchAPIError, { isFetchAPIError } from "@/types/errors/FetchAPIError";
 import {darBajaMarca, listarMarcas} from "@/services/MarcaService";
-import stylesTable from "@public/styles/modules/table/table.equipos.module.css";
+import stylesTable from "@public/styles/modules/table/table.tipoequipos.module.css";
 import {ModalInstance} from "@/app/hooks/modals/ModalProvider";
 import {ModalButtonsType} from "@/components/ModalFC";
 import EditMarcaForm from "@/app/(pages)/(whiteBackground)/marcas/(lista)/formEdit";

@@ -6,7 +6,7 @@ import TipoEquipoDTO from "@/types/dtos/TipoEquipoDTO";
 import FetchAPIError, {isFetchAPIError} from "@/types/errors/FetchAPIError";
 import {darBajaTipoEquipo, listarTiposEquipo} from "@/services/TipoEquipoService";
 import TipoEquipoFilter from "@/types/filters/TipoEquipoFilter";
-import stylesTable from "@public/styles/modules/table/table.equipos.module.css";
+import stylesTable from "@public/styles/modules/table/table.tipoequipos.module.css";
 import {ModalInstance} from "@/app/hooks/modals/ModalProvider";
 import EditTipoEquipoForm from "@/app/(pages)/(whiteBackground)/tiposEquipos/(lista)/formEdit";
 import {ModalButtonsType} from "@/components/ModalFC";

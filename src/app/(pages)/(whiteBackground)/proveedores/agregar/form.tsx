@@ -70,6 +70,7 @@ const RegisterProveedorForm: React.FC<RegisterProveedorFormProps> = (props: Regi
 
     return (
         <form onSubmit={handleSubmit(onSubmit)} className={styles.equipoForm}>
+            <h2>Registro de Proveedor</h2>
             <div className={styles.userDetailsRe}>
                 <div className={styles.inputBoxRe}>
                     <label className={styles.details}>

@@ -98,6 +98,7 @@ const RegisterTipoEquipoForm : React.FC<RegisterTipoEquipoFormProps> = (props: R
 
     return(
         <form onSubmit={handleSubmit(onSubmit)} className={styles.equipoForm}>
+            <h2>Registro de Tipo de Equipo</h2>
             <div className={styles.userDetailsRe}>
             <div className={styles.inputBoxRe}>
                 <label className={styles.details}>

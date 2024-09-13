@@ -6,7 +6,7 @@ import ProveedorDTO from "@/types/dtos/ProveedorDTO";
 import FetchAPIError, {isFetchAPIError} from "@/types/errors/FetchAPIError";
 import {darBajaProveedor, listarProveedores} from "@/services/ProveedorService";
 import ProveedorFilter from "@/types/filters/ProveedorFilter";
-import stylesTable from "@public/styles/modules/table/table.equipos.module.css";
+import stylesTable from "@public/styles/modules/table/table.tipoequipos.module.css";
 import {ModalInstance} from "@/app/hooks/modals/ModalProvider";
 import EditProveedorForm from "@/app/(pages)/(whiteBackground)/proveedores/(lista)/formEdit";
 import {ModalButtonsType} from "@/components/ModalFC";

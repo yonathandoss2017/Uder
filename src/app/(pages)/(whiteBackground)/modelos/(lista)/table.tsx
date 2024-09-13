@@ -6,7 +6,7 @@ import { useModal } from "@/app/hooks/modals/useModal";
 import ModeloDTO from "@/types/dtos/ModeloDTO";
 import FetchAPIError, { isFetchAPIError } from "@/types/errors/FetchAPIError";
 import { darBajaModelo, listarModelos } from "@/services/ModeloService";
-import stylesTable from "@public/styles/modules/table/table.equipos.module.css";
+import stylesTable from "@public/styles/modules/table/table.tipoequipos.module.css";
 import { ModalInstance } from "@/app/hooks/modals/ModalProvider";
 import { ModalButtonsType } from "@/components/ModalFC";
 import EditModeloForm from "@/app/(pages)/(whiteBackground)/modelos/(lista)/formEdit";

@@ -56,10 +56,22 @@ const sidebarConfig = [
         key: "marcas",
         submenus: [
             {
-                title: "Ingreso de Marca", path: "/marcas/agregar", permission: PermisoEnum.ALTA_MARCA
+                title: "Ingreso Marca", path: "/marcas/agregar", permission: PermisoEnum.ALTA_MARCA
             },
             {
-                title: "Listado de Marcas", path: "/marcas", permission: PermisoEnum.OBTENER_MARCAS
+                title: "Listado Marcas", path: "/marcas", permission: PermisoEnum.OBTENER_MARCAS
+            },
+        ]
+    },
+    {
+        title: "Gestión Modelos",
+        key: "modelos",
+        submenus: [
+            {
+                title: "Ingreso Modelo", path: "/modelos/agregar", permission: PermisoEnum.ALTA_MODELO
+            },
+            {
+                title: "Listado Modelos", path: "/modelos", permission: PermisoEnum.OBTENER_MODELOS
             },
         ]
     },
@@ -72,19 +84,6 @@ const sidebarConfig = [
             },
             {
                 title: "Listado Proveedores", path: "/proveedores", permission: PermisoEnum.OBTENER_PROVEEDORES
-            },
-        ]
-    },
-
-    {
-        title: "Gestión Modelos",
-        key: "modelos",
-        submenus: [
-            {
-                title: "Ingreso de Modelo", path: "/modelos/agregar", permission: PermisoEnum.ALTA_MODELO
-            },
-            {
-                title: "Listado Modelos", path: "/modelos", permission: PermisoEnum.OBTENER_MODELOS
             },
         ]
     }
