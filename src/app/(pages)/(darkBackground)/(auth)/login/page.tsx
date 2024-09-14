@@ -11,7 +11,7 @@ import {Metadata} from "next";
 
 // Define la metadata de la página principal
 export const metadata: Metadata = {
-    title: 'PInfra DD - Login'
+    title: 'PFT - Login'
 };
 
 // Define la página de inicio de sesión
@@ -20,7 +20,7 @@ const LoginPage = () => {
     return (
         <main className={styles.containerWrap}>
             <div className={styles.container}>
-                <h2>Digital Disruption</h2>
+                <h2>Login</h2>
                 <LoginForm/>
             </div>
         </main>

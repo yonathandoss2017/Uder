@@ -144,7 +144,7 @@ const Sidebar = (): ReactElement | null => {
     return (
         <nav className={styles.sidebarContainer}>
             {/* Título de la barra lateral */}
-            <div className={styles.sidebarTitle}>Digital Disruption</div>
+            <div className={styles.sidebarTitle}>Hospital</div>
             <ul className={styles.sidebarList}>
                 {/* Mapea la configuración de la barra lateral */}
                 {sidebarConfig.map((section) => {
