@@ -28,12 +28,15 @@ const SchemaUser: ZodObject<any> = z.object({
 
     // Validación del campo de segundo nombre (opcional)
     segundoNombre: z
+        .preprocess(((val): string => val ? String(val) : ''), // Convierte el valor a string
+            z
         .string()
         .max(30, "El segundo nombre no puede tener más de 30 caracteres")
         .refine((value: string) => !value.includes(" "), {
             message: "No debe contener espacios en blanco",
         })
-        .optional(),
+        .optional()
+        ),
 
     // Validación del campo de primer apellido
     primerApellido: z
@@ -46,12 +49,15 @@ const SchemaUser: ZodObject<any> = z.object({
 
     // Validación del campo de segundo apellido (opcional)
     segundoApellido: z
+        .preprocess(((val): string => val ? String(val) : ''), // Convierte el valor a string
+            z
         .string()
         .max(30, "El segundo apellido no puede tener más de 30 caracteres")
         .refine((value: string) => !value.includes(" "), {
             message: "No debe contener espacios en blanco",
         })
-        .optional(),
+        .optional()
+        ),
 
     // Validación del campo de fecha de nacimiento
     fechaNacimiento: z

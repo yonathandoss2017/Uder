@@ -114,6 +114,10 @@ function EditUserForm(props: Readonly<EditUserFormProps>): ReactElement {
         if (formValues.segundoNombre === "") formValues.segundoNombre = undefined;
         if (formValues.segundoApellido === "") formValues.segundoApellido = undefined;
 
+        if (!formValues.idPerfil) {
+            formValues.idPerfil = undefined;
+        }
+
         const userModified: UsuarioDTO = {
             ...props.editingUser, // Copia los datos originales del usuario (id, nombreUsuario, etc.)
             ...formValues // Copia los datos modificados del usuario (primerNombre, segundoNombre, etc.)
@@ -422,8 +426,8 @@ async function obtenerCambios(editingUser: UsuarioDTO, originalData: UsuarioDTO)
     if (originalData.fechaNacimiento != editingUser.fechaNacimiento) {
         changes.push({
             field: "Fecha de nacimiento",
-            previousValue: originalData.fechaNacimiento,
-            nextValue: editingUser.fechaNacimiento
+            previousValue: new Date(originalData.fechaNacimiento).toISOString().split('T')[0],
+            nextValue: new Date(editingUser.fechaNacimiento).toISOString().split('T')[0]
         });
     }
 

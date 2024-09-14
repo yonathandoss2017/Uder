@@ -16,29 +16,77 @@ import FetchAPIError, {isFetchAPIError} from "@/types/errors/FetchAPIError";
 const sidebarConfig = [
     {title: "Panel Principal", path: "/"},
     {
-        title: "Gestión de Usuarios",
+        title: "Gestión Usuarios",
         key: "usuarios",
         submenus: [
             {
-                title: "Registro de Usuarios", path: "/usuarios/registrar", permission: PermisoEnum.REACTIVAR_USUARIO
+                title: "Registro Usuarios", path: "/usuarios/registrar", permission: PermisoEnum.REACTIVAR_USUARIO
             },
             {
-                title: "Listado de Usuarios", path: "/usuarios", permission: PermisoEnum.OBTENER_USUARIOS
+                title: "Listado Usuarios", path: "/usuarios", permission: PermisoEnum.OBTENER_USUARIOS
             },
         ]
     },
     {
-        title: "Gestión de Equipos",
+        title: "Gestión Equipos",
         key: "equipos",
         submenus: [
             {
-                title: "Ingreso de Equipo", path: "/equipos/agregar", permission: PermisoEnum.ALTA_EQUIPO
+                title: "Registro Equipos", path: "/equipos/agregar", permission: PermisoEnum.ALTA_EQUIPO
             },
             {
-                title: "Listado de Equipos", path: "/equipos", permission: PermisoEnum.OBTENER_EQUIPOS
+                title: "Listado Equipos", path: "/equipos", permission: PermisoEnum.OBTENER_EQUIPOS
             },
         ]
     },
+    {
+        title: "Gestión Tipos Equipo",
+        key: "tiposEquipo",
+        submenus: [
+            {
+                title: "Registro Tipos Equipo", path: "/tiposEquipos/agregar", permission: PermisoEnum.ALTA_TIPO_EQUIPO
+            },
+            {
+                title: "Listado Tipos Equipo", path: "/tiposEquipos", permission: PermisoEnum.OBTENER_TIPO_EQUIPOS
+            },
+        ]
+    },
+    {
+        title: "Gestión Marca",
+        key: "marcas",
+        submenus: [
+            {
+                title: "Ingreso Marca", path: "/marcas/agregar", permission: PermisoEnum.ALTA_MARCA
+            },
+            {
+                title: "Listado Marcas", path: "/marcas", permission: PermisoEnum.OBTENER_MARCAS
+            },
+        ]
+    },
+    {
+        title: "Gestión Modelos",
+        key: "modelos",
+        submenus: [
+            {
+                title: "Ingreso Modelo", path: "/modelos/agregar", permission: PermisoEnum.ALTA_MODELO
+            },
+            {
+                title: "Listado Modelos", path: "/modelos", permission: PermisoEnum.OBTENER_MODELOS
+            },
+        ]
+    },
+    {
+        title: "Gestión Proveedores",
+        key: "proveedores",
+        submenus: [
+            {
+                title: "Ingreso de Proveedor", path: "/proveedores/agregar", permission: PermisoEnum.ALTA_PROVEEDOR
+            },
+            {
+                title: "Listado Proveedores", path: "/proveedores", permission: PermisoEnum.OBTENER_PROVEEDORES
+            },
+        ]
+    }
 ];
 
 const Sidebar = (): ReactElement | null => {
@@ -53,19 +101,27 @@ const Sidebar = (): ReactElement | null => {
     // Estado para gestionar qué menú está abierto
     const [openMenu, setOpenMenu] = useState<string | null>(null);
 
+    // No renderiza nada si sessionData es null (usuario no autenticado)
+    if (!sessionData) return null;
+
+    // eslint-disable-next-line react-hooks/rules-of-hooks
     useEffect(() => {
+        // Solo obtener permisos si sessionData está disponible
         (async (): Promise<void> => {
-            const response: PermisoEnum[] | FetchAPIError = await obtenerPermisos(sessionData?.user.sessionAPIToken as string);
-            if (isFetchAPIError(response)) {
-                console.error("ERROR - obtenerPermisos: ", response);
-                setPermissions([]);
-                return;
+            if (sessionData) {
+                const response: PermisoEnum[] | FetchAPIError = await obtenerPermisos(sessionData.user.sessionAPIToken as string);
+                if (isFetchAPIError(response)) {
+                    console.error("ERROR - obtenerPermisos: ", response);
+                    setPermissions([]);
+                    return;
+                }
+
+                setPermissions(response);
             }
-
-            setPermissions(response);
         })();
-    }, []);
+    }, [sessionData]); // Agrego sessionData como dependencia
 
+    // eslint-disable-next-line react-hooks/rules-of-hooks
     useEffect(() => {
         // Encuentra la sección cuyo submenú está siendo visualizado actualmente
         const matchedSection = sidebarConfig.find(section =>
@@ -88,7 +144,7 @@ const Sidebar = (): ReactElement | null => {
     return (
         <nav className={styles.sidebarContainer}>
             {/* Título de la barra lateral */}
-            <div className={styles.sidebarTitle}>Digital Disruption</div>
+            <div className={styles.sidebarTitle}>Hospital</div>
             <ul className={styles.sidebarList}>
                 {/* Mapea la configuración de la barra lateral */}
                 {sidebarConfig.map((section) => {
@@ -118,7 +174,7 @@ const Sidebar = (): ReactElement | null => {
                                     {/* Submenús que se muestran si el menú está abierto */}
                                     {openMenu === section.key && (
                                         <ul className={styles.subMenuContainer}>
-                                            {section.submenus.map((submenu) => (
+                                            {visibleSubmenus?.map((submenu) => (
                                                 <li
                                                     key={submenu.path}
                                                     className={`${pathname === submenu.path ? styles.activeOption : ""}`}

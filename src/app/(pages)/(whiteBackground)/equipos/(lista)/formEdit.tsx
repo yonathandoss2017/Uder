@@ -34,7 +34,6 @@ import ModalChangesFC from "@/components/ModalChangesFC";
 import {modificarEquipo} from "@/services/EquiposService";
 import {imageToBase64} from "@/utils/Utils";
 import styles from "@public/styles/modules/table/table.editformequipo.module.css";
-import LoadingPage from "@/app/(pages)/loading";
 
 /**
  * Propiedades del componente
@@ -155,7 +154,7 @@ function EditEquipoForm(props: Readonly<EditEquipoFormProps>): ReactElement {
 
             // ------------------- Cargar marcas -------------------
 
-            setMarcas(await listarMarcas(props.idInstitucion).then((response: MarcaDTO[] | FetchAPIError): MarcaDTO[] => {
+            setMarcas(await listarMarcas(props.sessionAPIToken).then((response: MarcaDTO[] | FetchAPIError): MarcaDTO[] => {
                 if (isFetchAPIError(response)) {
                     console.error("ERROR - Modificar Equipo - listarMarcas: ", response);
                     return [];
@@ -165,7 +164,7 @@ function EditEquipoForm(props: Readonly<EditEquipoFormProps>): ReactElement {
 
             // ------------------- Cargar modelos -------------------
 
-            setModelos(await listarModelos(props.idInstitucion).then((response: ModeloDTO[] | FetchAPIError): ModeloDTO[] => {
+            setModelos(await listarModelos(props.sessionAPIToken).then((response: ModeloDTO[] | FetchAPIError): ModeloDTO[] => {
                 if (isFetchAPIError(response)) {
                     console.error("ERROR - Modificar Equipo - listarModelos: ", response);
                     return [];
@@ -180,7 +179,7 @@ function EditEquipoForm(props: Readonly<EditEquipoFormProps>): ReactElement {
 
             // ------------------- Cargar tipos de equipo -------------------
 
-            setTiposEquipo(await listarTiposEquipo(props.idInstitucion).then((response: TipoEquipoDTO[] | FetchAPIError): TipoEquipoDTO[] => {
+            setTiposEquipo(await listarTiposEquipo(props.sessionAPIToken).then((response: TipoEquipoDTO[] | FetchAPIError): TipoEquipoDTO[] => {
                 if (isFetchAPIError(response)) {
                     console.error("ERROR - Modificar Equipo - listarTiposEquipo: ", response);
                     return [];
@@ -190,7 +189,7 @@ function EditEquipoForm(props: Readonly<EditEquipoFormProps>): ReactElement {
 
             // ------------------- Cargar proveedores -------------------
 
-            setProveedores(await listarProveedores(props.idInstitucion).then((response: ProveedorDTO[] | FetchAPIError): ProveedorDTO[] => {
+            setProveedores(await listarProveedores(props.sessionAPIToken).then((response: ProveedorDTO[] | FetchAPIError): ProveedorDTO[] => {
                 if (isFetchAPIError(response)) {
                     console.error("ERROR - Modificar Equipo - listarProveedores: ", response);
                     return [];
@@ -344,7 +343,7 @@ function EditEquipoForm(props: Readonly<EditEquipoFormProps>): ReactElement {
                     });
                 }
 
-                // Muestra un mensaje de éxito al modificar el usuario
+                // Muestra un mensaje de éxito al modificar el equipo
                 createModal({
                     children: (
                         <p>Equipo con número de serie: &quot;{props.editingEquipo.numSerie}&quot; modificado

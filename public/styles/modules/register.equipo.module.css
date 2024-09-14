@@ -187,7 +187,7 @@ form .userDetailsRe .inputBoxRe {
     height: 150px;
     width: 150px;
     margin: 50px auto;
-    border: dashed 2px gray;
+    border: dashed 2px rgb(128, 128, 128);
 }
 
 .preview img {

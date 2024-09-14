@@ -8,7 +8,7 @@
 
 /*==================== TABLA ====================*/
 .containerTable {
-    margin-left: 250px;
+    margin-left: 280px;
     background-color: #e5e5e533;
     padding: 30px 30px 0 30px;
     border-radius: 20px;
@@ -88,26 +88,44 @@
     border-radius: 0 0 20px 20px;
 }
 
+.filtersContainerInputs{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    width: 100%;
+    margin-bottom: 20px;
+}
+
+.filtersContainerInputs input {
+    width: 250px; /* Ancho fijo para todos */
+    margin: 5px 10px; /* Espaciado entre los elementos */
+    padding: 10px; /* Asegura que tengan el mismo padding */
+    border-radius: 5px;
+    border: solid 2px #808080ab;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+
 .filtersContainerInputs select {
+    min-width: 250px; /* Ajusta según sea necesario */
     padding: 5px;
     border-radius: 10px;
     color: white;
     background: black;
-    width: auto;
     font-weight: 500;
+    width: 250px; /* Ancho fijo para todos */
+    margin: 5px 10px; /* Espaciado entre los elementos */
+    padding: 10px;
 }
 
 .filtersContainerInputs option {
     color: white;
+    flex: 1 1 200px;
+    margin: 10px;
 }
 
-.filtersContainerInputs input {
-    margin: 0 10px;
-    padding: 5px;
-    border: solid 2px #808080ab;
-    border-radius: 5px;
-    font-weight: 500;
-}
+
 
 .filtersContainerButtons {
     display: flex;

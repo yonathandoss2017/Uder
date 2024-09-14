@@ -42,6 +42,7 @@ const HomePage = async (): Promise<ReactElement> => {
         }
 
         return response.sort((a: AuditoriaDTO, b: AuditoriaDTO): number => {
+            console.log("Fecha A: ", a.fechaHora);
             const dateA: number = new Date(a.fechaHora).getTime(); // Convierte la fecha y hora a milisegundos
             const dateB: number = new Date(b.fechaHora).getTime(); // Convierte la fecha y hora a milisegundos
 

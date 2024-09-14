@@ -1,6 +1,6 @@
 export default interface BajaEquipoDTO {
     id?: number;
-    fecha?: Date;
+    fecha?: string;
     razon: string;
     comentarios: string;
     idUsuario?: number;
