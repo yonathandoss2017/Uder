@@ -3,7 +3,6 @@
 Proyecto Final de Tecnicatura (Proyecto LTI 4º semestre 2024)
 
 ### Servidor: https://git.utec.edu.uy/pft/servidor-api
-Este proyecto está desarrollado con Next.js con [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
 ## Tabla de Contenidos
 
