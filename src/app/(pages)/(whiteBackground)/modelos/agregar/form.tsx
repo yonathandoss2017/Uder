@@ -72,7 +72,7 @@ const RegisterModeloForm: React.FC<RegisterModeloFormProps> = (props: RegisterMo
 
         const nuevoModel: ModeloDTO = {
             nombre: formValues.nombre,
-            activo: formValues.activo,
+            activo: true,
             idMarca: selectedMarcaId,
         };
 
