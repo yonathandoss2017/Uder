@@ -2,10 +2,11 @@
 
 // Importa los módulos necesarios
 import {signOut, useSession} from "next-auth/react";
-import {ReactNode} from "react";
+import {ReactNode, useEffect} from "react";
 import {Session} from "next-auth";
 import LoadingPage from "@/app/(pages)/loading";
 import ErrorFC from "@/components/ErrorFC";
+import Cookies from 'universal-cookie';
 
 // Define el componente layout de autenticación
 function AuthLayout({children}: Readonly<{ children: ReactNode }>) {
@@ -17,6 +18,10 @@ function AuthLayout({children}: Readonly<{ children: ReactNode }>) {
             data: Session | null,
             status: string
         };
+
+    useEffect(() => {
+        console.log("EN AUTH LAYOUT")
+    }, [sessionData?.user.sessionAPIToken]);
 
     // Muestra la página de carga si el estado de la sesión es "loading"
     if (status === "loading") return <LoadingPage/>
