@@ -10,7 +10,7 @@ build-job:
     - echo "Compiling the code..."
     - echo "Compile complete."
   tags:
-    - sonarQube
+    - web
 
 unit-test-job:
   stage: test
@@ -19,7 +19,7 @@ unit-test-job:
     - sleep 60
     - echo "Code coverage is 90%"
   tags:
-    - sonarQube
+    - web
 
 lint-test-job:
   stage: test
@@ -28,7 +28,7 @@ lint-test-job:
     - sleep 10
     - echo "No lint issues found."
   tags:
-    - sonarQube
+    - web
 
 deploy-job:
   stage: deploy
@@ -37,7 +37,7 @@ deploy-job:
     - echo "Deploying application..."
     - echo "Application successfully deployed."
   tags:
-    - sonarQube
+    - web
 
 sonarqube-check:
   image:
@@ -56,4 +56,4 @@ sonarqube-check:
   only:
     - sonarQube
   tags:
-    - sonarQube
+    - web
