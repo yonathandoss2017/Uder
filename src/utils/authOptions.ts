@@ -11,7 +11,9 @@ import {NextAuthOptions, User} from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import CredentialsProvider from "next-auth/providers/credentials";
 import FetchAPIError, {isFetchAPIError} from "@/types/errors/FetchAPIError";
+import UsuarioDTO from "@/types/dtos/UsuarioDTO";
 import {buscarClientePorToken, loginCredentials, renovarToken} from "@/services/SessionService";
+import {cookies} from 'next/headers'
 
 // Opciones de configuración para NextAuth
 const authOptions: NextAuthOptions = {
