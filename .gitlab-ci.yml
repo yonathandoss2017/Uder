@@ -1,5 +1,48 @@
+
+stages:
+  - build
+  - test
+  - deploy
+
+build-job:
+  stage: build
+  script:
+    - echo "Compiling the code..."
+    - echo "Compile complete."
+  tags:
+    - sonarQube
+
+unit-test-job:
+  stage: test
+  script:
+    - echo "Running unit tests... This will take about 60 seconds."
+    - sleep 60
+    - echo "Code coverage is 90%"
+  tags:
+    - sonarQube
+
+lint-test-job:
+  stage: test
+  script:
+    - echo "Linting code... This will take about 10 seconds."
+    - sleep 10
+    - echo "No lint issues found."
+  tags:
+    - sonarQube
+
+deploy-job:
+  stage: deploy
+  environment: production
+  script:
+    - echo "Deploying application..."
+    - echo "Application successfully deployed."
+  tags:
+    - sonarQube
+
 sonarqube-check:
-  image: maven:3.6.3-jdk-11
+  image:
+    name: sonarsource/sonar-scanner-cli:latest
+    entrypoint: [""]
   variables:
     SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"  # Defines the location of the analysis task cache
     GIT_DEPTH: "0"  # Tells git to fetch all the branches of the project, required by the analysis task
@@ -7,8 +50,10 @@ sonarqube-check:
     key: "${CI_JOB_NAME}"
     paths:
       - .sonar/cache
-  script: 
-    - mvn verify sonar:sonar -Dsonar.projectKey=ServidorAPI
+  script:
+    - sonar-scanner
   allow_failure: true
   only:
+    - sonarQube
+  tags:
     - sonarQube
