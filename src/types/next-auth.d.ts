@@ -1,4 +1,5 @@
 import UsuarioDTO from "@/types/dtos/UsuarioDTO";
+import {JWT} from "next-auth/jwt";
 
 declare module "next-auth" {
     /**
@@ -22,12 +23,6 @@ declare module "next-auth" {
             data?: UsuarioDTO
 
             /**
-             * Indica un error al iniciar sesión
-             * (Por ejemplo, tokén de sesión inválida del lado de la API)
-             */
-            error?: string
-
-            /**
              * (Al iniciar sesión con Google) Indica el nombre completo del usuario
              */
             name?: string;
@@ -36,12 +31,20 @@ declare module "next-auth" {
              * (Al iniciar sesión con Google) Indica el correo electrónico del usuario
              */
             email?: string
+
+            /**
+             * Indica un error al iniciar sesión
+             * (Por ejemplo, tokén de sesión inválida del lado de la API)
+             */
+            error?: string
+
         };
     }
 
 
     interface User {
         sessionAPIToken?: string
+        exp: number
     }
 
     interface Account {
@@ -69,15 +72,16 @@ declare module "next-auth/jwt" {
             sessionGoogleToken?: string
 
             /**
-             * Datos del usuario
+             * Fecha de expiración del token
              */
-            data?: UsuarioDTO
+            exp: number
 
             /**
              * Indica un error al iniciar sesión
              * (Por ejemplo, tokén de sesión inválida del lado de la API)
              */
             error?: string
+
         },
 
     }

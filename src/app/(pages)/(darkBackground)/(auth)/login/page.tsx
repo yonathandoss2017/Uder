@@ -5,13 +5,13 @@
 // Importa los estilos de la página
 import styles from "@public/styles/modules/auth/authPage.module.css";
 // Importa los módulos necesarios
-import React from "react";
+import React, {ReactElement} from "react";
 import LoginForm from "./form";
 import {Metadata} from "next";
 
 // Define la metadata de la página principal
 export const metadata: Metadata = {
-    title: 'PInfra DD - Login'
+    title: 'PFT - Login'
 };
 
 // Define la página de inicio de sesión
@@ -20,7 +20,7 @@ const LoginPage = () => {
     return (
         <main className={styles.containerWrap}>
             <div className={styles.container}>
-                <h2>Digital Disruption</h2>
+                <h2>Login</h2>
                 <LoginForm/>
             </div>
         </main>

@@ -7,7 +7,7 @@ export default interface UsuarioDTO {
     segundoNombre?: string;
     primerApellido: string;
     segundoApellido?: string;
-    fechaNacimiento: Date | string;
+    fechaNacimiento: string;
     nombreUsuario?: string;
     email: string;
     idPerfil?: number;

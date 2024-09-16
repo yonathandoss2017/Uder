@@ -111,28 +111,28 @@ const RegisterEquipoForm: React.FC<RegisterEquipoFormProps> = (props: RegisterEq
 
             // ------------------- Cargar marcas -------------------
 
-            setMarcas(await listarMarcas(props.clientData.idInstitucion).then((response: MarcaDTO[] | FetchAPIError): MarcaDTO[] => {
+            setMarcas(await listarMarcas(props.sessionAPIToken).then((response: MarcaDTO[] | FetchAPIError): MarcaDTO[] => {
                 if (isFetchAPIError(response)) return [];
                 return response;
             }));
 
             // ------------------- Cargar modelos -------------------
 
-            setModelos(await listarModelos(props.clientData.idInstitucion).then((response: ModeloDTO[] | FetchAPIError): ModeloDTO[] => {
+            setModelos(await listarModelos(props.sessionAPIToken).then((response: ModeloDTO[] | FetchAPIError): ModeloDTO[] => {
                 if (isFetchAPIError(response)) return [];
                 return response;
             }));
 
             // ------------------- Cargar tipos de equipo -------------------
 
-            setTiposEquipo(await listarTiposEquipo(props.clientData.idInstitucion).then((response: TipoEquipoDTO[] | FetchAPIError): TipoEquipoDTO[] => {
+            setTiposEquipo(await listarTiposEquipo(props.sessionAPIToken).then((response: TipoEquipoDTO[] | FetchAPIError): TipoEquipoDTO[] => {
                 if (isFetchAPIError(response)) return [];
                 return response;
             }));
 
             // ------------------- Cargar proveedores -------------------
 
-            setProveedores(await listarProveedores(props.clientData.idInstitucion).then((response: ProveedorDTO[] | FetchAPIError): ProveedorDTO[] => {
+            setProveedores(await listarProveedores(props.sessionAPIToken).then((response: ProveedorDTO[] | FetchAPIError): ProveedorDTO[] => {
                 if (isFetchAPIError(response)) return [];
                 return response;
             }));
