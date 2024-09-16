@@ -66,40 +66,6 @@ interface TableSearchTermsProps {
  */
 function TableEquiposFC(props: Readonly<TableEquiposFCProps>): ReactElement {
 
-    useEffect(() => {
-
-            // Configura el timer para renovar el token
-            const timer = setTimeout(() => {
-                createModal({
-                    children: (
-                        <p>Su sesión está por expirar, quiere renovarla?</p>
-                    ),
-                    buttonsType: ModalButtonsType.CONFIRM_CANCEL,
-                    onConfirm: async (): Promise<void> => {
-                        console.log("Renovando token en page");
-                        const response: string | FetchAPIError = await renovarToken(props.sessionAPIToken);
-                        if (isFetchAPIError(response)) {
-                            console.error("ERROR - EquiposPage_renovarToken: ", response);
-                            throw new Error(response.errorMessage);
-                        }
-                        window.location.reload();
-                    },
-                    onCancel: (): void => {
-                        console.log("Cancelando renovación de token");
-                        window.location.href = "/logout";
-                    }
-
-                }).show();
-            }, 15000);
-
-            return () => clearTimeout(timer);
-        }
-
-        ,
-        [props.sessionAPIToken]
-    );
-
-
     // ----------------------- Modales -----------------------
 
     const {createModal} = useModal();

@@ -11,9 +11,7 @@ import {NextAuthOptions, User} from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import CredentialsProvider from "next-auth/providers/credentials";
 import FetchAPIError, {isFetchAPIError} from "@/types/errors/FetchAPIError";
-import UsuarioDTO from "@/types/dtos/UsuarioDTO";
 import {buscarClientePorToken, loginCredentials, renovarToken} from "@/services/SessionService";
-import {cookies} from 'next/headers'
 
 // Opciones de configuración para NextAuth
 const authOptions: NextAuthOptions = {
@@ -65,6 +63,10 @@ const authOptions: NextAuthOptions = {
 
         })
     ],
+    session: {
+        strategy: 'jwt',
+        maxAge: 30000
+    },
     callbacks: {
         // Definimos los callbacks que se ejecutan después de ciertas acciones (autenticación, creación de token y sesión)
 
@@ -94,6 +96,7 @@ const authOptions: NextAuthOptions = {
             if (account) {
                 // Persistimos el token de sesión de Google en el JWT (JSON Web Token)
                 token.user.sessionGoogleToken = account.id_token;
+                token.user.exp = (Date.now() + 30000);
             }
 
             // Si el trigger es "update", modificamos el
@@ -137,7 +140,6 @@ const authOptions: NextAuthOptions = {
 
         async session({session, token}) {
 
-
             session.user.sessionAPIToken = token.user?.sessionAPIToken;
 
             // Método que se ejecuta después de que se ha creado la sesión de cliente
@@ -164,6 +166,8 @@ const authOptions: NextAuthOptions = {
                         }
                         session.user.data = response;
                         session.user.sessionAPIToken = sessionToken;
+                        session.expires = new Date(token.user.exp).toISOString();
+                        console.log(session.expires, "Expiracion del session auth")
                     }
                 } catch (error) {
                     console.error("Error al buscar cliente por token: ", error);
