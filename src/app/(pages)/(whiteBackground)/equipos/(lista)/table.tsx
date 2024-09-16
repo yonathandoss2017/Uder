@@ -69,6 +69,13 @@ function TableEquiposFC(props: Readonly<TableEquiposFCProps>): ReactElement {
 
     const {createModal} = useModal();
 
+
+    useEffect(() => {
+        console.log("EN HOME PAGE")
+        console.log("Session API Token: ", props.sessionAPIToken);
+
+    }, [props.sessionAPIToken]);
+
     // ----------------------- Términos de búsqueda  -----------------------
 
     const [currentPage, setCurrentPage] = useState<number>(1);
