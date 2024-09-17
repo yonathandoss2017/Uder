@@ -1,36 +1,36 @@
-import { Metadata } from "next";
-import { ReactElement } from "react";
-import { getServerSession, Session } from "next-auth";
+import {Metadata} from "next";
+import {ReactElement} from "react";
+import {getServerSession, Session} from "next-auth";
 import authOptions from "@/utils/authOptions";
 import UsuarioDTO from "@/types/dtos/UsuarioDTO";
 import LoadingPage from "@/app/(pages)/loading";
-import { verificarPermiso } from "@/services/SessionService";
+import {verificarPermiso} from "@/services/SessionService";
 import PermisoEnum from "@/types/enums/PermisoEnum";
 import ErrorFC from "@/components/ErrorFC";
-import TableMarcaFC from "@/app/(pages)/(whiteBackground)/marcas/(lista)/table";
+import TableFuncionalidadFC from "@/app/(pages)/(whiteBackground)/funcionalidades/(listar)/table";
 
 export const metadata: Metadata = {
     title: 'PFT - Lista de equipos',
 };
 
-const MarcaPage = async (): Promise<ReactElement> => {
+const FuncionalidadPage = async (): Promise<ReactElement> => {
     const sessionData: Session | null = await getServerSession(authOptions);
     const sessionAPIToken: string | undefined = sessionData?.user?.sessionAPIToken;
     const clientData: UsuarioDTO | undefined = sessionData?.user?.data;
 
     if (!sessionAPIToken || !clientData) return <LoadingPage />;
 
-    if (!(await verificarPermiso(sessionAPIToken, PermisoEnum.OBTENER_MARCAS))) {
+    if (!(await verificarPermiso(sessionAPIToken, PermisoEnum.OBTENER_FUNCIONALIDADES))) {
         return <ErrorFC message={"Acceso denegado"} />;
     }
 
-    const hasPermissionEdit: boolean = await verificarPermiso(sessionAPIToken, PermisoEnum.MODIFICAR_MARCA);
-    const hasPermissionBaja: boolean = await verificarPermiso(sessionAPIToken, PermisoEnum.BAJA_MARCA);
-    const hasPermissionView: boolean = await verificarPermiso(sessionAPIToken, PermisoEnum.OBTENER_MARCAS);
+    const hasPermissionEdit: boolean = await verificarPermiso(sessionAPIToken, PermisoEnum.MODIFICAR_FUNCIONALIDAD);
+    const hasPermissionBaja: boolean = await verificarPermiso(sessionAPIToken, PermisoEnum.BAJA_FUNCIONALIDAD);
+    const hasPermissionView: boolean = await verificarPermiso(sessionAPIToken, PermisoEnum.OBTENER_FUNCIONALIDADES);
 
     return (
         <main>
-            <TableMarcaFC
+            <TableFuncionalidadFC
                 sessionAPIToken={sessionAPIToken}
                 hasPermissionBaja={hasPermissionBaja}
                 hasPermissionEdit={hasPermissionEdit}
@@ -41,4 +41,4 @@ const MarcaPage = async (): Promise<ReactElement> => {
     );
 };
 
-export default MarcaPage;
+export default FuncionalidadPage;
