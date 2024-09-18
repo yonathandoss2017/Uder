@@ -86,6 +86,16 @@ const sidebarConfig = [
                 title: "Listado Proveedores", path: "/proveedores", permission: PermisoEnum.OBTENER_PROVEEDORES
             },
         ]
+    },
+    {
+        title: "Gestión Perfiles",  // Nueva sección de Perfiles
+        key: "perfiles",             // Clave única para la sección de perfiles
+        submenus: [
+            {
+                title: "Registro Perfiles", path: "/perfiles/agregar", permission: PermisoEnum.ALTA_PERFIL
+            },
+
+        ]
     }
 ];
 
