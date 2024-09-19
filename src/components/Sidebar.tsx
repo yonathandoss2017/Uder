@@ -94,6 +94,9 @@ const sidebarConfig = [
             {
                 title: "Registro Perfiles", path: "/perfiles/agregar", permission: PermisoEnum.ALTA_PERFIL
             },
+            {
+                title: "Listado Perfiles", path: "/Perfiles", permission: PermisoEnum.OBTENER_PERFILES
+            },
 
         ]
     }
