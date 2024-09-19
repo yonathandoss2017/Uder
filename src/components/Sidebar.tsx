@@ -86,7 +86,19 @@ const sidebarConfig = [
                 title: "Listado Proveedores", path: "/proveedores", permission: PermisoEnum.OBTENER_PROVEEDORES
             },
         ]
-    }
+    },
+    {
+        title: "Gestión Intervenciones",
+        key: "intervenciones",
+        submenus: [
+            {
+                title: "Ingreso Intervencion", path: "/intervenciones/agregar", permission: PermisoEnum.ALTA_INTERVENCION
+            },
+            {
+                title: "Listado Intervenciones", path: "/intervenciones", permission: PermisoEnum.OBTENER_INTERVENCIONES
+            },
+        ]
+    },
 ];
 
 const Sidebar = (): ReactElement | null => {
