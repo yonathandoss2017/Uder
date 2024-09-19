@@ -1,105 +1,105 @@
 'use client';
 
-import React, { useState } from "react";
-import styles from "@public/styles/modules/register.tiposequipo.module.css";
+import React from "react";
 import PerfilDTO from "@/types/dtos/PerfilDTO";
-import { useForm } from "react-hook-form";
-import { useRouter } from "next/router";
 import UsuarioDTO from "@/types/dtos/UsuarioDTO";
-
+import {useModal} from "@/app/hooks/modals/useModal";
+import {SubmitHandler, useForm, UseFormReturn} from "react-hook-form";
+import {zodResolver} from "@hookform/resolvers/zod";
+import styles from "@public/styles/modules/register.tiposequipo.module.css"; // Usamos el mismo archivo CSS que proveedores
+import SchemaPerfil from "@/validations/SchemaPerfil";
+import FetchAPIError, {isFetchAPIError} from "@/types/errors/FetchAPIError";
+import {agregarPerfil} from "@/services/PerfilService";
+import {ModalButtonsType} from "@/components/ModalFC";
 
 interface RegisterPerfilFormProps {
-    clientData: UsuarioDTO;
     sessionAPIToken: string;
+    clientData: UsuarioDTO;
 }
 
-const RegisterPerfilForm = ({ clientData, sessionAPIToken }: RegisterPerfilFormProps) => {
-    const { register, handleSubmit, formState: { errors } } = useForm<PerfilDTO>();
-    const router = useRouter();
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState<string | null>(null);
+interface FormValues extends PerfilDTO {}
 
-    const onSubmit = async (data: PerfilDTO) => {
-        setLoading(true);
-        setError(null);
+const RegisterPerfilForm: React.FC<RegisterPerfilFormProps> = (props: RegisterPerfilFormProps) => {
+    const {createModal} = useModal();
 
-        // Lógica para enviar el perfil al servidor
-        try {
-            const response = await fetch("/api/perfiles", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${sessionAPIToken}`,
-                },
-                body: JSON.stringify(data),
-            });
+    const {
+        register,
+        handleSubmit,
+        formState: {errors},
+        reset
+    }: UseFormReturn<FormValues> = useForm<FormValues>({
+        resolver: zodResolver(SchemaPerfil),
+        mode: 'all',
+        defaultValues: {}
+    });
 
-            if (response.ok) {
-                // Redirigir a otra página o mostrar un mensaje de éxito
-                router.push("/perfiles/success");
-            } else {
-                const responseData = await response.json();
-                setError(responseData.message || "Error al crear el perfil");
-            }
-        } catch (e) {
-            setError("Error de red o servidor no disponible");
+    const onSubmit: SubmitHandler<FormValues> = async (formValues: FormValues): Promise<void> => {
+        const nuevoPerfil: PerfilDTO = {
+            nombre: formValues.nombre,
+            activo: formValues.activo ?? true,
+            idFuncionalidades: formValues.idFuncionalidades,
+            idInstitucion: props.clientData.idInstitucion,
+            nivel: formValues.nivel
+        };
+
+        const response: PerfilDTO | FetchAPIError = await agregarPerfil(nuevoPerfil, props.sessionAPIToken);
+
+        if (isFetchAPIError(response)) {
+            console.error('ERROR - Registro de perfil - agregarPerfil:', response);
+            createModal({
+                children: (
+                    <div>
+                        <h2>Error al registrar el perfil</h2>
+                        <p>{response.errorMessage}</p>
+                    </div>
+                ),
+                buttonsType: ModalButtonsType.CONFIRM
+            }).show();
+            return;
         }
 
-        setLoading(false);
+        createModal({
+            children: (
+                <div>
+                    <h2>Perfil registrado correctamente</h2>
+                </div>
+            ),
+            buttonsType: ModalButtonsType.CONFIRM
+        }).show();
+
+        reset();
     };
 
     return (
-        <form onSubmit={handleSubmit(onSubmit)} className={styles.form}>
-            <div className={styles.field}>
-                <label htmlFor="nombre">Nombre del perfil</label>
-                <input
-                    id="nombre"
-                    type="text"
-                    {...register("nombre", { required: "El nombre es obligatorio" })}
-                />
-                {errors.nombre && <p className={styles.error}>{errors.nombre.message}</p>}
+        <form onSubmit={handleSubmit(onSubmit)} className={styles.equipoForm}>
+            <h2>Registro de Perfil</h2>
+            <div className={styles.userDetailsRe}>
+                <div className={styles.inputBoxRe}>
+                    <label className={styles.details}>
+                        <span>Nombre <span className={styles.requiredField}>*</span></span>
+                        <input
+                            {...register("nombre", {required: "Este campo es requerido"})}
+                            type="text"
+                            placeholder="Nombre del Perfil"
+                        />
+                    </label>
+                    {errors.nombre && <label className={styles.error}>{errors.nombre.message}</label>}
+                </div>
+                <div className={styles.inputBoxRe}>
+                    <label className={styles.details}>
+                        <span>Nivel <span className={styles.requiredField}>*</span></span>
+                        <input
+                            {...register("nivel", {required: "Este campo es requerido"})}
+                            type="number"
+                            placeholder="Nivel del Perfil"
+                        />
+                    </label>
+                    {errors.nivel && <label className={styles.error}>{errors.nivel.message}</label>}
+                </div>
+                <div className={styles.buttomAe}>
+                    <button type="submit">Agregar</button>
+                </div>
             </div>
-
-            <div className={styles.field}>
-                <label htmlFor="nivel">Nivel</label>
-                <input
-                    id="nivel"
-                    type="number"
-                    {...register("nivel", { required: "El nivel es obligatorio" })}
-                />
-                {errors.nivel && <p className={styles.error}>{errors.nivel.message}</p>}
-            </div>
-
-            <div className={styles.field}>
-                <label htmlFor="idInstitucion">ID de Institución</label>
-                <input
-                    id="idInstitucion"
-                    type="number"
-                    {...register("idInstitucion", { required: "La institución es obligatoria" })}
-                />
-                {errors.idInstitucion && <p className={styles.error}>{errors.idInstitucion.message}</p>}
-            </div>
-
-            <div className={styles.field}>
-                <label htmlFor="idFuncionalidades">Funcionalidades</label>
-                <input
-                    id="idFuncionalidades"
-                    type="number"
-                    {...register("idFuncionalidades", { required: "Las funcionalidades son obligatorias" })}
-                />
-                {errors.idFuncionalidades && <p className={styles.error}>{errors.idFuncionalidades.message}</p>}
-            </div>
-
-            <div className={styles.field}>
-                <label htmlFor="activo">Activo</label>
-                <input id="activo" type="checkbox" {...register("activo")} />
-            </div>
-
-            {error && <p className={styles.error}>{error}</p>}
-
-            <button type="submit" disabled={loading}>
-                {loading ? "Cargando..." : "Crear Perfil"}
-            </button>
         </form>
     );
 };

@@ -15,17 +15,14 @@ const SchemaPerfil: ZodObject<any> = z.object({
             message: "El nombre no puede estar vacío",
         }),
 
-    // Validación del nivel (debe ser un número mayor o igual a 1)
-    nivel: z.number()
-        .min(1, "El nivel debe ser mayor o igual a 1"),
+    nivel: z
+        .preprocess(((val): string => val ? String(val) : ''), // Convierte el valor a string
+            z.string()
+                .regex(/^\d+$/, 'El nivel debe contener solo números')
+                .refine((value: string) => !value.includes(" "), {
+                    message: "No debe contener espacios en blanco",
+                })),
 
-    // Validación del idInstitucion (debe ser un número entero positivo)
-    idInstitucion: z.number()
-        .positive("El id de la institución debe ser un número positivo"),
-
-    // Validación de idFuncionalidades (array de números)
-    idFuncionalidades: z.array(z.number().positive("El id de la funcionalidad debe ser un número positivo"))
-        .min(1, "Debe seleccionar al menos una funcionalidad")
 });
 
 export default SchemaPerfil;

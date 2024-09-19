@@ -49,7 +49,7 @@ const authOptions: NextAuthOptions = {
                 // Retornamos un objeto con el token de sesión en la API para persistirlo en el JWT (JSON Web Token)
                 return {
                     sessionAPIToken: response,
-                    exp: (Date.now() + 300000)
+                    exp: (Date.now() + 15000)
                 } as User;
 
             }
@@ -105,7 +105,7 @@ const authOptions: NextAuthOptions = {
                         // Indicamos un error en el JWT (JSON Web Token) de que expiró la sesión (El layout se encargará de redirigir al cliente a la página de inicio de sesión)
                         token.user.error = "expired_token";
                         token.user.sessionAPIToken = undefined;
-                    } else if (diff < 60000) { // Si no ha expirado y faltan menos de 60 segundos para que expire se renueva
+                    } else if (diff < 5000) { // Si no ha expirado y faltan menos de 60 segundos para que expire se renueva
                         console.log("JWT - Token expirado, renovando token");
                         const response: string | FetchAPIError = await renovarToken(token.user.sessionAPIToken);
                         if (isFetchAPIError(response)) {
@@ -113,7 +113,7 @@ const authOptions: NextAuthOptions = {
                             throw new Error(response.errorMessage);
                         }
                         token.user.sessionAPIToken = response;
-                        token.user.exp = (Date.now() + 300000);
+                        token.user.exp = (Date.now() + 15000);
                     }
                 }
             }
