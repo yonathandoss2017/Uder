@@ -88,18 +88,18 @@ const sidebarConfig = [
         ]
     },
     {
-        title: "Gestión Perfiles",  // Nueva sección de Perfiles
-        key: "perfiles",             // Clave única para la sección de perfiles
+        title: "Gestión Perfiles",
+        key: "perfiles",
         submenus: [
             {
                 title: "Registro Perfiles", path: "/perfiles/agregar", permission: PermisoEnum.ALTA_PERFIL
             },
             {
-                title: "Listado Perfiles", path: "/Perfiles", permission: PermisoEnum.OBTENER_PERFILES
+                title: "Listado Perfiles", path: "/perfiles", permission: PermisoEnum.OBTENER_PERFILES
             },
-
         ]
     }
+
 ];
 
 const Sidebar = (): ReactElement | null => {

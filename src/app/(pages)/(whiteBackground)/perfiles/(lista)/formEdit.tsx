@@ -2,14 +2,14 @@ import React, {ChangeEvent, ReactElement} from "react";
 import {useModal} from "@/app/hooks/modals/useModal";
 import {SubmitHandler, useForm, UseFormReturn} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
-import SchemaPerfil from "@/validations/SchemaPerfil";
-import styles from "@public/styles/modules/table/table.editformequipo.module.css";
+import SchemaPerfil from "@/validations/SchemaPerfil"; // Deberías crear este schema
+import styles from "@public/styles/modules/table/table.editformequipo.module.css"; // Cambiar a los estilos correctos
 import PerfilDTO from "@/types/dtos/PerfilDTO";
 import ChangeEntry from "@/types/ChangeEntry";
 import {ModalButtonsType} from "@/components/ModalFC";
 import FetchAPIError, {isFetchAPIError} from "@/types/errors/FetchAPIError";
 import ModalChangesFC from "@/components/ModalChangesFC";
-import {modificarPerfil} from "@/services/PerfilService";
+import {modificarPerfil} from "@/services/PerfilService"; // Servicio para modificar perfil
 
 interface EditPerfilFormProps {
     sessionAPIToken: string;
@@ -28,7 +28,7 @@ function EditPerfilForm(props: Readonly<EditPerfilFormProps>): ReactElement {
         handleSubmit,
         formState: {errors}
     }:  UseFormReturn<PerfilDTO> = useForm<PerfilDTO>({
-        resolver: zodResolver(SchemaPerfil),
+        resolver: zodResolver(SchemaPerfil), // Resolver con el schema de validación para perfil
         mode: 'all',
         defaultValues: {}
     });
@@ -37,11 +37,10 @@ function EditPerfilForm(props: Readonly<EditPerfilFormProps>): ReactElement {
 
         const modifiedPerfil: PerfilDTO = {
             ...props.editingPerfil,
-            nombre: formValues.nombre,
-            nivel: formValues.nivel
+            nombre: formValues.nombre
         };
 
-        const changes: ChangeEntry[] = await obtenerCambios(
+        const changes: ChangeEntry[] = await obtenerCambiosPerfil(
             modifiedPerfil,
             props.editingPerfil
         );
@@ -111,18 +110,6 @@ function EditPerfilForm(props: Readonly<EditPerfilFormProps>): ReactElement {
                     {errors.nombre &&
                         <label className={styles.error} style={{color: 'red'}}>{errors.nombre.message}</label>}
                 </div>
-                <div className={styles.inputBox}>
-                    <label className={styles.details}>Nivel<span className={styles.requiredField}>*</span></label>
-                    <input
-                        {...register("nivel", {required: "Este campo es requerido"})}
-                        type="number"
-                        placeholder="Nivel"
-                        className="nivel"
-                        defaultValue={props.editingPerfil.nivel}
-                    />
-                    {errors.nivel &&
-                        <label className={styles.error} style={{color: 'red'}}>{errors.nivel.message}</label>}
-                </div>
             </div>
 
             <div className={styles.buttomM}>
@@ -135,7 +122,7 @@ function EditPerfilForm(props: Readonly<EditPerfilFormProps>): ReactElement {
 
 export default EditPerfilForm;
 
-async function obtenerCambios(editingPerfil: PerfilDTO, originalData: PerfilDTO): Promise<ChangeEntry[]> {
+async function obtenerCambiosPerfil(editingPerfil: PerfilDTO, originalData: PerfilDTO): Promise<ChangeEntry[]> {
 
     const changes: ChangeEntry[] = [];
 
@@ -144,13 +131,6 @@ async function obtenerCambios(editingPerfil: PerfilDTO, originalData: PerfilDTO)
             field: "Nombre",
             previousValue: originalData.nombre,
             nextValue: editingPerfil.nombre
-        });
-    }
-    if (originalData.nivel !== editingPerfil.nivel) {
-        changes.push({
-            field: "Nivel",
-            previousValue: originalData.nivel,
-            nextValue: editingPerfil.nivel
         });
     }
 

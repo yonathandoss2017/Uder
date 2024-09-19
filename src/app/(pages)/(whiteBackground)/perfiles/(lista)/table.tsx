@@ -1,15 +1,24 @@
 "use client";
 
-import React, {ChangeEvent, MutableRefObject, ReactElement, useEffect, useRef, useState} from "react";
-import {useModal} from "@/app/hooks/modals/useModal";
+import React, { ChangeEvent, MutableRefObject, ReactElement, useEffect, useRef, useState } from "react";
+import { useModal } from "@/app/hooks/modals/useModal";
 import PerfilDTO from "@/types/dtos/PerfilDTO";
-import FetchAPIError, {isFetchAPIError} from "@/types/errors/FetchAPIError";
-import {darBajaPerfil, listarPerfiles} from "@/services/PerfilService";
-import PerfilFilter from "@/types/filters/PerfilFilter";
+import FetchAPIError, { isFetchAPIError } from "@/types/errors/FetchAPIError";
+import { darBajaPerfil, listarPerfiles } from "@/services/PerfilService";
 import stylesTable from "@public/styles/modules/table/table.tipoequipos.module.css";
-import {ModalInstance} from "@/app/hooks/modals/ModalProvider";
+import { ModalInstance } from "@/app/hooks/modals/ModalProvider";
 import EditPerfilForm from "@/app/(pages)/(whiteBackground)/perfiles/(lista)/formEdit";
-import {ModalButtonsType} from "@/components/ModalFC";
+import { ModalButtonsType } from "@/components/ModalFC";
+
+/**
+ *  Propiedades del componente TablePerfilesFC
+ *  @interface TablePerfilesFCProps
+ *  @property {string} sessionAPIToken - Token de la sesión del cliente en la API
+ *  @property {boolean} hasPermissionEdit - Indica si el cliente tiene permisos para editar
+ *  @property {boolean} hasPermissionBaja - Indica si el cliente tiene permisos para dar de baja
+ *  @property {boolean} hasPermissionView - Indica si el cliente tiene permisos para ver
+ *  @property {number} idInstitucion - ID de la institución del cliente
+ **/
 
 interface TablePerfilesFCProps {
     sessionAPIToken: string;
@@ -19,140 +28,252 @@ interface TablePerfilesFCProps {
     idInstitucion: number;
 }
 
+/**
+ * Propiedades de los filtros de la tabla
+ **/
+
 interface TableSearchTermsProps {
-    filter: PerfilFilter;
+    filter: { nombre?: string; activo?: boolean };
 }
 
 function TablePerfilesFC(props: Readonly<TablePerfilesFCProps>): ReactElement {
 
-    const {createModal} = useModal();
+    // ----------------------- Modales -----------------------
+    const { createModal } = useModal();
 
+    // ----------------------- Términos de búsqueda  -----------------------
     const [searchTerms, setSearchTerms]: [TableSearchTermsProps, (value: TableSearchTermsProps) => void]
         = useState<TableSearchTermsProps>({
-        filter: {activo: true, idInstitucion: props.idInstitucion}
+        filter: { activo: true }
     });
 
     const [appliedSearchTerms, setAppliedSearchTerms]: [TableSearchTermsProps, (value: TableSearchTermsProps) => void]
         = useState<TableSearchTermsProps>(searchTerms);
 
-    const [perfiles, setPerfiles]: [PerfilDTO[], (value: PerfilDTO[]) => void]
-        = useState<PerfilDTO[]>([]);
+    const refSearchTermsTimer: MutableRefObject<NodeJS.Timeout | null> = useRef<NodeJS.Timeout | null>(null);
 
-    const [errorMsg, setErrorMsg]: [string, (value: string) => void]
-        = useState<string>("");
+    useEffect((): void => {
+        if (refSearchTermsTimer.current !== null) {
+            clearTimeout(refSearchTermsTimer.current);
+        }
 
-    const searchTermsRef: MutableRefObject<TableSearchTermsProps> = useRef<TableSearchTermsProps>(searchTerms);
+        refSearchTermsTimer.current = setTimeout((): void => {
+            setAppliedSearchTerms(searchTerms);
+        }, 500);
 
-    useEffect(() => {
-        void applySearch();
+    }, [searchTerms]);
+
+    // ----------------------- Lista de perfiles -----------------------
+    const [perfiles, setPerfiles] = useState<PerfilDTO[]>([]);
+
+    useEffect((): void => {
+        (async (): Promise<void> => {
+            const response: PerfilDTO[] | FetchAPIError = await listarPerfiles(props.idInstitucion, 0, 1, "id", true);
+
+            if (isFetchAPIError(response)) {
+                console.error("ERROR - lista de perfiles - table.tsx - listarPerfiles", response.errorMessage);
+                return;
+            }
+            setPerfiles(response);
+        })();
+
     }, [appliedSearchTerms]);
 
-    const applySearch = async (): Promise<void> => {
-        const fetchedPerfiles: PerfilDTO[] | FetchAPIError =
-            await listarPerfiles(props.idInstitucion, props.sessionAPIToken, appliedSearchTerms.filter);
-        if (isFetchAPIError(fetchedPerfiles)) {
-            setErrorMsg(fetchedPerfiles.errorMessage);
-            return;
-        }
-        setPerfiles(fetchedPerfiles);
-    };
+    // Procedimiento que se ejecuta al hacer clic en el botón 'Modificar'
+    async function handleEditClick(perfil: PerfilDTO): Promise<void> {
+        if (!props.hasPermissionEdit) { return; }
 
-    const handleApplySearch = async (event: ChangeEvent<HTMLFormElement>): Promise<void> => {
-        event.preventDefault();
-        setAppliedSearchTerms(searchTermsRef.current);
-    };
-
-    const handleDarBaja = async (perfilId: number): Promise<void> => {
-        const response: void | FetchAPIError = await darBajaPerfil(perfilId, props.sessionAPIToken);
-        if (isFetchAPIError(response)) {
-            setErrorMsg(response.errorMessage);
-            return;
-        }
-
-        setPerfiles(perfiles.filter((perfil) => perfil.id !== perfilId));
-
-        createModal({
-            children: (
-                <p>Perfil dado de baja correctamente</p>
-            ),
-            buttonsType: ModalButtonsType.CONFIRM
-        }).show();
-    };
-
-    const handleEditPerfil = (perfil: PerfilDTO): void => {
-        createModal({
-            title: "Editar Perfil",
+        const modalModificar: ModalInstance = createModal({
             children: (
                 <EditPerfilForm
                     sessionAPIToken={props.sessionAPIToken}
-                    editingPerfil={perfil}
                     idInstitucion={props.idInstitucion}
-                    onCancel={() => {
-                        createModal({
-                            children: (
-                                <p>Edición cancelada</p>
-                            ),
-                            buttonsType: ModalButtonsType.CONFIRM
-                        }).show();
+                    editingPerfil={perfil}
+                    onSave={(perfilModified: PerfilDTO): void => {
+                        setPerfiles(perfiles.map((p: PerfilDTO): PerfilDTO => {
+                            return p.id === perfilModified.id ? perfilModified : p;
+                        }));
+                        modalModificar.close();
+                        refSearchTermsTimer.current = setTimeout((): void => {
+                            setAppliedSearchTerms({ ...appliedSearchTerms });
+                        }, 1000);
                     }}
-                    onSave={() => {
+                    onCancel={(): void => {
                         createModal({
                             children: (
-                                <p>Perfil modificado correctamente</p>
+                                <p>¿Estás seguro de que deseas cancelar la modificación del perfil?</p>
                             ),
-                            buttonsType: ModalButtonsType.CONFIRM
+                            buttonsType: ModalButtonsType.CONFIRM_CANCEL,
+                            onConfirm: (): void => {
+                                modalModificar.close();
+                            }
                         }).show();
-                        void applySearch();
                     }}
                 />
-            )
+            ),
+            buttonsType: ModalButtonsType.NONE
+        });
+
+        modalModificar.show();
+    }
+
+    // Procedimiento que se ejecuta al hacer clic en el botón 'Eliminar'
+    const handleEliminarClick = (perfilSelected: PerfilDTO): void => {
+        if (!props.hasPermissionBaja) {
+            createModal({
+                children: (
+                    <p>No tienes permisos para dar de baja perfiles</p>
+                ),
+                buttonsType: ModalButtonsType.CONFIRM
+            }).show();
+            return;
+        }
+
+        createModal({
+            title: "Dando de baja a \"" + perfilSelected.nombre + "\"",
+            children: (
+                <>
+                    <p>Estas por dar de baja al perfil <b>&quot;{perfilSelected.nombre}&quot;</b>.</p>
+                    <p>¿Desea continuar?</p>
+                </>
+            ),
+            buttonsType: ModalButtonsType.CONFIRM_CANCEL,
+            async onConfirm(): Promise<void> {
+                const response: void | FetchAPIError = await darBajaPerfil(perfilSelected.id as number, props.sessionAPIToken);
+                if (isFetchAPIError(response)) {
+                    createModal({
+                        children: (
+                            <p>Error al dar de baja el perfil: {response.errorMessage}</p>
+                        ),
+                        buttonsType: ModalButtonsType.CONFIRM
+                    }).show();
+                    return;
+                }
+
+                perfilSelected.activo = false;
+
+                createModal({
+                    children: (
+                        <p>Perfil &quot;{perfilSelected.nombre}&quot; dado de baja correctamente</p>
+                    ),
+                    buttonsType: ModalButtonsType.CONFIRM
+                }).show();
+
+                refSearchTermsTimer.current = setTimeout((): void => {
+                    setAppliedSearchTerms({ ...appliedSearchTerms });
+                }, 1000);
+            },
+            onCancel(): void {
+                createModal({
+                    title: "Baja Cancelada",
+                    children: (
+                        <p>Baja cancelada</p>
+                    ),
+                    buttonsType: ModalButtonsType.CONFIRM
+                }).show();
+            }
         }).show();
-    };
+    }
 
     return (
-        <section className={stylesTable.tableContainer}>
-            <form className={stylesTable.searchContainer} onSubmit={handleApplySearch}>
-                <input
-                    type="text"
-                    placeholder="Buscar por nombre"
-                    onChange={(e) => searchTermsRef.current = {...searchTermsRef.current, filter: {...searchTermsRef.current.filter, nombre: e.target.value}}}
-                />
-                <input
-                    type="number"
-                    placeholder="Buscar por nivel"
-                    onChange={(e) => searchTermsRef.current = {...searchTermsRef.current, filter: {...searchTermsRef.current.filter, nivel: Number(e.target.value)}}}
-                />
-                <button type="submit">Buscar</button>
-            </form>
-
-            {errorMsg && <p className="error-message">{errorMsg}</p>}
-
-            <table className={stylesTable.table}>
-                <thead>
-                <tr>
-                    <th>Nombre</th>
-                    <th>Nivel</th>
-                    {props.hasPermissionEdit && <th>Acciones</th>}
-                </tr>
-                </thead>
-                <tbody>
-                {perfiles.map((perfil) => (
-                    <tr key={perfil.id}>
-                        <td>{perfil.nombre}</td>
-                        <td>{perfil.nivel}</td>
-                        {props.hasPermissionEdit && (
-                            <td>
-                                <button onClick={() => handleEditPerfil(perfil)}>Editar</button>
-                                {props.hasPermissionBaja && (
-                                    <button onClick={() => handleDarBaja(perfil.id)}>Dar Baja</button>
-                                )}
-                            </td>
-                        )}
-                    </tr>
-                ))}
-                </tbody>
-            </table>
-        </section>
+        <div className={stylesTable.containerPage}>
+            <div className={stylesTable.containerTable}>
+                <div className={stylesTable.scroll}>
+                    {perfiles.length > 0 ? (
+                        <table style={{ width: "100%" }}>
+                            <thead>
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Nivel</th>
+                                <th></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {perfiles.map((perfil: PerfilDTO) => (
+                                <tr key={perfil.id}>
+                                    <td>{perfil.nombre}</td>
+                                    <td>{perfil.nivel}</td>
+                                    {props.hasPermissionEdit ? (
+                                        <td>
+                                            <button onClick={() => handleEditClick(perfil)}>Modificar</button>
+                                        </td>
+                                    ) : <td></td>}
+                                    {props.hasPermissionBaja ? (
+                                        <td>
+                                            <button onClick={(): void => handleEliminarClick(perfil)}>Eliminar</button>
+                                        </td>
+                                    ) : <td></td>}
+                                </tr>
+                            ))}
+                            </tbody>
+                        </table>
+                    ) : <h3>No se encontraron perfiles</h3>}
+                </div>
+                <div className={stylesTable.filtersContainer}>
+                    <div className={stylesTable.filtersContainerInputs}>
+                        <input
+                            type="text"
+                            name="nombre"
+                            placeholder="Buscar por nombre"
+                            value={searchTerms.filter.nombre || ''}
+                            onChange={(event: ChangeEvent<HTMLInputElement>): void => {
+                                setSearchTerms({
+                                    ...searchTerms,
+                                    filter: {
+                                        ...searchTerms.filter,
+                                        nombre: event.target.value || undefined
+                                    }
+                                });
+                            }}
+                        />
+                    </div>
+                </div>
+                <div className={stylesTable.filtersContainerButtons}>
+                    <label>
+                        <input
+                            type="radio"
+                            name="activo"
+                            value="true"
+                            checked={searchTerms.filter.activo === true}
+                            onChange={(): void => {
+                                setSearchTerms({
+                                    ...searchTerms,
+                                    filter: { ...searchTerms.filter, activo: true }
+                                });
+                            }}
+                        /> Activos
+                    </label>
+                    <label>
+                        <input
+                            type="radio"
+                            name="activo"
+                            value="false"
+                            checked={searchTerms.filter.activo === false}
+                            onChange={(): void => {
+                                setSearchTerms({
+                                    ...searchTerms,
+                                    filter: { ...searchTerms.filter, activo: false }
+                                });
+                            }}
+                        /> Dados de baja
+                    </label>
+                    <label>
+                        <input
+                            type="radio"
+                            name="activo"
+                            value="undefined"
+                            checked={searchTerms.filter.activo === undefined}
+                            onChange={(): void => {
+                                setSearchTerms({
+                                    ...searchTerms,
+                                    filter: { ...searchTerms.filter, activo: undefined }
+                                });
+                            }}
+                        /> Todos
+                    </label>
+                </div>
+            </div>
+        </div>
     );
 }
 
