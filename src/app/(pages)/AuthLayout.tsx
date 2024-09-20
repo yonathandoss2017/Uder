@@ -66,6 +66,9 @@ function AuthLayout({children}: Readonly<{ children: ReactNode }>) {
 
     useEffect(() => {
 
+        if (pathname === "/login") {
+            return;
+        }
         console.log("HAY TOKEN BOOLEAN", document.cookie.includes('sessionToken'));
         const expiresTimeTimestamp = Date.now() + 30000;
         const checkUserSession = setInterval(async () => {
@@ -85,8 +88,8 @@ function AuthLayout({children}: Readonly<{ children: ReactNode }>) {
                             console.error("ERROR - EquiposPage_renovarToken: ", response);
                             throw new Error(response.errorMessage);
                         }
-                        //document.cookie = `sessionToken=${response};path=/;max-age=30;samesite=lax;secure`;
-                        console.log(document.cookie = `sessionToken=${response};path=/;max-age=30;samesite=lax;secure`)
+                        document.cookie = `sessionToken=${response};path=/;max-age=30;samesite=lax;secure`;
+                       // console.log(document.cookie = `sessionToken=${response};path=/;max-age=30;samesite=lax;secure`)
                         session.user.sessionAPIToken = response;
                     }
                 } else if (isIdle() && timeRemaining < CHECK_SESSION_EXP_TIME) {
@@ -108,8 +111,8 @@ function AuthLayout({children}: Readonly<{ children: ReactNode }>) {
                                         console.error("ERROR - EquiposPage_renovarToken: ", response);
                                         throw new Error(response.errorMessage);
                                     }
-                                    // document.cookie = `sessionToken=${response};path=/;max-age=30;samesite=lax;secure`;
-                                    console.log(document.cookie = `sessionToken=${response}`)
+                                    document.cookie = `sessionToken=${response};path=/;max-age=30;samesite=lax;secure`;
+                                    //console.log(document.cookie = `sessionToken=${response}`)
                                     session.user.sessionAPIToken = response;
                                     setSessionModalActive(false);
                                 }
@@ -136,7 +139,7 @@ function AuthLayout({children}: Readonly<{ children: ReactNode }>) {
         return () => {
             clearInterval(checkUserSession);
         };
-    }, [update, session, isIdle, sessionModalActive]);
+    }, [update, session, isIdle, sessionModalActive, pathname]);
 
 
 // Muestra la página de carga si el estado de la sesión es "loading"
