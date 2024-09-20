@@ -2,7 +2,7 @@
 
 // Importa los módulos necesarios
 import {signOut, useSession} from "next-auth/react";
-import React, {ReactNode, useEffect} from "react";
+import React, {ReactElement, ReactNode, useEffect} from "react";
 import LoadingPage from "@/app/(pages)/loading";
 import ErrorFC from "@/components/ErrorFC";
 import {ModalButtonsType} from "@/components/ModalFC";
@@ -16,7 +16,7 @@ import {usePathname} from "next/navigation";
 function AuthLayout({children}: Readonly<{ children: ReactNode }>) {
 
     const {data: session, status, update} = useSession();
-    const CHECK_SESSION_EXP_TIME = 5000;
+    const CHECK_SESSION_EXP_TIME = 15000;
     const SESSION_IDLE_TIME = 10000;
 
     const pathname = usePathname();
@@ -39,6 +39,30 @@ function AuthLayout({children}: Readonly<{ children: ReactNode }>) {
     // ----------------------- Modales -----------------------
 
     const {createModal} = useModal();
+
+    const [showSessionExpiredError, setShowSessionExpiredError] = React.useState<boolean>(false);
+    const [sessionModalActive, setSessionModalActive] = React.useState<boolean>(false);
+
+    const renderSessionExpiredError = (): ReactElement => {
+        return (<ErrorFC customContent={(
+                <>
+                    <h1>Error</h1>
+                    <h2>La sesión expiro por inactividad</h2>
+                    <h3>Por favor inicie sesión nuevamente.</h3>
+                    <br/>
+                    <button onClick={async (): Promise<void> => {
+                        await signOut({
+                            callbackUrl: "/login", // URL de redirección después del cierre de sesión
+                            redirect: true    // Redirige al usuario después de cerrar la sesión
+                        });
+                    }}>
+                        Volver a iniciar sesión
+                    </button>
+                </>
+            )}></ErrorFC>
+        );
+    };
+
 
     useEffect(() => {
 
@@ -66,46 +90,43 @@ function AuthLayout({children}: Readonly<{ children: ReactNode }>) {
                         session.user.sessionAPIToken = response;
                     }
                 } else if (isIdle() && timeRemaining < CHECK_SESSION_EXP_TIME) {
-                    console.log("entre a idle")
-                    createModal({
-                        children: (
-                            <p>Su sesión está por expirar, quiere renovarla?</p>
-                        ),
-                        buttonsType: ModalButtonsType.CONFIRM_CANCEL,
-                        onConfirm: async (): Promise<void> => {
-                            console.log("Renovando token en page");
-                            if (session?.user.sessionAPIToken) {
-                                const response: string | FetchAPIError = await renovarToken(session?.user.sessionAPIToken);
-                                if (isFetchAPIError(response)) {
-                                    console.error("ERROR - EquiposPage_renovarToken: ", response);
-                                    throw new Error(response.errorMessage);
+                    if (!sessionModalActive) {
+                        console.log("entre a idle y modal no está activo");
+                        setSessionModalActive(true);
+                        console.log("modal ", sessionModalActive)
+                        console.log("entre a idle")
+                        createModal({
+                            children: (
+                                <p>Su sesión está por expirar, quiere renovarla?</p>
+                            ),
+                            buttonsType: ModalButtonsType.CONFIRM_CANCEL,
+                            onConfirm: async (): Promise<void> => {
+                                console.log("Renovando token en page");
+                                if (session?.user.sessionAPIToken) {
+                                    const response: string | FetchAPIError = await renovarToken(session?.user.sessionAPIToken);
+                                    if (isFetchAPIError(response)) {
+                                        console.error("ERROR - EquiposPage_renovarToken: ", response);
+                                        throw new Error(response.errorMessage);
+                                    }
+                                    // document.cookie = `sessionToken=${response};path=/;max-age=30;samesite=lax;secure`;
+                                    console.log(document.cookie = `sessionToken=${response}`)
+                                    session.user.sessionAPIToken = response;
+                                    setSessionModalActive(false);
                                 }
-                                // document.cookie = `sessionToken=${response};path=/;max-age=30;samesite=lax;secure`;
-                                console.log(document.cookie = `sessionToken=${response}`)
-                                session.user.sessionAPIToken = response;
+                            },
+                            onCancel: (): void => {
+                                setSessionModalActive(false);
+                                signOut({redirect: true, callbackUrl: "/login"})
 
                             }
-                        },
-                        onCancel: (): void => {
-                            signOut({
-                                callbackUrl: "/login", // URL de redirección después del cierre de sesión
-                                redirect: true    // Redirige al usuario después de cerrar la sesión
-                            });
-                        }
-                    }).show();
+                        }).show();
+                    }
                 } else if (timeRemaining < 0) {
-                    // session has expired, logout the user and display session expiration message
-                    await signOut({
-                        callbackUrl: "/login", // URL de redirección después del cierre de sesión
-                        redirect: true    // Redirige al usuario después de cerrar la sesión
-                    });
+                    setShowSessionExpiredError(true);
                 }
             } else {
                 if (pathname !== "/login") {
-                    await signOut({
-                        callbackUrl: "/login", // URL de redirección después del cierre de sesión
-                        redirect: true    // Redirige al usuario después de cerrar la sesión
-                    });
+                    setShowSessionExpiredError(true);
                 }
             }
 
@@ -114,29 +135,17 @@ function AuthLayout({children}: Readonly<{ children: ReactNode }>) {
         return () => {
             clearInterval(checkUserSession);
         };
-    }, [update, session, isIdle]);
+    }, [update, session, isIdle, sessionModalActive]);
 
 
 // Muestra la página de carga si el estado de la sesión es "loading"
     if (status === "loading") return <LoadingPage/>
 
 // Muestra un mensaje de error si se produce un error de sesión
-    if (session?.user?.error === "expired_token") return <ErrorFC customContent={(
-        <>
-            <h1>Error</h1>
-            <h2>La sesión expiro por inactividad</h2>
-            <h3>Por favor inicie sesión nuevamente.</h3>
-            <br/>
-            <button onClick={async (): Promise<void> => {
-                await signOut({
-                    callbackUrl: "/login", // URL de redirección después del cierre de sesión
-                    redirect: true    // Redirige al usuario después de cerrar la sesión
-                });
-            }}>
-                Volver a iniciar sesión
-            </button>
-        </>
-    )}></ErrorFC>
+    // Muestra un mensaje de error si se produce un error de sesión
+    if (session?.user?.error === "expired_token" || showSessionExpiredError) {
+        return renderSessionExpiredError(); // Renderiza el error si la sesión ha expirado
+    }
 
 // Muestra el contenido de la página
     return (
