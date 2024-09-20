@@ -66,8 +66,9 @@ function AuthLayout({children}: Readonly<{ children: ReactNode }>) {
 
     useEffect(() => {
 
-        if (pathname === "/login") {
+        if (pathname === "/login" || pathname === "/login/google") {
             return;
+
         }
         console.log("HAY TOKEN BOOLEAN", document.cookie.includes('sessionToken'));
         const expiresTimeTimestamp = Date.now() + 30000;
@@ -112,7 +113,6 @@ function AuthLayout({children}: Readonly<{ children: ReactNode }>) {
                                         throw new Error(response.errorMessage);
                                     }
                                     document.cookie = `sessionToken=${response};path=/;max-age=30;samesite=lax;secure`;
-                                    //console.log(document.cookie = `sessionToken=${response}`)
                                     session.user.sessionAPIToken = response;
                                     setSessionModalActive(false);
                                 }
@@ -130,7 +130,9 @@ function AuthLayout({children}: Readonly<{ children: ReactNode }>) {
                 }
             } else {
                 if (pathname !== "/login") {
-                    setShowSessionExpiredError(true);
+                    if(pathname !== "/login/google") {
+                        setShowSessionExpiredError(true);
+                    }
                 }
             }
 
@@ -147,7 +149,7 @@ function AuthLayout({children}: Readonly<{ children: ReactNode }>) {
 
 // Muestra un mensaje de error si se produce un error de sesión
     // Muestra un mensaje de error si se produce un error de sesión
-    if (session?.user?.error === "expired_token" || showSessionExpiredError) {
+    if (showSessionExpiredError) {
         return renderSessionExpiredError(); // Renderiza el error si la sesión ha expirado
     }
 

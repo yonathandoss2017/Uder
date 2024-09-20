@@ -91,11 +91,14 @@ const GoogleAuthPage = () => {
 
                         }).show();
                     } else {
-                        sessionData.user.sessionAPIToken = response; // Asigna el token de sesión al usuario
+                        document.cookie = `sessionToken=${response};path=/;max-age=30;samesite=lax;secure`;
+                        if (document.cookie.includes('sessionToken')) {
+                            sessionData.user.sessionAPIToken = response; // Asigna el token de sesión al usuario
 
-                        update(sessionData); // Actualiza la sesión del usuario (NextAuth)
+                            update(sessionData); // Actualiza la sesión del usuario (NextAuth)
 
-                        router.push("/"); // Redirige al usuario a la página principal
+                            window.location.href = "/"; // Redirige al usuario a la página principal
+                        }
                     }
                 }
 

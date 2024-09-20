@@ -104,10 +104,6 @@ const authOptions: NextAuthOptions = {
                 if(cookies().get('sessionToken')?.value !== undefined) {
                     console.log("ESTOY EN EL JWT ", cookies().get('sessionToken')?.value)
                     token.user.sessionAPIToken = cookies().get('sessionToken')?.value;
-                   // token.user.exp = Date.now() + 30000;
-                    console.log("EXP", token.user.exp);
-                }else{
-                    token.user.error = "expired_token";
                 }
 
             return token;
@@ -122,12 +118,6 @@ const authOptions: NextAuthOptions = {
 
             if (token.user.sessionGoogleToken) {
                 session.user.sessionGoogleToken = token.user.sessionGoogleToken;
-            }
-
-            // Si el token contiene un error, pasamos este error a la sesión
-            if (token?.user?.error) {
-                console.log("ENTRO AL ERROR DE TOKEN SESSION")
-                session.user.error = token.user.error;
             }
 
             // session.user.error = token.user.error;
@@ -148,19 +138,16 @@ const authOptions: NextAuthOptions = {
                             }
                             session.user.data = response;
                             session.user.sessionAPIToken = cookies().get('sessionToken')?.value;
-                            //session.expires = new Date(token.user.exp).toISOString();
                             console.log(session.expires, "Expiracion del session auth")
                         }
                     }
                 } catch (error) {
                     console.error("Error al buscar cliente por token: ", error);
                     session.user.sessionAPIToken = undefined;
-                    session.user.error = "expired_token";
                 }
             } else {
                 console.log("EN EL ELSE DEL SESSION")
                 session.user.sessionAPIToken = undefined;
-                token.user.error = "expired_token";
             }
             // Retornamos la sesión de cliente modificada
             console.log("SESSION", session)
