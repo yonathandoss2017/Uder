@@ -49,6 +49,7 @@ const authOptions: NextAuthOptions = {
                     cookies().set({
                         name: 'sessionToken',
                         value: response,
+                        httpOnly: false,
                         maxAge: 30,
                         path: '/',
                     })
@@ -56,7 +57,7 @@ const authOptions: NextAuthOptions = {
                 // Retornamos un objeto con el token de sesión en la API para persistirlo en el JWT (JSON Web Token)
                 return {
                     sessionAPIToken: response,
-                    exp: (Date.now() + 30000)
+                    //exp: (Date.now() + 30000)
                 } as User;
 
             }
@@ -103,7 +104,7 @@ const authOptions: NextAuthOptions = {
                 if(cookies().get('sessionToken')?.value !== undefined) {
                     console.log("ESTOY EN EL JWT ", cookies().get('sessionToken')?.value)
                     token.user.sessionAPIToken = cookies().get('sessionToken')?.value;
-                    token.user.exp = Date.now() + 30000;
+                   // token.user.exp = Date.now() + 30000;
                     console.log("EXP", token.user.exp);
                 }else{
                     token.user.error = "expired_token";
@@ -147,7 +148,7 @@ const authOptions: NextAuthOptions = {
                             }
                             session.user.data = response;
                             session.user.sessionAPIToken = cookies().get('sessionToken')?.value;
-                            session.expires = new Date(token.user.exp).toISOString();
+                            //session.expires = new Date(token.user.exp).toISOString();
                             console.log(session.expires, "Expiracion del session auth")
                         }
                     }
