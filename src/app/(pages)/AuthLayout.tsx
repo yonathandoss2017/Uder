@@ -11,11 +11,12 @@ import {renovarToken} from "@/services/SessionService";
 import {useModal} from "@/app/hooks/modals/useModal";
 import {useIdleTimer} from "react-idle-timer";
 
+
 // Define el componente layout de autenticación
 function AuthLayout({children}: Readonly<{ children: ReactNode }>) {
 
     const {data: session, status, update} = useSession();
-    const CHECK_SESSION_EXP_TIME = 10000;
+    const CHECK_SESSION_EXP_TIME = 20000;
     const SESSION_IDLE_TIME = 10000;
     const BASE_URL = process.env.NEXTAUTH_URL;
 
@@ -38,64 +39,80 @@ function AuthLayout({children}: Readonly<{ children: ReactNode }>) {
 
     const {createModal} = useModal();
 
+
+
     useEffect(() => {
-        const checkUserSession = setInterval(async () => {
-            const expiresTimeTimestamp = Math.floor(new Date(session?.expires || '').getTime());
-            const currentTimestamp = Date.now();
-            const timeRemaining = expiresTimeTimestamp - currentTimestamp;
 
-            console.log("Expiracion token", session?.expires)
+        console.log("HAY TOKEN BOOLEAN", document.cookie.includes('sessionToken'));
 
-            console.log("Time Remaining:", timeRemaining); // Agrega este log
-            console.log("isIdle:", isIdle()); // Agrega este log
-
-            if (!isIdle() && timeRemaining < CHECK_SESSION_EXP_TIME) {
-
-                if (session?.user.sessionAPIToken) {
-                    const response: string | FetchAPIError = await renovarToken(session?.user.sessionAPIToken);
-                    if (isFetchAPIError(response)) {
-                        console.error("ERROR - EquiposPage_renovarToken: ", response);
-                        throw new Error(response.errorMessage);
-                    }
-                    await update();
-                }
-
-            } else if(isIdle() && timeRemaining < CHECK_SESSION_EXP_TIME) {
-                createModal({
-                    children: (
-                        <p>Su sesión está por expirar, quiere renovarla?</p>
-                    ),
-                    buttonsType: ModalButtonsType.CONFIRM_CANCEL,
-                    onConfirm: async (): Promise<void> => {
-                        console.log("Renovando token en page");
-                        if (session?.user.sessionAPIToken) {
-                            const response: string | FetchAPIError = await renovarToken(session?.user.sessionAPIToken);
-                            if (isFetchAPIError(response)) {
-                                console.error("ERROR - EquiposPage_renovarToken: ", response);
-                                throw new Error(response.errorMessage);
+            const checkUserSession = setInterval(async () => {
+                const expiresTimeTimestamp =  Date.now() + 30000;
+                const currentTimestamp = Date.now();
+                    const timeRemaining = expiresTimeTimestamp - currentTimestamp;
+                    console.log("Time Remaining:", timeRemaining); // Agrega este log
+                    console.log("isIdle:", isIdle()); // Agrega este log
+                    if (document.cookie.includes('sessionToken')) {
+                        if (!isIdle() && timeRemaining < CHECK_SESSION_EXP_TIME) {
+                            console.log("entre a no idle")
+                            if (session?.user.sessionAPIToken) {
+                                console.log("no idle con token renovando")
+                                const response: string | FetchAPIError = await renovarToken(session?.user.sessionAPIToken);
+                                if (isFetchAPIError(response)) {
+                                    console.error("ERROR - EquiposPage_renovarToken: ", response);
+                                    throw new Error(response.errorMessage);
+                                }
+                                //document.cookie = `sessionToken=${response};path=/;max-age=30;samesite=lax;secure`;
+                                console.log(document.cookie = `sessionToken=${response};path=/;max-age=30;samesite=lax;secure`)
                             }
-                            session.user.sessionAPIToken = response;
-                            session.expires = new Date(Date.now() + 30000).toISOString();
-                            //await update();
+                        } else if (isIdle() && timeRemaining < CHECK_SESSION_EXP_TIME) {
+                            console.log("entre a idle")
+                            createModal({
+                                children: (
+                                    <p>Su sesión está por expirar, quiere renovarla?</p>
+                                ),
+                                buttonsType: ModalButtonsType.CONFIRM_CANCEL,
+                                onConfirm: async (): Promise<void> => {
+                                    console.log("Renovando token en page");
+                                    if (session?.user.sessionAPIToken) {
+                                        const response: string | FetchAPIError = await renovarToken(session?.user.sessionAPIToken);
+                                        if (isFetchAPIError(response)) {
+                                            console.error("ERROR - EquiposPage_renovarToken: ", response);
+                                            throw new Error(response.errorMessage);
+                                        }
+                                       // document.cookie = `sessionToken=${response};path=/;max-age=30;samesite=lax;secure`;
+                                        console.log(document.cookie = `sessionToken=${response}`)
 
+                                    }
+                                },
+                                onCancel: (): void => {
+                                     signOut({
+                                        callbackUrl: "/login", // URL de redirección después del cierre de sesión
+                                        redirect: true    // Redirige al usuario después de cerrar la sesión
+                                    });
+                                }
+                            }).show();
+                        } else if (timeRemaining < 0) {
+                            // session has expired, logout the user and display session expiration message
+                            await signOut({
+                                callbackUrl: "/login", // URL de redirección después del cierre de sesión
+                                redirect: true    // Redirige al usuario después de cerrar la sesión
+                            });
                         }
-                    },
-                    onCancel: (): void => {
-                        console.log("Cancelando renovación de token");
-                        window.location.href = "/logout";
+                    }else {
+                        await signOut({
+                            callbackUrl: "/login", // URL de redirección después del cierre de sesión
+                            redirect: true    // Redirige al usuario después de cerrar la sesión
+                        });
                     }
-                }).show();
-            }
-            else if (timeRemaining < 0) {
-                // session has expired, logout the user and display session expiration message
-                signOut({callbackUrl: BASE_URL + '/logout', redirect: true});
-            }
-        }, CHECK_SESSION_EXP_TIME);
 
-        return () => {
-            clearInterval(checkUserSession);
-        };
-    }, [update, session, isIdle]);
+            }, CHECK_SESSION_EXP_TIME);
+
+
+            return () => {
+                clearInterval(checkUserSession);
+            };
+            }, [update, session, isIdle]);
+
 
 
 // Muestra la página de carga si el estado de la sesión es "loading"

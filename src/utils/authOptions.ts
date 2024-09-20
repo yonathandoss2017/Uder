@@ -12,6 +12,7 @@ import GoogleProvider from "next-auth/providers/google";
 import CredentialsProvider from "next-auth/providers/credentials";
 import FetchAPIError, {isFetchAPIError} from "@/types/errors/FetchAPIError";
 import {buscarClientePorToken, loginCredentials, renovarToken} from "@/services/SessionService";
+import {cookies} from "next/headers";
 
 // Opciones de configuración para NextAuth
 const authOptions: NextAuthOptions = {
@@ -44,15 +45,14 @@ const authOptions: NextAuthOptions = {
                 if (isFetchAPIError(response)) {
                     console.error("ERROR - NextAuth_CredentialsProvider_authorize: ", response);
                     throw new Error(response.errorMessage);
-                } /*else {
+                } else {
                     cookies().set({
                         name: 'sessionToken',
                         value: response,
-                        httpOnly: true,
                         maxAge: 30,
                         path: '/',
                     })
-                }*/
+                }
                 // Retornamos un objeto con el token de sesión en la API para persistirlo en el JWT (JSON Web Token)
                 return {
                     sessionAPIToken: response,
@@ -63,10 +63,6 @@ const authOptions: NextAuthOptions = {
 
         })
     ],
-    session: {
-        strategy: 'jwt',
-        maxAge: 30000
-    },
     callbacks: {
         // Definimos los callbacks que se ejecutan después de ciertas acciones (autenticación, creación de token y sesión)
 
@@ -96,7 +92,6 @@ const authOptions: NextAuthOptions = {
             if (account) {
                 // Persistimos el token de sesión de Google en el JWT (JSON Web Token)
                 token.user.sessionGoogleToken = account.id_token;
-                token.user.exp = (Date.now() + 30000);
             }
 
             // Si el trigger es "update", modificamos el
@@ -105,42 +100,22 @@ const authOptions: NextAuthOptions = {
                 token.user = session.user;
             }
 
-            const sessionToken =  token.user?.sessionAPIToken;
-            console.log("EXP", token.user.exp);
-
-            if (sessionToken) {
-                if (token?.user.exp) {
-                    const exp: number = token.user.exp;
-                    const diff: number = exp - Date.now();
-                    // Si expiro
-                    if (diff < 1) {
-                        console.log("Expiró")
-                        // Indicamos un error en el JWT (JSON Web Token) de que expiró la sesión (El layout se encargará de redirigir al cliente a la página de inicio de sesión)
-                        token.user.error = "expired_token";
-                        token.user.sessionAPIToken = undefined;
-                    } else if (diff < 15000) { // Si no ha expirado y faltan menos de 60 segundos para que expire se renueva
-                        console.log("JWT - Token expirado, renovando token");
-                        const response: string | FetchAPIError = await renovarToken(sessionToken);
-                        if (isFetchAPIError(response)) {
-                            console.error("ERROR - NextAuth_Callbacks_jwt: ", response);
-                            throw new Error(response.errorMessage);
-                        }
-                        console.log("antes", token.user.sessionAPIToken)
-                        token.user.sessionAPIToken = response;
-                        console.log("despues", token.user.sessionAPIToken)
-                        console.log("antesEXP", token.user.exp)
-                        token.user.exp = (Date.now() + 30000);
-                        console.log("despuesEXP", token.user.exp)
-                    }
+                if(cookies().get('sessionToken')?.value !== undefined) {
+                    console.log("ESTOY EN EL JWT ", cookies().get('sessionToken')?.value)
+                    token.user.sessionAPIToken = cookies().get('sessionToken')?.value;
+                    token.user.exp = Date.now() + 30000;
+                    console.log("EXP", token.user.exp);
+                }else{
+                    token.user.error = "expired_token";
                 }
-            }
-            // Retornamos el JWT (JSON Web Token) modificado
+
             return token;
+
         },
 
         async session({session, token}) {
 
-            session.user.sessionAPIToken = token.user?.sessionAPIToken;
+            session.user.sessionAPIToken = cookies().get('sessionToken')?.value
 
             // Método que se ejecuta después de que se ha creado la sesión de cliente
 
@@ -150,24 +125,31 @@ const authOptions: NextAuthOptions = {
 
             // Si el token contiene un error, pasamos este error a la sesión
             if (token?.user?.error) {
+                console.log("ENTRO AL ERROR DE TOKEN SESSION")
                 session.user.error = token.user.error;
             }
 
             // session.user.error = token.user.error;
-            const sessionToken = session.user.sessionAPIToken;
+            const sessionToken = cookies().get('sessionToken')?.value
+            console.log("TENGO COOKIE")
+            console.log(sessionToken)
             // Si el JWT (JSON Web Token) tiene el token de sesión del cliente en la API, lo guardamos en la sesión y obtenemos los datos del cliente
             if (sessionToken) {
-                session.user.sessionAPIToken = token.user?.sessionAPIToken;
+                console.log("TOKEN COOKIE DESDE EL SESSION", cookies().get('sessionToken')?.value)
+                session.user.sessionAPIToken = cookies().get('sessionToken')?.value
                 try {
-                    if(token.user?.sessionAPIToken) {
-                        const response = await buscarClientePorToken(token.user?.sessionAPIToken);
-                        if (isFetchAPIError(response)) {
-                            throw new Error(response.errorMessage);
+                    if(cookies().get('sessionToken')?.value !== undefined) {
+                        {
+                            console.log("POR OBTENER EL RESPONSE", cookies().get('sessionToken')?.value)
+                            const response = await buscarClientePorToken(cookies().get('sessionToken')!!.value);
+                            if (isFetchAPIError(response)) {
+                                throw new Error(response.errorMessage);
+                            }
+                            session.user.data = response;
+                            session.user.sessionAPIToken = cookies().get('sessionToken')?.value;
+                            session.expires = new Date(token.user.exp).toISOString();
+                            console.log(session.expires, "Expiracion del session auth")
                         }
-                        session.user.data = response;
-                        session.user.sessionAPIToken = sessionToken;
-                        session.expires = new Date(token.user.exp).toISOString();
-                        console.log(session.expires, "Expiracion del session auth")
                     }
                 } catch (error) {
                     console.error("Error al buscar cliente por token: ", error);
@@ -175,6 +157,7 @@ const authOptions: NextAuthOptions = {
                     session.user.error = "expired_token";
                 }
             } else {
+                console.log("EN EL ELSE DEL SESSION")
                 session.user.sessionAPIToken = undefined;
                 token.user.error = "expired_token";
             }
