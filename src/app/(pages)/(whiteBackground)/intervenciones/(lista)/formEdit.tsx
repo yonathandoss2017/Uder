@@ -3,7 +3,7 @@ import React, { ReactElement, useEffect, useState } from "react";
 import { useModal } from "@/app/hooks/modals/useModal";
 import { SubmitHandler, useForm, UseFormReturn } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import SchemaIntervencion from "@/validations/SchemaIntervencion"; // Asumiendo que existe un esquema de validación
+import SchemaIntervencion from "@/validations/SchemaIntervencion";
 import ChangeEntry from "@/types/ChangeEntry";
 import { ModalButtonsType } from "@/components/ModalFC";
 import ModalChangesFC from "@/components/ModalChangesFC";
@@ -23,20 +23,31 @@ interface EditIntervencionFormProps {
 
 function EditIntervencionForm(props: Readonly<EditIntervencionFormProps>): ReactElement {
     const { createModal } = useModal();
-
-    // Estados para los equipos y tipos de intervención
     const [equipos, setEquipos] = useState<any[]>([]);
     const [tiposIntervencion, setTiposIntervencion] = useState<any[]>([]);
 
+    // Configuración del formulario con valores por defecto y resolver para validación
     const {
         register,
         handleSubmit,
+        setValue,
         formState: { errors }
     }: UseFormReturn<IntervencionDTO> = useForm<IntervencionDTO>({
-        resolver: zodResolver(SchemaIntervencion), // Asumiendo que existe un esquema de validación
+        resolver: zodResolver(SchemaIntervencion),
         mode: "all",
-        defaultValues: {}
+        defaultValues: props.editingIntervencion // Cargar los valores por defecto al inicializar el formulario
     });
+
+    // Establecer valores por defecto al montar el componente y cuando los props cambien
+    useEffect(() => {
+        if (props.editingIntervencion) {
+            setValue("fechaHora", props.editingIntervencion.fechaHora);
+            setValue("motivo", props.editingIntervencion.motivo);
+            setValue("comentarios", props.editingIntervencion.comentarios || "");
+            setValue("idEquipo", props.editingIntervencion.idEquipo);
+            setValue("idTipoIntervencion", props.editingIntervencion.idTipoIntervencion);
+        }
+    }, [props.editingIntervencion, setValue]);
 
     // Cargar equipos y tipos de intervención al montar el componente
     useEffect(() => {
@@ -66,9 +77,18 @@ function EditIntervencionForm(props: Readonly<EditIntervencionFormProps>): React
     // Función para manejar el envío del formulario
     const onSubmit: SubmitHandler<IntervencionDTO> = async (formValues: IntervencionDTO): Promise<void> => {
         const modifiedIntervencion: IntervencionDTO = {
-            ...props.editingIntervencion,
+            ...props.editingIntervencion,  // Incluye el ID de la intervención aquí
             ...formValues
         };
+
+        // Aquí debes asegurarte que el ID esté presente
+        if (!modifiedIntervencion.id) {
+            createModal({
+                children: <p>Error: Falta el ID de la intervención</p>,
+                buttonsType: ModalButtonsType.CONFIRM
+            }).show();
+            return;
+        }
 
         const changes: ChangeEntry[] = await obtenerCambios(modifiedIntervencion, props.editingIntervencion);
 
@@ -124,7 +144,7 @@ function EditIntervencionForm(props: Readonly<EditIntervencionFormProps>): React
                     <input
                         {...register("fechaHora", { required: "Este campo es requerido" })}
                         type="datetime-local"
-                        defaultValue={props.editingIntervencion.fechaHora}
+                        defaultValue={props.editingIntervencion.fechaHora} // Mostrar valor por defecto
                     />
                     {errors.fechaHora && <label className={styles.error}>{errors.fechaHora.message}</label>}
                 </div>
@@ -136,7 +156,7 @@ function EditIntervencionForm(props: Readonly<EditIntervencionFormProps>): React
                     <input
                         {...register("motivo", { required: "Este campo es requerido" })}
                         type="text"
-                        defaultValue={props.editingIntervencion.motivo}
+                        defaultValue={props.editingIntervencion.motivo} // Mostrar valor por defecto
                     />
                     {errors.motivo && <label className={styles.error}>{errors.motivo.message}</label>}
                 </div>
@@ -155,7 +175,7 @@ function EditIntervencionForm(props: Readonly<EditIntervencionFormProps>): React
                             value: equipo.nombre
                         }))}
                         selectedKey={props.editingIntervencion.idEquipo}
-                        onChange={(e) => (props.editingIntervencion.idEquipo = parseInt(e.target.value))}
+                        onChange={(e) => setValue("idEquipo", parseInt(e.target.value))}
                     />
                 </div>
 
@@ -168,7 +188,7 @@ function EditIntervencionForm(props: Readonly<EditIntervencionFormProps>): React
                             value: tipo.nombre
                         }))}
                         selectedKey={props.editingIntervencion.idTipoIntervencion}
-                        onChange={(e) => (props.editingIntervencion.idTipoIntervencion = parseInt(e.target.value))}
+                        onChange={(e) => setValue("idTipoIntervencion", parseInt(e.target.value))}
                     />
                 </div>
             </div>

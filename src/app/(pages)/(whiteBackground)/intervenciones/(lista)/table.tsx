@@ -4,7 +4,7 @@ import React, { ChangeEvent, MutableRefObject, ReactElement, useEffect, useRef, 
 import { useModal } from "@/app/hooks/modals/useModal";
 import IntervencionDTO from "@/types/dtos/IntervencionDTO";
 import FetchAPIError, { isFetchAPIError } from "@/types/errors/FetchAPIError";
-import { listarIntervenciones, modificarIntervencion } from "@/services/IntervencionService";
+import { listarIntervenciones } from "@/services/IntervencionService";
 import IntervencionFilter from "@/types/filters/IntervencionFilter";
 import stylesTable from "@public/styles/modules/table/table.tipoequipos.module.css";
 import { ModalInstance } from "@/app/hooks/modals/ModalProvider";
@@ -87,7 +87,7 @@ function TableIntervencionFC(props: Readonly<TableIntervencionFCProps>): ReactEl
                             ),
                             buttonsType: ModalButtonsType.CONFIRM_CANCEL,
                             onConfirm: (): void => {
-                                modalModificar.close()
+                                modalModificar.close();
                             }
                         }).show();
                     }}
