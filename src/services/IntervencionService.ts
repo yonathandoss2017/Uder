@@ -68,28 +68,25 @@ export async function agregarIntervencion(intervencion: IntervencionDTO, token: 
  * @returns Promise<IntervencionDTO[] | FetchAPIError> - Lista de intervenciones o error.
  */
 export async function listarIntervenciones(token: string, filter: IntervencionFilter = {}): Promise<IntervencionDTO[] | FetchAPIError> {
-    // Parámetros de la URL de la petición a la API
     const queryParams: URLSearchParams = new URLSearchParams({
-        ...(filter.id && { filter_id: filter.id.toString() }),
-        ...(filter.fechaDesde && { filter_fechaDesde: filter.fechaDesde }),
-        ...(filter.fechaHasta && { filter_fechaHasta: filter.fechaHasta }),
-        ...(filter.nombreUsuario && { filter_nombreUsuario: filter.nombreUsuario }),
-        ...(filter.tipoIntervencion && { filter_tipoIntervencion: filter.tipoIntervencion }),
-        ...(filter.idEquipo && { filter_idEquipo: filter.idEquipo.toString() }),
-        ...(filter.trabajable != undefined && { filter_trabajable: filter.trabajable.toString() })
+        ...(filter.fechaDesde && { fechaDesde: filter.fechaDesde }),
+        ...(filter.fechaHasta && { fechaHasta: filter.fechaHasta }),
+        ...(filter.idEquipo && { idEquipo: filter.idEquipo.toString() }),
+        ...(filter.idTipoIntervencion && { idTipoIntervencion: filter.idTipoIntervencion.toString() })
     });
-    const url: string = `${SERVICE_PATH}/listar?${queryParams}`; // URL de la petición a la API
 
+    const url: string = `${SERVICE_PATH}/listar?${queryParams.toString()}`;
     const options: RequestInit = {
         method: 'GET',
         headers: {
-            'Authorization': `Bearer ${token}`, // Cabecera de autorización
+            'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'
         }
     };
 
     return await fetchBodyWithErrorHandling<IntervencionDTO[]>(url, options);
 }
+
 
 /**
  * Función para modificar datos de una intervención.

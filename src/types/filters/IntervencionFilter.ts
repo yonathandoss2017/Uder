@@ -1,9 +1,6 @@
 export default interface IntervencionFilter {
-    id?: number;
-    fechaDesde?: string; // Asume formato ISO-8601
-    fechaHasta?: string; // Asume formato ISO-8601
-    nombreUsuario?: string;
-    tipoIntervencion?: string;
-    idEquipo?: number;
-    trabajable?: boolean;
+    fechaDesde?: string; // Fecha desde
+    fechaHasta?: string; // Fecha hasta
+    idEquipo?: number;   // Identificación del equipo
+    idTipoIntervencion?: number; // Tipo de intervención
 }

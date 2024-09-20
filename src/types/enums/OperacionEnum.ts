@@ -25,8 +25,7 @@ enum OperacionEnum {
     MODIFICAR_MODELO = 21,
     BAJA_MODELO = 22,
     ALTA_INTERVENCION = 23,
-    MODIFICAR_INTERVENCION = 24,
-    BAJA_INTERVENCION = 25
+    TRABAJAR_INTERVENCION = 24
 
 }
 
@@ -83,10 +82,8 @@ export function translateOperacionEnum(operacionEnum: OperacionEnum | string): s
             return "Baja de modelo";
         case OperacionEnum.ALTA_INTERVENCION:
             return "Alta de intervencion";
-        case OperacionEnum.MODIFICAR_INTERVENCION:
+        case OperacionEnum.TRABAJAR_INTERVENCION:
             return "Modificación de intervencion";
-        case OperacionEnum.BAJA_INTERVENCION:
-            return "Baja de intervencion";
         default:
             return "-";
     }
