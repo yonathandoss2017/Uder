@@ -66,7 +66,7 @@ function AuthLayout({children}: Readonly<{ children: ReactNode }>) {
 
     useEffect(() => {
 
-        if (pathname === "/login" || pathname === "/login/google") {
+        if (pathname === "/login" || pathname === "/login/google" || pathname === "/signup" || pathname === "/signup/google") {
             return;
 
         }
@@ -126,12 +126,18 @@ function AuthLayout({children}: Readonly<{ children: ReactNode }>) {
                         }).show();
                     }
                 } else if (timeRemaining < 0) {
+                    setSessionModalActive(false);
                     setShowSessionExpiredError(true);
                 }
             } else {
                 if (pathname !== "/login") {
                     if(pathname !== "/login/google") {
-                        setShowSessionExpiredError(true);
+                        if(pathname !== "/signup") {
+                            if(pathname !== "/signup/google") {
+                                setSessionModalActive(false);
+                                setShowSessionExpiredError(true);
+                            }
+                        }
                     }
                 }
             }
