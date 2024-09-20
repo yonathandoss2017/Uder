@@ -93,11 +93,12 @@ const GoogleAuthPage = () => {
                     } else {
                         document.cookie = `sessionToken=${response};path=/;max-age=30;samesite=lax;secure`;
                         if (document.cookie.includes('sessionToken')) {
+                            window.location.href = "/";
                             sessionData.user.sessionAPIToken = response; // Asigna el token de sesión al usuario
 
-                            update(sessionData); // Actualiza la sesión del usuario (NextAuth)
+                            //update(sessionData); // Actualiza la sesión del usuario (NextAuth)
 
-                            window.location.href = "/"; // Redirige al usuario a la página principal
+                            // Redirige al usuario a la página principal
                         }
                     }
                 }
