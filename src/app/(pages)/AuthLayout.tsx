@@ -116,6 +116,7 @@ function AuthLayout({children}: Readonly<{ children: ReactNode }>) {
                             },
                             onCancel: (): void => {
                                 setSessionModalActive(false);
+                                document.cookie = `sessionToken=;max-age=0;path=/;samesite=lax;secure`;
                                 signOut({redirect: true, callbackUrl: "/login"})
 
                             }
