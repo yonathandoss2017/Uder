@@ -18,6 +18,7 @@ function AuthLayout({children}: Readonly<{ children: ReactNode }>) {
     const {data: session, status, update} = useSession();
     const CHECK_SESSION_EXP_TIME = 15000;
     const SESSION_IDLE_TIME = 10000;
+    const [hayToken, setHayToken] = React.useState<boolean>(false);
 
     const pathname = usePathname();
 
@@ -63,6 +64,32 @@ function AuthLayout({children}: Readonly<{ children: ReactNode }>) {
         );
     };
 
+    const sessionModal = createModal({
+        children: (
+            <p>Su sesión está por expirar, quiere renovarla?</p>
+        ),
+        buttonsType: ModalButtonsType.CONFIRM_CANCEL,
+        onConfirm: async (): Promise<void> => {
+            console.log("Renovando token en page");
+            if (session?.user.sessionAPIToken) {
+                const response: string | FetchAPIError = await renovarToken(session?.user.sessionAPIToken);
+                if (isFetchAPIError(response)) {
+                    console.error("ERROR - EquiposPage_renovarToken: ", response);
+                    throw new Error(response.errorMessage);
+                }
+                document.cookie = `sessionToken=${response};path=/;max-age=30;samesite=lax;secure`;
+                session.user.sessionAPIToken = response;
+                setSessionModalActive(false);
+            }
+        },
+        onCancel: (): void => {
+            setSessionModalActive(false);
+            document.cookie = `sessionToken=;max-age=0;path=/;samesite=lax;secure`;
+            signOut({redirect: true, callbackUrl: "/login"})
+
+        }
+    });
+
 
     useEffect(() => {
 
@@ -79,6 +106,7 @@ function AuthLayout({children}: Readonly<{ children: ReactNode }>) {
             console.log("isIdle:", isIdle()); // Agrega este log
             console.log("HAY TOKEN BOOLEAN2", document.cookie.includes('sessionToken'));
             if (document.cookie.includes('sessionToken')) {
+                setHayToken(true)
                 console.log("DENTRO DEL PRIMER IF")
                 if (!isIdle() && timeRemaining < CHECK_SESSION_EXP_TIME) {
                     console.log("entre a no idle")
@@ -90,7 +118,6 @@ function AuthLayout({children}: Readonly<{ children: ReactNode }>) {
                             throw new Error(response.errorMessage);
                         }
                         document.cookie = `sessionToken=${response};path=/;max-age=30;samesite=lax;secure`;
-                       // console.log(document.cookie = `sessionToken=${response};path=/;max-age=30;samesite=lax;secure`)
                         session.user.sessionAPIToken = response;
                     }
                 } else if (isIdle() && timeRemaining < CHECK_SESSION_EXP_TIME) {
@@ -99,45 +126,7 @@ function AuthLayout({children}: Readonly<{ children: ReactNode }>) {
                         setSessionModalActive(true);
                         console.log("modal ", sessionModalActive)
                         console.log("entre a idle")
-                        createModal({
-                            children: (
-                                <p>Su sesión está por expirar, quiere renovarla?</p>
-                            ),
-                            buttonsType: ModalButtonsType.CONFIRM_CANCEL,
-                            onConfirm: async (): Promise<void> => {
-                                console.log("Renovando token en page");
-                                if (session?.user.sessionAPIToken) {
-                                    const response: string | FetchAPIError = await renovarToken(session?.user.sessionAPIToken);
-                                    if (isFetchAPIError(response)) {
-                                        console.error("ERROR - EquiposPage_renovarToken: ", response);
-                                        throw new Error(response.errorMessage);
-                                    }
-                                    document.cookie = `sessionToken=${response};path=/;max-age=30;samesite=lax;secure`;
-                                    session.user.sessionAPIToken = response;
-                                    setSessionModalActive(false);
-                                }
-                            },
-                            onCancel: (): void => {
-                                setSessionModalActive(false);
-                                document.cookie = `sessionToken=;max-age=0;path=/;samesite=lax;secure`;
-                                signOut({redirect: true, callbackUrl: "/login"})
-
-                            }
-                        }).show();
-                    }
-                } else if (timeRemaining < 0) {
-                    setSessionModalActive(false);
-                    setShowSessionExpiredError(true);
-                }
-            } else {
-                if (pathname !== "/login") {
-                    if(pathname !== "/login/google") {
-                        if(pathname !== "/signup") {
-                            if(pathname !== "/signup/google") {
-                                setSessionModalActive(false);
-                                setShowSessionExpiredError(true);
-                            }
-                        }
+                        sessionModal.show();
                     }
                 }
             }
@@ -147,7 +136,24 @@ function AuthLayout({children}: Readonly<{ children: ReactNode }>) {
         return () => {
             clearInterval(checkUserSession);
         };
-    }, [update, session, isIdle, sessionModalActive, pathname]);
+    }, [update, session, isIdle, sessionModalActive, pathname, hayToken]);
+
+    useEffect(() => {
+        const intervalId = setInterval(async () => {
+            console.log("ESTOY DENTRO DEL SEGUNDO USE EFEFECT")
+            if (!document.cookie.includes('sessionToken') && pathname !== "/login" && pathname !== "/login/google" && pathname !== "/signup" && pathname !== "/signup/google") {
+                console.log("EN EL PRIMER IF DEL SEGUNDO USE EFFECT")
+
+                console.log("pase el if IF")
+                sessionModal.close();
+                console.log("DESPUES DE CLOSE")
+                setSessionModalActive(false);
+                setShowSessionExpiredError(true);
+            }
+        }, 5000);
+
+        return () => clearInterval(intervalId); // Limpia el intervalo cuando el componente se desmonte
+    }, [pathname, sessionModalActive]); // Dependencias del useEffect
 
 
 // Muestra la página de carga si el estado de la sesión es "loading"
