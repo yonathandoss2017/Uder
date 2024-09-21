@@ -9,7 +9,6 @@ import { ModalButtonsType } from "@/components/ModalFC";
 import ModalChangesFC from "@/components/ModalChangesFC";
 import FetchAPIError, { isFetchAPIError } from "@/types/errors/FetchAPIError";
 import { modificarIntervencion } from "@/services/IntervencionService";
-import { listarEquipos } from "@/services/EquiposService";
 import { listarTiposIntervencion } from "@/services/TipoIntervencionService";
 import ComboBoxFC from "@/components/ComboBoxFC";
 import styles from "@public/styles/modules/table/table.editformequipo.module.css";
@@ -21,24 +20,22 @@ interface EditIntervencionFormProps {
     onCancel?: () => void;
 }
 
-function EditIntervencionForm(props: Readonly<EditIntervencionFormProps>): ReactElement {
+function TrabajarIntervencionForm(props: Readonly<EditIntervencionFormProps>): ReactElement {
     const { createModal } = useModal();
-    const [equipos, setEquipos] = useState<any[]>([]);
     const [tiposIntervencion, setTiposIntervencion] = useState<any[]>([]);
 
-    // Configuración del formulario con valores por defecto y resolver para validación
     const {
         register,
         handleSubmit,
         setValue,
-        formState: { errors }
+        formState: { errors },
+        watch
     }: UseFormReturn<IntervencionDTO> = useForm<IntervencionDTO>({
         resolver: zodResolver(SchemaIntervencion),
         mode: "all",
-        defaultValues: props.editingIntervencion // Cargar los valores por defecto al inicializar el formulario
+        defaultValues: props.editingIntervencion
     });
 
-    // Establecer valores por defecto al montar el componente y cuando los props cambien
     useEffect(() => {
         if (props.editingIntervencion) {
             setValue("fechaHora", props.editingIntervencion.fechaHora);
@@ -49,19 +46,7 @@ function EditIntervencionForm(props: Readonly<EditIntervencionFormProps>): React
         }
     }, [props.editingIntervencion, setValue]);
 
-    // Cargar equipos y tipos de intervención al montar el componente
     useEffect(() => {
-        listarEquipos(props.sessionAPIToken).then((response) => {
-            if (isFetchAPIError(response)) {
-                createModal({
-                    children: <div>Error al cargar los equipos: {response.errorMessage}</div>,
-                    buttonsType: ModalButtonsType.CONFIRM
-                }).show();
-                return;
-            }
-            setEquipos(response);
-        });
-
         listarTiposIntervencion(props.sessionAPIToken).then((response) => {
             if (isFetchAPIError(response)) {
                 createModal({
@@ -74,14 +59,12 @@ function EditIntervencionForm(props: Readonly<EditIntervencionFormProps>): React
         });
     }, [props.sessionAPIToken, createModal]);
 
-    // Función para manejar el envío del formulario
     const onSubmit: SubmitHandler<IntervencionDTO> = async (formValues: IntervencionDTO): Promise<void> => {
         const modifiedIntervencion: IntervencionDTO = {
-            ...props.editingIntervencion,  // Incluye el ID de la intervención aquí
+            ...props.editingIntervencion,
             ...formValues
         };
 
-        // Aquí debes asegurarte que el ID esté presente
         if (!modifiedIntervencion.id) {
             createModal({
                 children: <p>Error: Falta el ID de la intervención</p>,
@@ -101,21 +84,21 @@ function EditIntervencionForm(props: Readonly<EditIntervencionFormProps>): React
         }
 
         createModal({
-            title: `Modificando intervención`,
+            title: `Trabajando intervención`,
             children: ModalChangesFC(changes),
             async onConfirm(): Promise<void> {
                 const response: void | FetchAPIError = await modificarIntervencion(modifiedIntervencion, props.sessionAPIToken);
 
                 if (isFetchAPIError(response)) {
                     createModal({
-                        children: <p>Error al modificar intervención: {response.errorMessage}</p>,
+                        children: <p>Error al trabajar intervención: {response.errorMessage}</p>,
                         buttonsType: ModalButtonsType.CONFIRM
                     }).show();
                     return;
                 }
 
                 createModal({
-                    children: <p>Intervención modificada correctamente</p>,
+                    children: <p>Intervención trabajada correctamente</p>,
                     buttonsType: ModalButtonsType.CONFIRM
                 }).show();
 
@@ -125,16 +108,18 @@ function EditIntervencionForm(props: Readonly<EditIntervencionFormProps>): React
             },
             onCancel(): void {
                 createModal({
-                    children: <p>Modificación cancelada</p>,
+                    children: <p>Trabajo cancelado</p>,
                     buttonsType: ModalButtonsType.CONFIRM
                 }).show();
             }
         }).show();
     };
 
+    const idTipoIntervencion = watch("idTipoIntervencion");
+
     return (
         <form onSubmit={handleSubmit(onSubmit)} className={`${styles.formContainer} ${styles.aparecer}`}>
-            <h2>Modificación de Intervención</h2>
+            <h2>Trabajo de Intervención</h2>
 
             <div className={styles.detailsContainer}>
                 <div className={styles.inputBox}>
@@ -144,7 +129,7 @@ function EditIntervencionForm(props: Readonly<EditIntervencionFormProps>): React
                     <input
                         {...register("fechaHora", { required: "Este campo es requerido" })}
                         type="datetime-local"
-                        defaultValue={props.editingIntervencion.fechaHora} // Mostrar valor por defecto
+                        defaultValue={props.editingIntervencion.fechaHora}
                     />
                     {errors.fechaHora && <label className={styles.error}>{errors.fechaHora.message}</label>}
                 </div>
@@ -156,7 +141,7 @@ function EditIntervencionForm(props: Readonly<EditIntervencionFormProps>): React
                     <input
                         {...register("motivo", { required: "Este campo es requerido" })}
                         type="text"
-                        defaultValue={props.editingIntervencion.motivo} // Mostrar valor por defecto
+                        defaultValue={props.editingIntervencion.motivo}
                     />
                     {errors.motivo && <label className={styles.error}>{errors.motivo.message}</label>}
                 </div>
@@ -164,19 +149,6 @@ function EditIntervencionForm(props: Readonly<EditIntervencionFormProps>): React
                 <div className={styles.inputBox}>
                     <label className={styles.details}>Comentarios</label>
                     <textarea {...register("comentarios")} defaultValue={props.editingIntervencion.comentarios || ""} />
-                </div>
-
-                <div className={styles.inputBox}>
-                    <label className={styles.details}>Equipo<span className={styles.requiredField}>*</span></label>
-                    <ComboBoxFC
-                        message="Seleccione un equipo"
-                        elements={equipos.map((equipo) => ({
-                            key: equipo.id,
-                            value: equipo.nombre
-                        }))}
-                        selectedKey={props.editingIntervencion.idEquipo}
-                        onChange={(e) => setValue("idEquipo", parseInt(e.target.value))}
-                    />
                 </div>
 
                 <div className={styles.inputBox}>
@@ -201,7 +173,7 @@ function EditIntervencionForm(props: Readonly<EditIntervencionFormProps>): React
     );
 }
 
-export default EditIntervencionForm;
+export default TrabajarIntervencionForm;
 
 async function obtenerCambios(editingIntervencion: IntervencionDTO, originalData: IntervencionDTO): Promise<ChangeEntry[]> {
     const changes: ChangeEntry[] = [];
@@ -227,18 +199,18 @@ async function obtenerCambios(editingIntervencion: IntervencionDTO, originalData
             nextValue: editingIntervencion.comentarios || ""
         });
     }
-    if (originalData.idEquipo !== editingIntervencion.idEquipo) {
-        changes.push({
-            field: "Equipo",
-            previousValue: originalData.idEquipo.toString(),
-            nextValue: editingIntervencion.idEquipo.toString()
-        });
-    }
     if (originalData.idTipoIntervencion !== editingIntervencion.idTipoIntervencion) {
         changes.push({
             field: "Tipo de Intervención",
             previousValue: originalData.idTipoIntervencion.toString(),
             nextValue: editingIntervencion.idTipoIntervencion.toString()
+        });
+    }
+    if (originalData.idEquipo !== editingIntervencion.idEquipo) {
+        changes.push({
+            field: "Equipo",
+            previousValue: originalData.idEquipo.toString(),
+            nextValue: editingIntervencion.idEquipo.toString()
         });
     }
 

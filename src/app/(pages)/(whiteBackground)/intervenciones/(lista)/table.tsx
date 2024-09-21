@@ -5,11 +5,15 @@ import { useModal } from "@/app/hooks/modals/useModal";
 import IntervencionDTO from "@/types/dtos/IntervencionDTO";
 import FetchAPIError, { isFetchAPIError } from "@/types/errors/FetchAPIError";
 import { listarIntervenciones } from "@/services/IntervencionService";
+import { listarEquipos } from "@/services/EquiposService";
+import { listarTiposIntervencion } from "@/services/TipoIntervencionService";
 import IntervencionFilter from "@/types/filters/IntervencionFilter";
 import stylesTable from "@public/styles/modules/table/table.tipoequipos.module.css";
 import { ModalInstance } from "@/app/hooks/modals/ModalProvider";
 import { ModalButtonsType } from "@/components/ModalFC";
 import EditIntervencionForm from "@/app/(pages)/(whiteBackground)/intervenciones/(lista)/formEdit";
+import EquipoDTO from "@/types/dtos/EquipoDTO";
+import TipoIntervencionDTO from "@/types/dtos/TipoIntervencionDTO";
 
 // Propiedades del componente TableIntervencionFC
 interface TableIntervencionFCProps {
@@ -22,12 +26,19 @@ interface TableSearchTermsProps {
     filter: IntervencionFilter;
 }
 
-function TableIntervencionFC(props: Readonly<TableIntervencionFCProps>): ReactElement {
+interface Equipo {
+    id: number;
+    nombre: string;
+}
 
-    // ----------------------- Modales -----------------------
+interface TipoIntervencion {
+    id: number;
+    nombre: string;
+}
+
+function TableIntervencionFC(props: Readonly<TableIntervencionFCProps>): ReactElement {
     const { createModal } = useModal();
 
-    // ----------------------- Términos de búsqueda -----------------------
     const [searchTerms, setSearchTerms]: [TableSearchTermsProps, (value: TableSearchTermsProps) => void]
         = useState<TableSearchTermsProps>({ filter: {} });
 
@@ -46,26 +57,59 @@ function TableIntervencionFC(props: Readonly<TableIntervencionFCProps>): ReactEl
         }, 500);
     }, [searchTerms]);
 
-    // ----------------------- Lista de intervenciones -----------------------
     const [intervenciones, setIntervenciones] = useState<IntervencionDTO[]>([]);
+    const [equipos, setEquipos] = useState<Equipo[]>([]);
+    const [tiposIntervencion, setTiposIntervencion] = useState<TipoIntervencion[]>([]);
 
     useEffect((): void => {
         (async (): Promise<void> => {
-            const response: IntervencionDTO[] | FetchAPIError = await listarIntervenciones(props.sessionAPIToken, appliedSearchTerms.filter);
-            if (isFetchAPIError(response)) {
-                const errorMessage: string = response.errorMessage;
-                console.error("ERROR - lista de intervenciones", errorMessage);
+            const intervResponse: IntervencionDTO[] | FetchAPIError = await listarIntervenciones(props.sessionAPIToken, appliedSearchTerms.filter);
+            if (isFetchAPIError(intervResponse)) {
+                console.error("ERROR - lista de intervenciones", intervResponse.errorMessage);
                 return;
             }
-            setIntervenciones(response);
-        })();
-    }, [appliedSearchTerms]);
 
-    // Procedimiento que se ejecuta al hacer clic en el botón 'Modificar'
+            const equiposResponse: EquipoDTO[] | FetchAPIError = await listarEquipos(props.sessionAPIToken);
+            if (isFetchAPIError(equiposResponse)) {
+                console.error("ERROR - lista de equipos", equiposResponse.errorMessage);
+                return;
+            }
+
+            const tiposResponse: TipoIntervencionDTO[] | FetchAPIError = await listarTiposIntervencion(props.sessionAPIToken);
+            if (isFetchAPIError(tiposResponse)) {
+                console.error("ERROR - lista de tipos de intervención", tiposResponse.errorMessage);
+                return;
+            }
+
+            setIntervenciones(intervResponse as IntervencionDTO[]);
+            setEquipos((equiposResponse as EquipoDTO[]).map(dtoToEquipo));
+            setTiposIntervencion((tiposResponse as TipoIntervencionDTO[]).map(dtoToTipoIntervencion));
+        })();
+    }, [appliedSearchTerms, props.sessionAPIToken]);
+
+    function dtoToEquipo(equipoDTO: EquipoDTO): Equipo {
+        if (equipoDTO.id === undefined) {
+            throw new Error("EquipoDTO.id is undefined");
+        }
+        return {
+            id: equipoDTO.id,
+            nombre: equipoDTO.nombre
+        };
+    }
+
+    function dtoToTipoIntervencion(tipoIntervencionDTO: TipoIntervencionDTO): TipoIntervencion {
+        if (tipoIntervencionDTO.id === undefined) {
+            throw new Error("TipoIntervencionDTO.id is undefined");
+        }
+        return {
+            id: tipoIntervencionDTO.id,
+            nombre: tipoIntervencionDTO.nombre
+        };
+    }
+
     async function handleEditClick(intervencion: IntervencionDTO): Promise<void> {
         if (!props.hasPermissionEdit) { return; }
 
-        // Crea un modal para modificar la intervención
         const modalModificar: ModalInstance = createModal({
             children: (
                 <EditIntervencionForm
@@ -75,9 +119,9 @@ function TableIntervencionFC(props: Readonly<TableIntervencionFCProps>): ReactEl
                         setIntervenciones(intervenciones.map((interv: IntervencionDTO): IntervencionDTO => {
                             return interv.id === intervencionModified.id ? intervencionModified : interv;
                         }));
-                        modalModificar.close(); // Cierra el modal
+                        modalModificar.close();
                         refSearchTermsTimer.current = setTimeout((): void => {
-                            setAppliedSearchTerms({ ...appliedSearchTerms }); // Actualiza los términos de búsqueda
+                            setAppliedSearchTerms({ ...appliedSearchTerms });
                         }, 1000);
                     }}
                     onCancel={(): void => {
@@ -99,6 +143,35 @@ function TableIntervencionFC(props: Readonly<TableIntervencionFCProps>): ReactEl
         modalModificar.show();
     }
 
+    const ID_TIPOS_INTERVENCION_RESOLUCION = [3, 6];
+
+    const getEquipoNombre = (idEquipo: number): string => {
+        const equipo = equipos.find(e => e.id === idEquipo);
+        return equipo ? equipo.nombre : 'Desconocido';
+    };
+
+    const getTipoIntervencionNombre = (idTipoIntervencion: number): string => {
+        const tipoIntervencion = tiposIntervencion.find(t => t.id === idTipoIntervencion);
+        return tipoIntervencion ? tipoIntervencion.nombre : 'Desconocido';
+    };
+
+    const handleViewCommentsClick = (comentarios: string): void => {
+        createModal({
+            children: (
+                <div>
+                    <h3>Comentarios</h3>
+                    <p>{comentarios}</p>
+                </div>
+            ),
+            buttonsType: ModalButtonsType.CLOSE
+        }).show();
+    };
+
+    const formatDate = (dateString: string): string => {
+        const date = new Date(dateString);
+        return date.toLocaleDateString();
+    };
+
     return (
         <div className={stylesTable.containerPage}>
             <div className={stylesTable.containerTable}>
@@ -109,7 +182,6 @@ function TableIntervencionFC(props: Readonly<TableIntervencionFCProps>): ReactEl
                             <tr>
                                 <th>Fecha</th>
                                 <th>Motivo</th>
-                                <th>Comentarios</th>
                                 <th>Tipo Intervención</th>
                                 <th>Equipo</th>
                                 <th></th>
@@ -118,20 +190,17 @@ function TableIntervencionFC(props: Readonly<TableIntervencionFCProps>): ReactEl
                             <tbody>
                             {intervenciones.map((intervencion: IntervencionDTO) => (
                                 <tr key={intervencion.id}>
-                                    <td>{intervencion.fechaHora}</td>
+                                    <td>{formatDate(intervencion.fechaHora)}</td>
                                     <td>{intervencion.motivo}</td>
-                                    <td>{intervencion.comentarios}</td>
-                                    <td>{intervencion.idTipoIntervencion}</td>
-                                    <td>{intervencion.idEquipo}</td>
-                                    {props.hasPermissionEdit ?
-                                        <td>
-                                            <button onClick={() => handleEditClick(intervencion)}>Modificar</button>
-                                        </td>
-                                        :
-                                        <td></td>
-                                    }
+                                    <td>{getTipoIntervencionNombre(intervencion.idTipoIntervencion)}</td>
+                                    <td>{getEquipoNombre(intervencion.idEquipo)}</td>
+                                    <td>
+                                        <button onClick={() => handleViewCommentsClick(intervencion.comentarios ?? '')}>Comentarios</button>
+                                        {props.hasPermissionEdit && !ID_TIPOS_INTERVENCION_RESOLUCION.includes(intervencion.idTipoIntervencion) ? (
+                                            <button style={{ marginLeft: '10px' }} onClick={() => handleEditClick(intervencion)}>Trabajar</button>
+                                        ) : null}
+                                    </td>
                                 </tr>
-
                             ))}
                             </tbody>
                         </table>
@@ -139,42 +208,40 @@ function TableIntervencionFC(props: Readonly<TableIntervencionFCProps>): ReactEl
                 </div>
                 <div className={stylesTable.filtersContainer}>
                     <div className={stylesTable.filtersContainerInputs}>
+                        <label htmlFor="fechaDesde">Fecha Desde:</label>
                         <input
                             type="date"
                             name="fechaDesde"
-                            placeholder="Fecha desde"
-                            value={searchTerms.filter.fechaDesde || ''}
+                            value={searchTerms.filter.fechaDesde ? searchTerms.filter.fechaDesde.toISOString().split('T')[0] : ''}
                             onChange={(event: ChangeEvent<HTMLInputElement>): void => {
                                 setSearchTerms({
                                     ...searchTerms,
                                     filter: {
                                         ...searchTerms.filter,
-                                        fechaDesde: event.target.value ? event.target.value : undefined
+                                        fechaDesde: event.target.value ? new Date(event.target.value) : undefined
                                     }
                                 });
                             }}
                         />
+                        <label htmlFor="fechaHasta">Fecha Hasta:</label>
                         <input
                             type="date"
                             name="fechaHasta"
-                            placeholder="Fecha hasta"
-                            value={searchTerms.filter.fechaHasta || ''}
+                            value={searchTerms.filter.fechaHasta ? searchTerms.filter.fechaHasta.toISOString().split('T')[0] : ''}
                             onChange={(event: ChangeEvent<HTMLInputElement>): void => {
                                 setSearchTerms({
                                     ...searchTerms,
                                     filter: {
                                         ...searchTerms.filter,
-                                        fechaHasta: event.target.value ? event.target.value : undefined
+                                        fechaHasta: event.target.value ? new Date(event.target.value) : undefined
                                     }
                                 });
                             }}
                         />
-                        <input
-                            type="number"
+                        <select
                             name="idEquipo"
-                            placeholder="ID del equipo"
-                            value={searchTerms.filter.idEquipo?.toString() || ''}
-                            onChange={(event: ChangeEvent<HTMLInputElement>): void => {
+                            value={searchTerms.filter.idEquipo || ''}
+                            onChange={(event: ChangeEvent<HTMLSelectElement>): void => {
                                 setSearchTerms({
                                     ...searchTerms,
                                     filter: {
@@ -183,13 +250,16 @@ function TableIntervencionFC(props: Readonly<TableIntervencionFCProps>): ReactEl
                                     }
                                 });
                             }}
-                        />
-                        <input
-                            type="number"
+                        >
+                            <option value="">Todos los equipos</option>
+                            {equipos.map((equipo) => (
+                                <option key={equipo.id} value={equipo.id}>{equipo.nombre}</option>
+                            ))}
+                        </select>
+                        <select
                             name="idTipoIntervencion"
-                            placeholder="ID del tipo de intervención"
-                            value={searchTerms.filter.idTipoIntervencion?.toString() || ''}
-                            onChange={(event: ChangeEvent<HTMLInputElement>): void => {
+                            value={searchTerms.filter.idTipoIntervencion || ''}
+                            onChange={(event: ChangeEvent<HTMLSelectElement>): void => {
                                 setSearchTerms({
                                     ...searchTerms,
                                     filter: {
@@ -198,7 +268,12 @@ function TableIntervencionFC(props: Readonly<TableIntervencionFCProps>): ReactEl
                                     }
                                 });
                             }}
-                        />
+                        >
+                            <option value="">Todos los tipos</option>
+                            {tiposIntervencion.map((tipo) => (
+                                <option key={tipo.id} value={tipo.id}>{tipo.nombre}</option>
+                            ))}
+                        </select>
                     </div>
                 </div>
             </div>
