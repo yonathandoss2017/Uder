@@ -130,7 +130,7 @@ function TableFuncionalidadFC(props: Readonly<TableFuncionalidadFCProps>): React
                                     </tr>
                                 ))}
                                 </tbody>
-                            </table>) : <h3>No se encontraron equipos</h3>}
+                            </table>) : <h3>No se encontraron funcionalidades</h3>}
                     </div>
                     {funcionalidades.length > 0 && (
                         <div className={stylesTable.pagination}>
