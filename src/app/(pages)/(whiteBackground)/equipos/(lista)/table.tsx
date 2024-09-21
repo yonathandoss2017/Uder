@@ -380,17 +380,13 @@ function TableEquiposFC(props: Readonly<TableEquiposFCProps>): ReactElement {
                                         return tipo.id === equipo.idTipoEquipo
                                     })?.nombre
                                     }</td>
-                                    <td>
-                                        {props.hasPermissionView && (
-                                            <>
-                                                {(
-                                                    <button onClick={() => handleVerClick(equipo)}>
-                                                        Ver
-                                                    </button>
-                                                )}
-                                            </>
-                                        )}
-                                    </td>
+                                    {props.hasPermissionView ?
+                                        <td>
+                                            <button onClick={() => handleVerClick(equipo)}>Ver</button>
+                                        </td>
+                                        :
+                                        <td></td>
+                                    }
                                     {props.hasPermissionEdit ?
                                         <td>
                                             <button onClick={() => handleEditClick(equipo)}>Modificar</button>

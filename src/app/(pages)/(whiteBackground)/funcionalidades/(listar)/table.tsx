@@ -41,6 +41,7 @@ function TableFuncionalidadFC(props: Readonly<TableFuncionalidadFCProps>): React
     //Define si ha cargado
     const [loading, setLoading] = useState<boolean>(false);
 
+    //Set de términos de búsqueda
     const [searchTerms, setSearchTerms]: [TableSearchTermsProps, (value: TableSearchTermsProps) => void]
         = useState<TableSearchTermsProps>({
         size: recordsPerPage,
@@ -58,9 +59,11 @@ function TableFuncionalidadFC(props: Readonly<TableFuncionalidadFCProps>): React
         setAppliedSearchTerms(searchTerms); // Actualiza los términos de búsqueda
     }, [searchTerms]);
 
+    // ----------------------- Obtener funcionalidades -----------------------
     //Lista de funcionalidades
     const [funcionalidades, setFuncionalidades] = useState<FuncionalidadDTO[]>([]);
 
+    //Obtiene la lista de funcionalidades
     useEffect((): void => {
         (async (): Promise<void> => {
             const response: FuncionalidadDTO[] | FetchAPIError = await listarFuncionalidades(props.sessionAPIToken, appliedSearchTerms.size, appliedSearchTerms.page, appliedSearchTerms.fieldSort, appliedSearchTerms.sortDirectionAsc);
@@ -74,8 +77,9 @@ function TableFuncionalidadFC(props: Readonly<TableFuncionalidadFCProps>): React
             console.log(response);
             calcularPaginas();
         })();
-    }, [appliedSearchTerms]);
+    }, [appliedSearchTerms]); // Cuando cambian los términos de búsqueda
 
+    // ----------------------- Paginacion -----------------------
     //Metodo para calcular paginas disponibles
     function calcularPaginas(): void {
         contarFuncionalidades(props.idInstitucion)
@@ -107,6 +111,64 @@ function TableFuncionalidadFC(props: Readonly<TableFuncionalidadFCProps>): React
 
     }, [currentPage]); //Cuando cambia la página
 
+    // ----------------------- Metodos -----------------------
+
+    // Procedimiento que se ejecuta al hacer click en el boton "Ver"
+    function handleVerClick(funcionalidad: FuncionalidadDTO): void {
+        if (!props.hasPermissionView) return; //Si el cliente no tiene permisos para ver, no hace nada
+        /*createModal({
+            //children: <ModalViewEquipoFC equipo={equipo} sessionAPIToken={props.sessionAPIToken}/>, // Renderiza el componente como JSX
+            //buttonsType: ModalButtonsType.CLOSE // Establece el tipo de botones del modal
+        }).show();*/
+    }
+
+    // Procedimiento que se ejecuta al hacer clic en el botón 'Modificar'
+    const handleEditClick = (funcionalidad: FuncionalidadDTO): void => {
+        if (!props.hasPermissionEdit) return; // Si el cliente no tiene permisos para modificar, no hace nada
+/*
+        const modalModificar: ModalInstance = createModal({
+            children: (
+                <EditEquipoForm
+                    sessionAPIToken={props.sessionAPIToken}
+                    idInstitucion={props.idInstitucion}
+                    editingEquipo={equipo}
+                    onSave={(equipoModified: EquipoDTO): void => {
+                        if (equipos) {
+                            // Actualiza el equipo en la lista
+                            setEquipos(equipos.map((equipo: EquipoDTO): EquipoDTO => {
+                                if (equipo.id === equipoModified.id) {
+                                    return equipoModified;
+                                }
+                                return equipo;
+                            }));
+                        }
+
+                        modalModificar.close(); // Cierra el modal
+
+                        // Refresca la lista volviendo a cargar los términos de búsqueda después de 3 segundos
+                        refSearchTermsTimer.current = setTimeout((): void => {
+                            setAppliedSearchTerms({...appliedSearchTerms}); // Actualiza los términos de búsqueda
+                        }, 3000);
+                    }}
+                    onCancel={(): void => {
+                        createModal({
+                            children: (
+                                <p>¿Estás seguro de que deseas cancelar la modificación del equipo?</p>
+                            ),
+                            buttonsType: ModalButtonsType.CONFIRM_CANCEL,
+                            onConfirm: (): void => {
+                                modalModificar.close()
+                            }
+                        }).show();
+                    }}
+                />
+            ),
+            buttonsType: ModalButtonsType.NONE
+        });
+
+        modalModificar.show();*/
+    }
+
     //if (!loading) return <LoadingPage/>
     return (
         <div>
@@ -127,6 +189,20 @@ function TableFuncionalidadFC(props: Readonly<TableFuncionalidadFCProps>): React
                                 {funcionalidades.map((funcionalidad: FuncionalidadDTO) => (
                                     <tr key={funcionalidad.id}>
                                         <td>{funcionalidad.nombre}</td>
+                                        {props.hasPermissionView ?
+                                            <td>
+                                                <button onClick={() => handleVerClick(funcionalidad)}>Ver</button>
+                                            </td>
+                                            :
+                                            <td></td>
+                                        }
+                                        {props.hasPermissionEdit ?
+                                            <td>
+                                                <button onClick={() => handleEditClick(funcionalidad)}>Modificar</button>
+                                            </td>
+                                            :
+                                            <td></td>
+                                        }
                                     </tr>
                                 ))}
                                 </tbody>
