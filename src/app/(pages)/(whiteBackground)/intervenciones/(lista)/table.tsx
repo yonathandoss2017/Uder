@@ -15,7 +15,6 @@ import EditIntervencionForm from "@/app/(pages)/(whiteBackground)/intervenciones
 import EquipoDTO from "@/types/dtos/EquipoDTO";
 import TipoIntervencionDTO from "@/types/dtos/TipoIntervencionDTO";
 
-// Propiedades del componente TableIntervencionFC
 interface TableIntervencionFCProps {
     sessionAPIToken: string;
     hasPermissionEdit: boolean;
@@ -39,20 +38,17 @@ interface TipoIntervencion {
 function TableIntervencionFC(props: Readonly<TableIntervencionFCProps>): ReactElement {
     const { createModal } = useModal();
 
-    const [searchTerms, setSearchTerms]: [TableSearchTermsProps, (value: TableSearchTermsProps) => void]
-        = useState<TableSearchTermsProps>({ filter: {} });
+    const [searchTerms, setSearchTerms] = useState<TableSearchTermsProps>({ filter: {} });
+    const [appliedSearchTerms, setAppliedSearchTerms] = useState<TableSearchTermsProps>(searchTerms);
 
-    const [appliedSearchTerms, setAppliedSearchTerms]: [TableSearchTermsProps, (value: TableSearchTermsProps) => void]
-        = useState<TableSearchTermsProps>(searchTerms);
+    const refSearchTermsTimer = useRef<NodeJS.Timeout | null>(null);
 
-    const refSearchTermsTimer: MutableRefObject<NodeJS.Timeout | null> = useRef<NodeJS.Timeout | null>(null);
-
-    useEffect((): void => {
+    useEffect(() => {
         if (refSearchTermsTimer.current !== null) {
             clearTimeout(refSearchTermsTimer.current);
         }
 
-        refSearchTermsTimer.current = setTimeout((): void => {
+        refSearchTermsTimer.current = setTimeout(() => {
             setAppliedSearchTerms(searchTerms);
         }, 500);
     }, [searchTerms]);
@@ -61,21 +57,21 @@ function TableIntervencionFC(props: Readonly<TableIntervencionFCProps>): ReactEl
     const [equipos, setEquipos] = useState<Equipo[]>([]);
     const [tiposIntervencion, setTiposIntervencion] = useState<TipoIntervencion[]>([]);
 
-    useEffect((): void => {
-        (async (): Promise<void> => {
-            const intervResponse: IntervencionDTO[] | FetchAPIError = await listarIntervenciones(props.sessionAPIToken, appliedSearchTerms.filter);
+    useEffect(() => {
+        (async () => {
+            const intervResponse = await listarIntervenciones(props.sessionAPIToken, appliedSearchTerms.filter);
             if (isFetchAPIError(intervResponse)) {
                 console.error("ERROR - lista de intervenciones", intervResponse.errorMessage);
                 return;
             }
 
-            const equiposResponse: EquipoDTO[] | FetchAPIError = await listarEquipos(props.sessionAPIToken);
+            const equiposResponse = await listarEquipos(props.sessionAPIToken);
             if (isFetchAPIError(equiposResponse)) {
                 console.error("ERROR - lista de equipos", equiposResponse.errorMessage);
                 return;
             }
 
-            const tiposResponse: TipoIntervencionDTO[] | FetchAPIError = await listarTiposIntervencion(props.sessionAPIToken);
+            const tiposResponse = await listarTiposIntervencion(props.sessionAPIToken);
             if (isFetchAPIError(tiposResponse)) {
                 console.error("ERROR - lista de tipos de intervención", tiposResponse.errorMessage);
                 return;
@@ -116,21 +112,21 @@ function TableIntervencionFC(props: Readonly<TableIntervencionFCProps>): ReactEl
                     sessionAPIToken={props.sessionAPIToken}
                     editingIntervencion={intervencion}
                     onSave={(intervencionModified: IntervencionDTO): void => {
-                        setIntervenciones(intervenciones.map((interv: IntervencionDTO): IntervencionDTO => {
+                        setIntervenciones(intervenciones.map((interv: IntervencionDTO) => {
                             return interv.id === intervencionModified.id ? intervencionModified : interv;
                         }));
                         modalModificar.close();
-                        refSearchTermsTimer.current = setTimeout((): void => {
+                        refSearchTermsTimer.current = setTimeout(() => {
                             setAppliedSearchTerms({ ...appliedSearchTerms });
                         }, 1000);
                     }}
-                    onCancel={(): void => {
+                    onCancel={() => {
                         createModal({
                             children: (
                                 <p>¿Estás seguro de que deseas cancelar la modificación de la intervención?</p>
                             ),
                             buttonsType: ModalButtonsType.CONFIRM_CANCEL,
-                            onConfirm: (): void => {
+                            onConfirm: () => {
                                 modalModificar.close();
                             }
                         }).show();
@@ -184,6 +180,7 @@ function TableIntervencionFC(props: Readonly<TableIntervencionFCProps>): ReactEl
                                 <th>Motivo</th>
                                 <th>Tipo Intervención</th>
                                 <th>Equipo</th>
+                                <th>Comentarios</th> {/* Nueva columna Comentarios */}
                                 <th></th>
                             </tr>
                             </thead>
@@ -196,6 +193,8 @@ function TableIntervencionFC(props: Readonly<TableIntervencionFCProps>): ReactEl
                                     <td>{getEquipoNombre(intervencion.idEquipo)}</td>
                                     <td>
                                         <button onClick={() => handleViewCommentsClick(intervencion.comentarios ?? '')}>Comentarios</button>
+                                    </td> {/* Botón Comentarios movido a la nueva columna */}
+                                    <td>
                                         {props.hasPermissionEdit && !ID_TIPOS_INTERVENCION_RESOLUCION.includes(intervencion.idTipoIntervencion) ? (
                                             <button style={{ marginLeft: '10px' }} onClick={() => handleEditClick(intervencion)}>Trabajar</button>
                                         ) : null}
