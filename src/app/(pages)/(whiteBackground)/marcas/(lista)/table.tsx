@@ -279,14 +279,15 @@ function TableMarcaFC(props: Readonly<TableMarcaFCProps>): ReactElement {
                                         :
                                         <td></td>
                                     }
-                                    {props.hasPermissionBaja ?
-                                        <td>
-                                            <button onClick={(): void => handleEliminarClick(marca)}>Eliminar
-                                            </button>
-                                        </td>
-                                        :
+                                    {props.hasPermissionBaja || props.hasPermissionReactivar ? (
+                                            <td>
+                                                <button onClick={(): void => handleEliminarClick(marca)}>
+                                                    {marca.activo ? 'Eliminar' : 'Reactivar'}
+                                                </button>
+                                            </td>
+                                    ) : (
                                         <td></td>
-                                    }
+                                    )}
                                 </tr>
 
                             ))}

@@ -82,6 +82,14 @@ export function translateOperacionEnum(operacionEnum: OperacionEnum | string): s
             return "Modificación de modelo";
         case OperacionEnum.BAJA_MODELO:
             return "Baja de modelo";
+        case OperacionEnum.REACTIVAR_PROVEEDOR:
+            return "Reactivación de proveedor";
+        case OperacionEnum.REACTIVAR_MODELO:
+            return "Reactivación de modelo";
+        case OperacionEnum.REACTIVAR_MARCA:
+            return "Reactivación de marca";
+        case OperacionEnum.REACTIVAR_TIPO_EQUIPO:
+            return "Reactivación de tipo de equipo";
         default:
             return "-";
     }
