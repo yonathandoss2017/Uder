@@ -5,7 +5,7 @@ import React, {ChangeEvent, MutableRefObject, ReactElement, useEffect, useRef, u
 import { useModal } from "@/app/hooks/modals/useModal";
 import MarcaDTO from "@/types/dtos/MarcaDTO";
 import FetchAPIError, { isFetchAPIError } from "@/types/errors/FetchAPIError";
-import {darBajaMarca, listarMarcas} from "@/services/MarcaService";
+import {darBajaMarca, listarMarcas, reactivarMarca} from "@/services/MarcaService";
 import stylesTable from "@public/styles/modules/table/table.tipoequipos.module.css";
 import {ModalInstance} from "@/app/hooks/modals/ModalProvider";
 import {ModalButtonsType} from "@/components/ModalFC";
@@ -25,6 +25,7 @@ interface TableMarcaFCProps {
     sessionAPIToken: string;
     hasPermissionEdit: boolean;
     hasPermissionBaja: boolean;
+    hasPermissionReactivar: boolean;
     hasPermissionView: boolean;
     idInstitucion: number;
 }
@@ -127,7 +128,69 @@ function TableMarcaFC(props: Readonly<TableMarcaFCProps>): ReactElement {
     }
 
         // Procedimiento que se ejecuta al hacer clic en el botón 'Eliminar'
-        const handleEliminarClick = (marcaSelected: MarcaDTO): void => {
+    const handleEliminarClick = (marcaSelected: MarcaDTO): void => {
+        if (!marcaSelected.activo) { // Si la marca está inactiva, entonces se reactiva
+            if (!props.hasPermissionReactivar) { // Verifica si el usuario tiene permiso para reactivar
+                createModal({
+                    children: (
+                        <p>No tienes permisos para reactivar la marca</p>
+                    ),
+                    buttonsType: ModalButtonsType.CONFIRM
+                }).show();
+                return;
+            }
+
+            // Crea un modal para confirmar la reactivación de la marca
+            createModal({
+                title: "Reactivando \"" + marcaSelected.nombre + "\"",
+                children: (
+                    <>
+                        <p>Estás por reactivar la marca <b>&quot;{marcaSelected.nombre}&quot;</b>.</p>
+                        <p>¿Desea continuar?</p>
+                    </>
+                ),
+                buttonsType: ModalButtonsType.CONFIRM_CANCEL,
+                async onConfirm(): Promise<void> { // Acción al confirmar
+                    // Realiza la reactivación de la marca en la API
+                    const response: void | FetchAPIError = await reactivarMarca(marcaSelected.id as number, props.sessionAPIToken);
+                    if (isFetchAPIError(response)) {
+                        // Si ocurre un error en la solicitud, muestra un mensaje de error
+                        const errorMessage: string = response.errorMessage;
+                        createModal({
+                            children: (
+                                <p>Error al reactivar la marca: {errorMessage}</p>
+                            ),
+                            buttonsType: ModalButtonsType.CONFIRM
+                        }).show();
+                        console.error('ERROR - Reactivar Marca - table.tsx - handleEliminarClick - reactivarMarca', response);
+                        return;
+                    }
+
+                    marcaSelected.activo = true; // Actualiza el estado de marca a activo
+
+                    // Muestra un mensaje de éxito al reactivar la marca
+                    createModal({
+                        children: (
+                            <p>Marca con nombre: &quot;{marcaSelected.nombre}&quot; reactivada correctamente</p>
+                        ),
+                        buttonsType: ModalButtonsType.CONFIRM
+                    }).show();
+
+                    refSearchTermsTimer.current = setTimeout((): void => {
+                        setAppliedSearchTerms({...appliedSearchTerms}); // Actualiza los términos de búsqueda
+                    }, 1000);
+                },
+                onCancel(): void { // Acción al cancelar
+                    // Muestra un mensaje de cancelación
+                    createModal({
+                        children: (
+                            <p>Reactivación cancelada</p>
+                        ),
+                        buttonsType: ModalButtonsType.CONFIRM
+                    }).show();
+                }
+            }).show();
+        } else { // Si la marca está activa, entonces se da de baja
             if (!props.hasPermissionBaja) { // Si el cliente no tiene permisos para dar de baja, muestra un mensaje de error
                 createModal({
                     children: (
@@ -135,7 +198,6 @@ function TableMarcaFC(props: Readonly<TableMarcaFCProps>): ReactElement {
                     ),
                     buttonsType: ModalButtonsType.CONFIRM
                 }).show();
-
                 return;
             }
 
@@ -144,12 +206,12 @@ function TableMarcaFC(props: Readonly<TableMarcaFCProps>): ReactElement {
                 title: "Dando de baja a \"" + marcaSelected.nombre + "\"",
                 children: (
                     <>
-                        <p>Estas por dar de baja la marca <b>&quot;{marcaSelected.nombre}&quot;</b>.</p>
+                        <p>Estás por dar de baja la marca <b>&quot;{marcaSelected.nombre}&quot;</b>.</p>
                         <p>¿Desea continuar?</p>
                     </>
                 ),
                 buttonsType: ModalButtonsType.CONFIRM_CANCEL,
-                async onConfirm(): Promise<void> { //Acción al confirmar
+                async onConfirm(): Promise<void> { // Acción al confirmar
                     // Realiza la baja de marca en la API
                     const response: void | FetchAPIError = await darBajaMarca(marcaSelected.id as number, props.sessionAPIToken);
                     if (isFetchAPIError(response)) {
@@ -157,11 +219,11 @@ function TableMarcaFC(props: Readonly<TableMarcaFCProps>): ReactElement {
                         const errorMessage: string = response.errorMessage;
                         createModal({
                             children: (
-                                <p>Error al dar de baja de marca: {errorMessage}</p>
+                                <p>Error al dar de baja la marca: {errorMessage}</p>
                             ),
                             buttonsType: ModalButtonsType.CONFIRM
                         }).show();
-                        console.error('ERROR - Dar de baja Marca - table.tsx - handleEliminarClick - darBajamarca', response);
+                        console.error('ERROR - Dar de baja Marca - table.tsx - handleEliminarClick - darBajaMarca', response);
                         return;
                     }
 
@@ -179,7 +241,7 @@ function TableMarcaFC(props: Readonly<TableMarcaFCProps>): ReactElement {
                         setAppliedSearchTerms({...appliedSearchTerms}); // Actualiza los términos de búsqueda
                     }, 1000);
                 },
-                onCancel(): void { //Acción al cancelar
+                onCancel(): void { // Acción al cancelar
                     // Muestra un mensaje de cancelación
                     createModal({
                         title: "Baja Cancelada",
@@ -191,6 +253,8 @@ function TableMarcaFC(props: Readonly<TableMarcaFCProps>): ReactElement {
                 }
             }).show();
         }
+    };
+
 
     return(
         <div className={stylesTable.containerPage}>
