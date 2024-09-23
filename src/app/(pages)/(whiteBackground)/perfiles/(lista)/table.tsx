@@ -1,14 +1,15 @@
 "use client";
 
-import React, { ChangeEvent, MutableRefObject, ReactElement, useEffect, useRef, useState } from "react";
-import { useModal } from "@/app/hooks/modals/useModal";
+import React, {ChangeEvent, MutableRefObject, ReactElement, useEffect, useRef, useState} from "react";
+import {useModal} from "@/app/hooks/modals/useModal";
 import PerfilDTO from "@/types/dtos/PerfilDTO";
-import FetchAPIError, { isFetchAPIError } from "@/types/errors/FetchAPIError";
-import { darBajaPerfil, listarPerfiles } from "@/services/PerfilService";
+import FetchAPIError, {isFetchAPIError} from "@/types/errors/FetchAPIError";
+import {darBajaPerfil, listarPerfiles} from "@/services/PerfilService";
+import PerfilFilter from "@/types/filters/PerfilFilter";
 import stylesTable from "@public/styles/modules/table/table.tipoequipos.module.css";
-import { ModalInstance } from "@/app/hooks/modals/ModalProvider";
+import {ModalInstance} from "@/app/hooks/modals/ModalProvider";
 import EditPerfilForm from "@/app/(pages)/(whiteBackground)/perfiles/(lista)/formEdit";
-import { ModalButtonsType } from "@/components/ModalFC";
+import {ModalButtonsType} from "@/components/ModalFC";
 
 /**
  *  Propiedades del componente TablePerfilesFC
@@ -33,18 +34,18 @@ interface TablePerfilesFCProps {
  **/
 
 interface TableSearchTermsProps {
-    filter: { nombre?: string; activo?: boolean };
+    filter: PerfilFilter;
 }
 
 function TablePerfilesFC(props: Readonly<TablePerfilesFCProps>): ReactElement {
 
     // ----------------------- Modales -----------------------
-    const { createModal } = useModal();
+    const {createModal} = useModal();
 
     // ----------------------- Términos de búsqueda  -----------------------
     const [searchTerms, setSearchTerms]: [TableSearchTermsProps, (value: TableSearchTermsProps) => void]
         = useState<TableSearchTermsProps>({
-        filter: { activo: true }
+        filter: {activo: true}
     });
 
     const [appliedSearchTerms, setAppliedSearchTerms]: [TableSearchTermsProps, (value: TableSearchTermsProps) => void]
@@ -68,12 +69,13 @@ function TablePerfilesFC(props: Readonly<TablePerfilesFCProps>): ReactElement {
 
     useEffect((): void => {
         (async (): Promise<void> => {
-            const response: PerfilDTO[] | FetchAPIError = await listarPerfiles(props.idInstitucion, 0, 1, "id", true);
+            const response: PerfilDTO[] | FetchAPIError = await listarPerfiles(props.sessionAPIToken, appliedSearchTerms.filter);
 
             if (isFetchAPIError(response)) {
                 console.error("ERROR - lista de perfiles - table.tsx - listarPerfiles", response.errorMessage);
                 return;
             }
+            console.log(response);
             setPerfiles(response);
         })();
 
@@ -133,7 +135,7 @@ function TablePerfilesFC(props: Readonly<TablePerfilesFCProps>): ReactElement {
             title: "Dando de baja a \"" + perfilSelected.nombre + "\"",
             children: (
                 <>
-                    <p>Estas por dar de baja al perfil <b>&quot;{perfilSelected.nombre}&quot;</b>.</p>
+                    <p>Estás por dar de baja al perfil <b>&quot;{perfilSelected.nombre}&quot;</b>.</p>
                     <p>¿Desea continuar?</p>
                 </>
             ),
@@ -180,11 +182,10 @@ function TablePerfilesFC(props: Readonly<TablePerfilesFCProps>): ReactElement {
             <div className={stylesTable.containerTable}>
                 <div className={stylesTable.scroll}>
                     {perfiles.length > 0 ? (
-                        <table style={{ width: "100%" }}>
+                        <table style={{width: "100%"}}>
                             <thead>
                             <tr>
                                 <th>Nombre</th>
-                                <th>Nivel</th>
                                 <th></th>
                             </tr>
                             </thead>
@@ -192,12 +193,11 @@ function TablePerfilesFC(props: Readonly<TablePerfilesFCProps>): ReactElement {
                             {perfiles.map((perfil: PerfilDTO) => (
                                 <tr key={perfil.id}>
                                     <td>{perfil.nombre}</td>
-                                    <td>{perfil.nivel}</td>
-                                    {props.hasPermissionEdit ? (
-                                        <td>
-                                            <button onClick={() => handleEditClick(perfil)}>Modificar</button>
-                                        </td>
-                                    ) : <td></td>}
+                                    {/*{props.hasPermissionEdit ? (*/}
+                                    {/*    <td>*/}
+                                    {/*        <button onClick={() => handleEditClick(perfil)}>Modificar</button>*/}
+                                    {/*    </td>*/}
+                                    {/*) : <td></td>}*/}
                                     {props.hasPermissionBaja ? (
                                         <td>
                                             <button onClick={(): void => handleEliminarClick(perfil)}>Eliminar</button>
@@ -241,7 +241,7 @@ function TablePerfilesFC(props: Readonly<TablePerfilesFCProps>): ReactElement {
                                     filter: { ...searchTerms.filter, activo: true }
                                 });
                             }}
-                        /> Activos
+                        />Activos
                     </label>
                     <label>
                         <input
@@ -255,7 +255,7 @@ function TablePerfilesFC(props: Readonly<TablePerfilesFCProps>): ReactElement {
                                     filter: { ...searchTerms.filter, activo: false }
                                 });
                             }}
-                        /> Dados de baja
+                        />Dados de baja
                     </label>
                     <label>
                         <input
@@ -269,7 +269,7 @@ function TablePerfilesFC(props: Readonly<TablePerfilesFCProps>): ReactElement {
                                     filter: { ...searchTerms.filter, activo: undefined }
                                 });
                             }}
-                        /> Todos
+                        />Todos
                     </label>
                 </div>
             </div>

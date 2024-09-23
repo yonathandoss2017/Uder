@@ -1,15 +1,15 @@
-import React, {ChangeEvent, ReactElement} from "react";
+import React, {ReactElement} from "react";
 import {useModal} from "@/app/hooks/modals/useModal";
 import {SubmitHandler, useForm, UseFormReturn} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
-import SchemaPerfil from "@/validations/SchemaPerfil"; // Deberías crear este schema
-import styles from "@public/styles/modules/table/table.editformequipo.module.css"; // Cambiar a los estilos correctos
+import SchemaPerfil from "@/validations/SchemaPerfil";
+import styles from "@public/styles/modules/table/table.editformequipo.module.css";
 import PerfilDTO from "@/types/dtos/PerfilDTO";
 import ChangeEntry from "@/types/ChangeEntry";
 import {ModalButtonsType} from "@/components/ModalFC";
 import FetchAPIError, {isFetchAPIError} from "@/types/errors/FetchAPIError";
 import ModalChangesFC from "@/components/ModalChangesFC";
-import {modificarPerfil} from "@/services/PerfilService"; // Servicio para modificar perfil
+import {modificarPerfil} from "@/services/PerfilService";
 
 interface EditPerfilFormProps {
     sessionAPIToken: string;
@@ -27,8 +27,8 @@ function EditPerfilForm(props: Readonly<EditPerfilFormProps>): ReactElement {
         register,
         handleSubmit,
         formState: {errors}
-    }:  UseFormReturn<PerfilDTO> = useForm<PerfilDTO>({
-        resolver: zodResolver(SchemaPerfil), // Resolver con el schema de validación para perfil
+    }: UseFormReturn<PerfilDTO> = useForm<PerfilDTO>({
+        resolver: zodResolver(SchemaPerfil),
         mode: 'all',
         defaultValues: {}
     });
@@ -37,10 +37,10 @@ function EditPerfilForm(props: Readonly<EditPerfilFormProps>): ReactElement {
 
         const modifiedPerfil: PerfilDTO = {
             ...props.editingPerfil,
-            nombre: formValues.nombre
+            nombre: formValues.nombre,
         };
 
-        const changes: ChangeEntry[] = await obtenerCambiosPerfil(
+        const changes: ChangeEntry[] = await obtenerCambios(
             modifiedPerfil,
             props.editingPerfil
         );
@@ -122,7 +122,7 @@ function EditPerfilForm(props: Readonly<EditPerfilFormProps>): ReactElement {
 
 export default EditPerfilForm;
 
-async function obtenerCambiosPerfil(editingPerfil: PerfilDTO, originalData: PerfilDTO): Promise<ChangeEntry[]> {
+async function obtenerCambios(editingPerfil: PerfilDTO, originalData: PerfilDTO): Promise<ChangeEntry[]> {
 
     const changes: ChangeEntry[] = [];
 
