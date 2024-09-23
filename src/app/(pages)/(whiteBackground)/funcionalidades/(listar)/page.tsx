@@ -35,6 +35,8 @@ const FuncionalidadPage = async (): Promise<ReactElement> => {
     const hasPermissionEdit: boolean = await verificarPermiso(sessionAPIToken, PermisoEnum.MODIFICAR_FUNCIONALIDAD);
     const hasPermissionBaja: boolean = await verificarPermiso(sessionAPIToken, PermisoEnum.BAJA_FUNCIONALIDAD);
     const hasPermissionView: boolean = await verificarPermiso(sessionAPIToken, PermisoEnum.OBTENER_FUNCIONALIDADES);
+    const hasPermissionAsignar: boolean = await verificarPermiso(sessionAPIToken, PermisoEnum.ASIGNAR_FUNCIONALIDAD);
+    const hasPermissionRevocar: boolean = await verificarPermiso(sessionAPIToken, PermisoEnum.REVOCAR_FUNCIONALIDAD);
 
     return (
         <main>
@@ -43,6 +45,8 @@ const FuncionalidadPage = async (): Promise<ReactElement> => {
                 hasPermissionBaja={hasPermissionBaja}
                 hasPermissionEdit={hasPermissionEdit}
                 hasPermissionView={hasPermissionView}
+                hasPermissionAsignar={hasPermissionAsignar}
+                hasPermissionRevocar={hasPermissionRevocar}
                 idInstitucion={clientData.idInstitucion}
             />
         </main>

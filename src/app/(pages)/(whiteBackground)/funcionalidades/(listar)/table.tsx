@@ -18,6 +18,8 @@ interface TableFuncionalidadFCProps {
     hasPermissionEdit: boolean;
     hasPermissionBaja: boolean;
     hasPermissionView: boolean;
+    hasPermissionAsignar: boolean;
+    hasPermissionRevocar: boolean;
     idInstitucion: number;
 }
 
