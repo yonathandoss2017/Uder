@@ -11,6 +11,7 @@ import {ModalButtonsType} from "@/components/ModalFC";
 import {ModalInstance} from "@/app/hooks/modals/ModalProvider";
 import EditFuncionalidadForm from "@/app/(pages)/(whiteBackground)/funcionalidades/(listar)/formEdit";
 import {func} from "prop-types";
+import AgregarPermisosForm from "@/app/(pages)/(whiteBackground)/funcionalidades/(listar)/formAgregarPermisos";
 
 //Props
 interface TableFuncionalidadFCProps {
@@ -136,10 +137,15 @@ function TableFuncionalidadFC(props: Readonly<TableFuncionalidadFCProps>): React
     // Procedimiento que se ejecuta al hacer clic en el botón 'Modificar'
     async function handleEditClick(funcionalidad: FuncionalidadDTO): Promise<void> {
 
-        console.log("EN LA TABLA", funcionalidad.idInstitucion);
         if (!props.hasPermissionEdit) {
+            createModal({
+                children: (
+                    <p>No tienes permisos para modificar funcionalidades</p>
+                ),
+                buttonsType: ModalButtonsType.CONFIRM
+            }).show();
             return
-        } // Si el cliente no tiene permisos para modificar, no hace nada
+        } // Si el cliente no tiene permisos para modificar
 
         // Crea un modal para modificar la funcionalidad
         const modalModificar: ModalInstance = createModal({
@@ -246,6 +252,59 @@ function TableFuncionalidadFC(props: Readonly<TableFuncionalidadFCProps>): React
 
     }
 
+    const handleAsignarFuncionalidades = (funcionalidad: FuncionalidadDTO): void => {
+        if (!props.hasPermissionAsignar && !props.hasPermissionRevocar) {
+            createModal({
+                children: (
+                    <p>No tienes permisos para asignar o revocar funcionalidades a perfiles</p>
+                ),
+                buttonsType: ModalButtonsType.CONFIRM
+            }).show();
+
+            return;
+        }
+
+        const modalPermisos: ModalInstance = createModal({
+            children: (
+            <AgregarPermisosForm
+                sessionAPIToken={props.sessionAPIToken}
+                idInstitucion={props.idInstitucion}
+                funcionalidad={funcionalidad}
+                onSave={(funcionalidadModified: FuncionalidadDTO): void => {
+                    if (funcionalidades) {
+                        // Actualiza el equipo en la lista
+                        setFuncionalidades(funcionalidades.map((funcionalidad: FuncionalidadDTO): FuncionalidadDTO => {
+                            if (funcionalidadModified.id === funcionalidad.id) {
+                                return funcionalidadModified;
+                            }
+                            return funcionalidad;
+                        }));
+                    }
+
+                    modalPermisos.close(); // Cierra el modal
+
+                    // Refresca la lista volviendo a cargar los términos de búsqueda después de 3 segundos
+                    setAppliedSearchTerms({...appliedSearchTerms}); // Actualiza los términos de búsqueda
+                }}
+                onCancel={(): void => {
+                    createModal({
+                        children: (
+                            <p>¿Estás seguro de que deseas cancelar la modificación de la funcionalidad?</p>
+                        ),
+                        buttonsType: ModalButtonsType.CONFIRM_CANCEL,
+                        onConfirm: (): void => {
+                            modalPermisos.close()
+                        }
+                    }).show();
+                }}
+            />
+            ),
+            buttonsType: ModalButtonsType.NONE
+            });
+
+        modalPermisos.show();
+    }
+
 
     //if (!loading) return <LoadingPage/>
     return (
@@ -276,6 +335,14 @@ function TableFuncionalidadFC(props: Readonly<TableFuncionalidadFCProps>): React
                                     {props.hasPermissionEdit ?
                                         <td>
                                             <button onClick={() => handleEditClick(funcionalidad)}>Modificar</button>
+                                        </td>
+                                        :
+                                        <td></td>
+                                    }
+                                    {props.hasPermissionAsignar || props.hasPermissionRevocar ?
+                                        <td>
+                                            <button onClick={(): void => handleAsignarFuncionalidades(funcionalidad)}>Perfiles
+                                            </button>
                                         </td>
                                         :
                                         <td></td>
