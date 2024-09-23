@@ -93,34 +93,26 @@ function TableProveedoresFC(props: Readonly<TableProveedoresFCProps>): ReactElem
                     idInstitucion={props.idInstitucion}
                     editingProveedor={proveedor}
                     onSave={(proveedorModified: ProveedorDTO): void => {
-                        setProveedores(proveedores.map((p: ProveedorDTO): ProveedorDTO => {
-                            return p.id === proveedorModified.id ? proveedorModified : p;
-                        }));
+                        setProveedores(proveedores.map(p => p.id === proveedorModified.id ? proveedorModified : p));
                         modalModificar.close();
-                        refSearchTermsTimer.current = setTimeout((): void => {
-                            setAppliedSearchTerms({ ...appliedSearchTerms });
-                        }, 1000);
+                        setAppliedSearchTerms({ ...appliedSearchTerms });
                     }}
                     onCancel={(): void => {
                         createModal({
-                            children: (
-                                <p>¿Estás seguro de que deseas cancelar la modificación del proveedor?</p>
-                            ),
+                            children: <p>¿Estás seguro de que deseas cancelar la modificación del proveedor?</p>,
                             buttonsType: ModalButtonsType.CONFIRM_CANCEL,
-                            onConfirm: (): void => {
-                                modalModificar.close();
-                            }
+                            onConfirm: (): void => modalModificar.close(),
                         }).show();
                     }}
                 />
             ),
-            buttonsType: ModalButtonsType.NONE
+            buttonsType: ModalButtonsType.NONE,
         });
+
 
         modalModificar.show();
     }
 
-    // Procedimiento que se ejecuta al hacer clic en el botón 'Eliminar'
     // Procedimiento que se ejecuta al hacer clic en el botón 'Eliminar'
     const handleEliminarClick = (proveedorSelected: ProveedorDTO): void => {
         if (!proveedorSelected.activo) { // Si el proveedor está inactivo, entonces se reactiva

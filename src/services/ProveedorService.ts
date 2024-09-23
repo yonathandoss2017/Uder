@@ -22,7 +22,8 @@ export async function listarProveedores(token: string, filter: ProveedorFilter =
         // Parámetros de búsqueda adicionales de filtrado (si existen)
         ...(!!filter.id && {filter_id: filter.id.toString()}),
         ...(!!filter.nombre && {filter_nombre: filter.nombre}),
-        ...(filter.activo != undefined && {filter_activo: filter.activo.toString()})
+        ...(filter.activo != undefined && {filter_activo: filter.activo.toString()}),
+        ...(!!filter.paisOrigen && {filter_paisOrigen: filter.paisOrigen})
     });
     const url: string = `${SERVICE_PATH}/listar?${queryParams}`; // URL de la petición a la API
 
