@@ -4,12 +4,13 @@ import React, {ReactElement, useEffect, useState} from "react";
 import {useModal} from "@/app/hooks/modals/useModal";
 import FuncionalidadDTO from "@/types/dtos/FuncionalidadDTO";
 import FetchAPIError, {isFetchAPIError} from "@/types/errors/FetchAPIError";
-import {contarFuncionalidades, listarFuncionalidades} from "@/services/FuncionalidadService";
+import {contarFuncionalidades, darBajaFuncionalidad, listarFuncionalidades} from "@/services/FuncionalidadService";
 import stylesTable from "@public/styles/modules/table/table.tipoequipos.module.css";
 import ModalViewFuncionalidadFC from "@/components/ModalViewFuncionalidadFC";
 import {ModalButtonsType} from "@/components/ModalFC";
 import {ModalInstance} from "@/app/hooks/modals/ModalProvider";
 import EditFuncionalidadForm from "@/app/(pages)/(whiteBackground)/funcionalidades/(listar)/formEdit";
+import {func} from "prop-types";
 
 //Props
 interface TableFuncionalidadFCProps {
@@ -180,6 +181,70 @@ function TableFuncionalidadFC(props: Readonly<TableFuncionalidadFCProps>): React
         modalModificar.show();
     }
 
+    // Procedimiento que se ejecuta al hacer clic en el botón 'Eliminar'
+    const handleEliminarClick = (funcionalidadSelected: FuncionalidadDTO): void => {
+        if(!props.hasPermissionBaja){
+            createModal({
+                children: (
+                    <p>No tienes permisos para dar de baja funcionalidades</p>
+                ),
+                buttonsType: ModalButtonsType.CONFIRM
+            }).show();
+
+            return;
+        }
+
+        // Crea un modal para confirmar la baja de la funcionalidad
+        createModal({
+            title: "Dando de baja a \"" + funcionalidadSelected.nombre + "\"",
+            children: (
+                <>
+                    <p>Estas por dar de baja la funcionalidad <b>&quot;{funcionalidadSelected.nombre}&quot;</b>.</p>
+                    <p>¿Desea continuar?</p>
+                </>
+            ),
+            buttonsType: ModalButtonsType.CONFIRM_CANCEL,
+            async onConfirm(): Promise<void> { //Acción al confirmar
+                // Realiza la baja de la funcionalidad en la API
+                const response: void | FetchAPIError = await darBajaFuncionalidad(funcionalidadSelected.id as number, props.sessionAPIToken);
+                if (isFetchAPIError(response)){
+                    // Si ocurre un error en la solicitud, muestra un mensaje de error
+                    const errorMessage: string = response.errorMessage;
+                    createModal({
+                        children: (
+                            <p>Error al dar de baja la funcionalidad: {errorMessage}</p>
+                        ),
+                        buttonsType: ModalButtonsType.CONFIRM
+                    }).show();
+                    console.error('ERROR - Dar de baja Funcionalidad - table.tsx - handleEliminarClick - darBajaFuncionalidad', response);
+                    return;
+                }
+
+                // Muestra un mensaje de éxito al dar de baja el tipo de equipo
+                createModal({
+                    children: (
+                        <p>Funcionalidad con nombre: &quot;{funcionalidadSelected.nombre}&quot; dada de baja correctamente</p>
+                    ),
+                    buttonsType: ModalButtonsType.CONFIRM
+                }).show();
+
+                setAppliedSearchTerms({...appliedSearchTerms}); // Actualiza los términos de búsqueda
+            },
+            onCancel(): void { //Acción al cancelar
+                // Muestra un mensaje de cancelación
+                createModal({
+                    title: "Baja Cancelada",
+                    children: (
+                        <p>Baja cancelada</p>
+                    ),
+                    buttonsType: ModalButtonsType.CONFIRM
+                }).show();
+            }
+        }).show();
+
+    }
+
+
     //if (!loading) return <LoadingPage/>
     return (
         <div className={stylesTable.containerPage}>
@@ -209,6 +274,14 @@ function TableFuncionalidadFC(props: Readonly<TableFuncionalidadFCProps>): React
                                     {props.hasPermissionEdit ?
                                         <td>
                                             <button onClick={() => handleEditClick(funcionalidad)}>Modificar</button>
+                                        </td>
+                                        :
+                                        <td></td>
+                                    }
+                                    {props.hasPermissionBaja ?
+                                        <td>
+                                            <button onClick={(): void => handleEliminarClick(funcionalidad)}>Eliminar
+                                            </button>
                                         </td>
                                         :
                                         <td></td>
