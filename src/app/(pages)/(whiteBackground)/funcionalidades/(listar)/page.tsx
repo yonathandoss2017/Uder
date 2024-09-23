@@ -1,5 +1,5 @@
 import {Metadata} from "next";
-import {ReactElement} from "react";
+import React, {ReactElement} from "react";
 import {getServerSession, Session} from "next-auth";
 import authOptions from "@/utils/authOptions";
 import UsuarioDTO from "@/types/dtos/UsuarioDTO";
@@ -14,15 +14,23 @@ export const metadata: Metadata = {
 };
 
 const FuncionalidadPage = async (): Promise<ReactElement> => {
+    // Obtiene la información de la sesión del cliente desde el servidor front (NextAuth)
     const sessionData: Session | null = await getServerSession(authOptions);
+
+    // Obtiene el token de sesión del cliente en la API
     const sessionAPIToken: string | undefined = sessionData?.user?.sessionAPIToken;
+
+    // Obtiene los datos de usuario del cliente
     const clientData: UsuarioDTO | undefined = sessionData?.user?.data;
 
-    if (!sessionAPIToken || !clientData) return <LoadingPage />;
+    // Si no se obtienen los datos se muestra la página de carga
+    if (!sessionAPIToken || !clientData) return <LoadingPage/>;
 
     if (!(await verificarPermiso(sessionAPIToken, PermisoEnum.OBTENER_FUNCIONALIDADES))) {
         return <ErrorFC message={"Acceso denegado"} />;
     }
+
+    console.log("CLIENT DATA", clientData.idInstitucion);
 
     const hasPermissionEdit: boolean = await verificarPermiso(sessionAPIToken, PermisoEnum.MODIFICAR_FUNCIONALIDAD);
     const hasPermissionBaja: boolean = await verificarPermiso(sessionAPIToken, PermisoEnum.BAJA_FUNCIONALIDAD);

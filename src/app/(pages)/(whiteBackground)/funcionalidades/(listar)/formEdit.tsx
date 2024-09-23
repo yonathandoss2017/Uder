@@ -8,10 +8,8 @@ import ChangeEntry from "@/types/ChangeEntry";
 import {ModalButtonsType} from "@/components/ModalFC";
 import ModalChangesFC from "@/components/ModalChangesFC";
 import FetchAPIError, {isFetchAPIError} from "@/types/errors/FetchAPIError";
-import {modificarTipoEquipo} from "@/services/TipoEquipoService";
 import styles from "@public/styles/modules/table/table.editformequipo.module.css";
 import {modificarFuncionalidad} from "@/services/FuncionalidadService";
-import TipoEquipoDTO from "@/types/dtos/TipoEquipoDTO";
 
 interface EditFuncionalidadFormProps {
     sessionAPIToken: string;
@@ -26,6 +24,8 @@ function EditFuncionalidadForm(props: Readonly<EditFuncionalidadFormProps>): Rea
     // ----------------------- Modales -----------------------
 
     const {createModal} = useModal();
+
+    console.log("ID INSTITUCION",props.editingFuncionalidad.idInstitucion)
 
     // -------------------- Formulario de modificación de funcionalidades--------------------
     // Obtenemos los métodos y propiedades necesarios del hook useForm para el formulario
@@ -65,9 +65,10 @@ function EditFuncionalidadForm(props: Readonly<EditFuncionalidadFormProps>): Rea
 
         // Muestra un mensaje de confirmación antes de modificar y guarda la respuesta
         createModal({
-            title: "Modificando funcionalidad \"" + props.editingFuncionalidad + "\"",
+            title: `Modificando funcionalidad "${props.editingFuncionalidad.nombre}"`,
             children: ModalChangesFC(changes),
             async onConfirm(): Promise<void> {
+                console.log("ID INSTITUCION", modifiedFuncionalidad.idInstitucion);
                 // Realiza la modificación del tipo de equipo en la API
                 const response: void | FetchAPIError = await modificarFuncionalidad(modifiedFuncionalidad, props.sessionAPIToken);
 

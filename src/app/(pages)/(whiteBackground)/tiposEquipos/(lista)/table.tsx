@@ -248,7 +248,6 @@ function TableTiposEquiposFC(props: Readonly<TableTiposEquipoFCProps>): ReactEle
                                         <td></td>
                                     }
                                 </tr>
-
                             ))}
                             </tbody>
                         </table>) : <h3>No se encontraron equipos</h3>}

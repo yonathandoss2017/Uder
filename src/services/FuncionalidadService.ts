@@ -1,7 +1,7 @@
 import EquipoFilter from "@/types/filters/EquipoFilter";
 import TipoEquipoDTO from "@/types/dtos/TipoEquipoDTO";
 import FetchAPIError, {isFetchAPIError} from "@/types/errors/FetchAPIError";
-import {fetchBodyWithErrorHandling} from "@/utils/ServiceMethods";
+import {fetchBodyWithErrorHandling, fetchVoidWithErrorHandling} from "@/utils/ServiceMethods";
 import FuncionalidadDTO from "@/types/dtos/FuncionalidadDTO";
 import EquipoFieldSortEnum from "@/types/enums/EquipoFieldSortEnum";
 import PermisoEnum from "@/types/enums/PermisoEnum";
@@ -82,5 +82,5 @@ export async function modificarFuncionalidad(funcionalidad: FuncionalidadDTO, to
     };
 
     // Realiza la petición a la API y retorna el resultado
-    return await fetchBodyWithErrorHandling(url, options);
+    return await fetchVoidWithErrorHandling(url, options);
 }

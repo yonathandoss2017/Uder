@@ -1,17 +1,14 @@
 "use client"
 
-import React, {ReactElement, useEffect,useState} from "react";
+import React, {ReactElement, useEffect, useState} from "react";
 import {useModal} from "@/app/hooks/modals/useModal";
 import FuncionalidadDTO from "@/types/dtos/FuncionalidadDTO";
 import FetchAPIError, {isFetchAPIError} from "@/types/errors/FetchAPIError";
 import {contarFuncionalidades, listarFuncionalidades} from "@/services/FuncionalidadService";
-import LoadingPage from "@/app/(pages)/loading";
 import stylesTable from "@public/styles/modules/table/table.tipoequipos.module.css";
 import ModalViewFuncionalidadFC from "@/components/ModalViewFuncionalidadFC";
 import {ModalButtonsType} from "@/components/ModalFC";
 import {ModalInstance} from "@/app/hooks/modals/ModalProvider";
-import EditTipoEquipoForm from "@/app/(pages)/(whiteBackground)/tiposEquipos/(lista)/formEdit";
-import TipoEquipoDTO from "@/types/dtos/TipoEquipoDTO";
 import EditFuncionalidadForm from "@/app/(pages)/(whiteBackground)/funcionalidades/(listar)/formEdit";
 
 //Props
@@ -80,10 +77,15 @@ function TableFuncionalidadFC(props: Readonly<TableFuncionalidadFCProps>): React
                 return;
             }
             setFuncionalidades(response);
+            funcionalidades.map((funcionalidad: FuncionalidadDTO) => {
+                console.log("PROBANDO")
+                console.log("Funcionalidad: ", funcionalidad.idInstitucion);
+            });
             console.log(response);
             calcularPaginas();
         })();
     }, [appliedSearchTerms]); // Cuando cambian los términos de búsqueda
+
 
     // ----------------------- Paginacion -----------------------
     //Metodo para calcular paginas disponibles
@@ -129,8 +131,13 @@ function TableFuncionalidadFC(props: Readonly<TableFuncionalidadFCProps>): React
     }
 
     // Procedimiento que se ejecuta al hacer clic en el botón 'Modificar'
-    const handleEditClick = (funcionalidad: FuncionalidadDTO): void => {
-        if (!props.hasPermissionEdit) return; // Si el cliente no tiene permisos para modificar, no hace nada
+    async function handleEditClick(funcionalidad: FuncionalidadDTO): Promise<void> {
+
+        console.log("EN LA TABLA", funcionalidad.idInstitucion);
+        if (!props.hasPermissionEdit) {
+            return
+        } // Si el cliente no tiene permisos para modificar, no hace nada
+
         // Crea un modal para modificar la funcionalidad
         const modalModificar: ModalInstance = createModal({
             children: (
@@ -175,121 +182,119 @@ function TableFuncionalidadFC(props: Readonly<TableFuncionalidadFCProps>): React
 
     //if (!loading) return <LoadingPage/>
     return (
-        <div>
-            <div className={stylesTable.containerPage}>
-                <div className={stylesTable.containerTable}>
-                    <div className={stylesTable.scroll}>
-                        {funcionalidades.length > 0 ? (
-                            <table style={{width: "100%"}}>
-                                <thead>
-                                <tr>
-                                    <th>Nombre</th>
-                                    <th></th>
-                                    <th></th>
-                                    <th></th>
+        <div className={stylesTable.containerPage}>
+            <div className={stylesTable.containerTable}>
+                <div className={stylesTable.scroll}>
+                    {funcionalidades.length > 0 ? (
+                        <table style={{width: "100%"}}>
+                            <thead>
+                            <tr>
+                                <th>Nombre</th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {funcionalidades.map((funcionalidad: FuncionalidadDTO) => (
+                                <tr key={funcionalidad.id}>
+                                    <td>{funcionalidad.nombre}</td>
+                                    {props.hasPermissionView ?
+                                        <td>
+                                            <button onClick={() => handleVerClick(funcionalidad)}>Ver</button>
+                                        </td>
+                                        :
+                                        <td></td>
+                                    }
+                                    {props.hasPermissionEdit ?
+                                        <td>
+                                            <button onClick={() => handleEditClick(funcionalidad)}>Modificar</button>
+                                        </td>
+                                        :
+                                        <td></td>
+                                    }
                                 </tr>
-                                </thead>
-                                <tbody>
-                                {funcionalidades.map((funcionalidad: FuncionalidadDTO) => (
-                                    <tr key={funcionalidad.id}>
-                                        <td>{funcionalidad.nombre}</td>
-                                        {props.hasPermissionView ?
-                                            <td>
-                                                <button onClick={() => handleVerClick(funcionalidad)}>Ver</button>
-                                            </td>
-                                            :
-                                            <td></td>
-                                        }
-                                        {props.hasPermissionEdit ?
-                                            <td>
-                                                <button onClick={() => handleEditClick(funcionalidad)}>Modificar</button>
-                                            </td>
-                                            :
-                                            <td></td>
-                                        }
-                                    </tr>
-                                ))}
-                                </tbody>
-                            </table>) : <h3>No se encontraron funcionalidades</h3>}
-                    </div>
-                    {funcionalidades.length > 0 && (
-                        <div className={stylesTable.pagination}>
-                            <button
-                                onClick={() => setCurrentPage(currentPage - 1)}
-                                disabled={currentPage === 1}
-
-                            >
-                                Anterior
-                            </button>
-
-                            {currentPage > 4 && (
-                                <>
-                                    <button
-                                        key={1}
-                                        onClick={() => setCurrentPage(1)}
-                                    >
-                                        {1}
-                                    </button>
-                                    <span>...</span>
-                                </>
-                            )}
-
-                            {Array.from({length: 3}, (_, index) => {
-
-                                const num = currentPage - (index + 1);
-                                if (num < 1 || currentPage == 1) return;
-                                return (
-                                    <button
-                                        key={num}
-                                        onClick={() => setCurrentPage(num)}
-                                    >
-                                        {num}
-                                    </button>
-                                )
-                            }).reverse()}
-
-                            <button
-                                key={currentPage}
-                                className={stylesTable.activePage}
-                            >
-                                {currentPage}
-                            </button>
-
-                            {Array.from({length: 3}, (_, index) => {
-                                const num = currentPage + (index + 1);
-                                if (num > npage) return;
-                                return (
-                                    <button
-                                        key={num}
-                                        onClick={() => setCurrentPage(num)}
-                                    >
-                                        {num}
-                                    </button>
-                                )
-                            })}
-
-                            {currentPage < npage - 3 && (
-                                <>
-                                    <span>...</span>
-                                    <button
-                                        key={npage}
-                                        onClick={() => setCurrentPage(npage)}
-                                    >
-                                        {npage}
-                                    </button>
-                                </>
-                            )}
-
-                            <button
-                                onClick={() => setCurrentPage(currentPage + 1)}
-                                disabled={currentPage === npage}
-                            >
-                                Siguiente
-                            </button>
-
-                        </div>
-                    )}
+                            ))}
+                            </tbody>
+                        </table>) : <h3>No se encontraron funcionalidades</h3>}
                 </div>
+                {funcionalidades.length > 0 && (
+                    <div className={stylesTable.pagination}>
+                        <button
+                            onClick={() => setCurrentPage(currentPage - 1)}
+                            disabled={currentPage === 1}
+
+                        >
+                            Anterior
+                        </button>
+
+                        {currentPage > 4 && (
+                            <>
+                                <button
+                                    key={1}
+                                    onClick={() => setCurrentPage(1)}
+                                >
+                                    {1}
+                                </button>
+                                <span>...</span>
+                            </>
+                        )}
+
+                        {Array.from({length: 3}, (_, index) => {
+
+                            const num = currentPage - (index + 1);
+                            if (num < 1 || currentPage == 1) return;
+                            return (
+                                <button
+                                    key={num}
+                                    onClick={() => setCurrentPage(num)}
+                                >
+                                    {num}
+                                </button>
+                            )
+                        }).reverse()}
+
+                        <button
+                            key={currentPage}
+                            className={stylesTable.activePage}
+                        >
+                            {currentPage}
+                        </button>
+
+                        {Array.from({length: 3}, (_, index) => {
+                            const num = currentPage + (index + 1);
+                            if (num > npage) return;
+                            return (
+                                <button
+                                    key={num}
+                                    onClick={() => setCurrentPage(num)}
+                                >
+                                    {num}
+                                </button>
+                            )
+                        })}
+
+                        {currentPage < npage - 3 && (
+                            <>
+                                <span>...</span>
+                                <button
+                                    key={npage}
+                                    onClick={() => setCurrentPage(npage)}
+                                >
+                                    {npage}
+                                </button>
+                            </>
+                        )}
+
+                        <button
+                            onClick={() => setCurrentPage(currentPage + 1)}
+                            disabled={currentPage === npage}
+                        >
+                            Siguiente
+                        </button>
+
+                    </div>
+                )}
             </div>
         </div>
     );
