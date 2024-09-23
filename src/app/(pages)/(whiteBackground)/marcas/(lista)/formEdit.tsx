@@ -66,6 +66,7 @@ function EditMarcaForm(props: Readonly<EditMarcaFormProps>): ReactElement{
         createModal({
             title: "Modificando marca \"" + props.editingMarca + "\"",
             children: ModalChangesFC(changes),
+            buttonsType: ModalButtonsType.CONFIRM_CANCEL,
             async onConfirm(): Promise<void> {
                 // Realiza la modificación de marca en la API
                 const response: void | FetchAPIError = await modificarMarca(modifiedMarca, props.sessionAPIToken);

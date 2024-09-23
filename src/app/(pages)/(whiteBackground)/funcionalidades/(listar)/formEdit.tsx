@@ -67,6 +67,7 @@ function EditFuncionalidadForm(props: Readonly<EditFuncionalidadFormProps>): Rea
         createModal({
             title: `Modificando funcionalidad "${props.editingFuncionalidad.nombre}"`,
             children: ModalChangesFC(changes),
+            buttonsType: ModalButtonsType.CONFIRM_CANCEL,
             async onConfirm(): Promise<void> {
                 console.log("ID INSTITUCION", modifiedFuncionalidad.idInstitucion);
                 // Realiza la modificación del tipo de equipo en la API
