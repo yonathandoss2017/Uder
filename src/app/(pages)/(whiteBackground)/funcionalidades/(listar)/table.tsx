@@ -7,6 +7,8 @@ import FetchAPIError, {isFetchAPIError} from "@/types/errors/FetchAPIError";
 import {contarFuncionalidades, listarFuncionalidades} from "@/services/FuncionalidadService";
 import LoadingPage from "@/app/(pages)/loading";
 import stylesTable from "@public/styles/modules/table/table.equipos.module.css";
+import ModalViewFuncionalidadFC from "@/components/ModalViewFuncionalidadFC";
+import {ModalButtonsType} from "@/components/ModalFC";
 
 //Props
 interface TableFuncionalidadFCProps {
@@ -116,10 +118,10 @@ function TableFuncionalidadFC(props: Readonly<TableFuncionalidadFCProps>): React
     // Procedimiento que se ejecuta al hacer click en el boton "Ver"
     function handleVerClick(funcionalidad: FuncionalidadDTO): void {
         if (!props.hasPermissionView) return; //Si el cliente no tiene permisos para ver, no hace nada
-        /*createModal({
-            //children: <ModalViewEquipoFC equipo={equipo} sessionAPIToken={props.sessionAPIToken}/>, // Renderiza el componente como JSX
-            //buttonsType: ModalButtonsType.CLOSE // Establece el tipo de botones del modal
-        }).show();*/
+        createModal({
+            children: <ModalViewFuncionalidadFC funcionalidad={funcionalidad} sessionAPIToken={props.sessionAPIToken}/>, // Renderiza el componente como JSX
+            buttonsType: ModalButtonsType.CLOSE // Establece el tipo de botones del modal
+        }).show();
     }
 
     // Procedimiento que se ejecuta al hacer clic en el botón 'Modificar'
