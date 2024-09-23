@@ -134,7 +134,7 @@ function TableTiposEquiposFC(props: Readonly<TableTiposEquipoFCProps>): ReactEle
                     onCancel={(): void => {
                         createModal({
                             children: (
-                                <p>¿Estás seguro de que deseas cancelar la modificación del equipo?</p>
+                                <p>¿Estás seguro de que deseas cancelar la modificación del tipo de equipo?</p>
                             ),
                             buttonsType: ModalButtonsType.CONFIRM_CANCEL,
                             onConfirm: (): void => {

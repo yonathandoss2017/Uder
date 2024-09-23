@@ -6,9 +6,13 @@ import FuncionalidadDTO from "@/types/dtos/FuncionalidadDTO";
 import FetchAPIError, {isFetchAPIError} from "@/types/errors/FetchAPIError";
 import {contarFuncionalidades, listarFuncionalidades} from "@/services/FuncionalidadService";
 import LoadingPage from "@/app/(pages)/loading";
-import stylesTable from "@public/styles/modules/table/table.equipos.module.css";
+import stylesTable from "@public/styles/modules/table/table.tipoequipos.module.css";
 import ModalViewFuncionalidadFC from "@/components/ModalViewFuncionalidadFC";
 import {ModalButtonsType} from "@/components/ModalFC";
+import {ModalInstance} from "@/app/hooks/modals/ModalProvider";
+import EditTipoEquipoForm from "@/app/(pages)/(whiteBackground)/tiposEquipos/(lista)/formEdit";
+import TipoEquipoDTO from "@/types/dtos/TipoEquipoDTO";
+import EditFuncionalidadForm from "@/app/(pages)/(whiteBackground)/funcionalidades/(listar)/formEdit";
 
 //Props
 interface TableFuncionalidadFCProps {
@@ -127,35 +131,33 @@ function TableFuncionalidadFC(props: Readonly<TableFuncionalidadFCProps>): React
     // Procedimiento que se ejecuta al hacer clic en el botón 'Modificar'
     const handleEditClick = (funcionalidad: FuncionalidadDTO): void => {
         if (!props.hasPermissionEdit) return; // Si el cliente no tiene permisos para modificar, no hace nada
-/*
+        // Crea un modal para modificar la funcionalidad
         const modalModificar: ModalInstance = createModal({
             children: (
-                <EditEquipoForm
+                <EditFuncionalidadForm
                     sessionAPIToken={props.sessionAPIToken}
                     idInstitucion={props.idInstitucion}
-                    editingEquipo={equipo}
-                    onSave={(equipoModified: EquipoDTO): void => {
-                        if (equipos) {
+                    editingFuncionalidad={funcionalidad}
+                    onSave={(funcionalidadModified: FuncionalidadDTO): void => {
+                        if (funcionalidades) {
                             // Actualiza el equipo en la lista
-                            setEquipos(equipos.map((equipo: EquipoDTO): EquipoDTO => {
-                                if (equipo.id === equipoModified.id) {
-                                    return equipoModified;
+                            setFuncionalidades(funcionalidades.map((funcionalidad: FuncionalidadDTO): FuncionalidadDTO => {
+                                if (funcionalidadModified.id === funcionalidad.id) {
+                                    return funcionalidadModified;
                                 }
-                                return equipo;
+                                return funcionalidad;
                             }));
                         }
 
                         modalModificar.close(); // Cierra el modal
 
                         // Refresca la lista volviendo a cargar los términos de búsqueda después de 3 segundos
-                        refSearchTermsTimer.current = setTimeout((): void => {
-                            setAppliedSearchTerms({...appliedSearchTerms}); // Actualiza los términos de búsqueda
-                        }, 3000);
+                        setAppliedSearchTerms({...appliedSearchTerms}); // Actualiza los términos de búsqueda
                     }}
                     onCancel={(): void => {
                         createModal({
                             children: (
-                                <p>¿Estás seguro de que deseas cancelar la modificación del equipo?</p>
+                                <p>¿Estás seguro de que deseas cancelar la modificación de la funcionalidad?</p>
                             ),
                             buttonsType: ModalButtonsType.CONFIRM_CANCEL,
                             onConfirm: (): void => {
@@ -168,7 +170,7 @@ function TableFuncionalidadFC(props: Readonly<TableFuncionalidadFCProps>): React
             buttonsType: ModalButtonsType.NONE
         });
 
-        modalModificar.show();*/
+        modalModificar.show();
     }
 
     //if (!loading) return <LoadingPage/>

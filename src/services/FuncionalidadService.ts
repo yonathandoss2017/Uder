@@ -69,3 +69,18 @@ export async function obtenerPermisosFuncionalidad(funcionalidad: FuncionalidadD
     // Realiza la petición a la API y retorna el resultado
     return await fetchBodyWithErrorHandling<PermisoEnum[]>(url, options);
 }
+
+export async function modificarFuncionalidad(funcionalidad: FuncionalidadDTO, token: string): Promise<void | FetchAPIError> {
+    const url: string = `${SERVICE_PATH}/modificar`; // URL de la petición a la API
+    const options: RequestInit = { // Opciones de la petición
+        method: 'PUT',
+        headers: {
+            'Authorization': 'Bearer ' + token, // Cabecera de autorización con el token de sesión
+            'Content-Type': 'application/json' // Tipo de contenido JSON
+        },
+        body: JSON.stringify(funcionalidad) // Cuerpo de la petición
+    };
+
+    // Realiza la petición a la API y retorna el resultado
+    return await fetchBodyWithErrorHandling(url, options);
+}

@@ -4,6 +4,7 @@ import PermisoEnum from "@/types/enums/PermisoEnum";
 import FetchAPIError, {isFetchAPIError} from "@/types/errors/FetchAPIError";
 import {obtenerPermisosFuncionalidad} from "@/services/FuncionalidadService";
 import styles from "@public/styles/modules/modal.view.funcionalidad.module.css";
+import LoadingPage from "@/app/(pages)/loading";
 
 interface ModalViewFuncionalidadFC{
     funcionalidad: FuncionalidadDTO;
@@ -30,6 +31,7 @@ const ModalViewFuncionalidadFC = ({funcionalidad, sessionAPIToken}: ModalViewFun
         setLoaded(true);
     }, [funcionalidad, sessionAPIToken]);
 
+    if (!loaded) return <LoadingPage />;
     return (
         <div className={`${styles.container}`}>
             <h2>Datos de la funcionalidad</h2>
