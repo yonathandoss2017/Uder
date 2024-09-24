@@ -48,7 +48,7 @@ function EditProveedorForm(props: Readonly<EditProveedorFormProps>): ReactElemen
     // Carga inicial de países de origen
     useEffect(() => {
         (async (): Promise<void> => {
-            setPaisesOrigen(await listarPaises(props.idInstitucion).then((response: PaisDTO[] | FetchAPIError): PaisDTO[] => {
+            setPaisesOrigen(await listarPaises(props.sessionAPIToken).then((response: PaisDTO[] | FetchAPIError): PaisDTO[] => {
                 if (isFetchAPIError(response)) {
                     console.error("ERROR - Modificar Proveedor - listarPaises: ", response);
                     return [];
