@@ -10,8 +10,7 @@ import ModalViewFuncionalidadFC from "@/components/ModalViewFuncionalidadFC";
 import {ModalButtonsType} from "@/components/ModalFC";
 import {ModalInstance} from "@/app/hooks/modals/ModalProvider";
 import EditFuncionalidadForm from "@/app/(pages)/(whiteBackground)/funcionalidades/(listar)/formEdit";
-import {func} from "prop-types";
-import AgregarPermisosForm from "@/app/(pages)/(whiteBackground)/funcionalidades/(listar)/formAgregarPermisos";
+import AsignarFuncionalidadesForm from "@/app/(pages)/(whiteBackground)/funcionalidades/(listar)/formAsignar";
 
 //Props
 interface TableFuncionalidadFCProps {
@@ -263,36 +262,23 @@ function TableFuncionalidadFC(props: Readonly<TableFuncionalidadFCProps>): React
             return;
         }
 
-        const modalPermisos: ModalInstance = createModal({
+        const modalFuncionalidades: ModalInstance = createModal({
             children: (
-            <AgregarPermisosForm
+            <AsignarFuncionalidadesForm
                 sessionAPIToken={props.sessionAPIToken}
                 idInstitucion={props.idInstitucion}
                 funcionalidad={funcionalidad}
-                onSave={(funcionalidadModified: FuncionalidadDTO): void => {
-                    if (funcionalidades) {
-                        // Actualiza el equipo en la lista
-                        setFuncionalidades(funcionalidades.map((funcionalidad: FuncionalidadDTO): FuncionalidadDTO => {
-                            if (funcionalidadModified.id === funcionalidad.id) {
-                                return funcionalidadModified;
-                            }
-                            return funcionalidad;
-                        }));
-                    }
-
-                    modalPermisos.close(); // Cierra el modal
-
-                    // Refresca la lista volviendo a cargar los términos de búsqueda después de 3 segundos
-                    setAppliedSearchTerms({...appliedSearchTerms}); // Actualiza los términos de búsqueda
+                onSave={(): void => {
+                    modalFuncionalidades.close(); // Cierra el modal
                 }}
                 onCancel={(): void => {
                     createModal({
                         children: (
-                            <p>¿Estás seguro de que deseas cancelar la modificación de la funcionalidad?</p>
+                            <p>¿Estás seguro de que deseas cancelar la modificación de las funcionalidades?</p>
                         ),
                         buttonsType: ModalButtonsType.CONFIRM_CANCEL,
                         onConfirm: (): void => {
-                            modalPermisos.close()
+                            modalFuncionalidades.close()
                         }
                     }).show();
                 }}
@@ -301,7 +287,7 @@ function TableFuncionalidadFC(props: Readonly<TableFuncionalidadFCProps>): React
             buttonsType: ModalButtonsType.NONE
             });
 
-        modalPermisos.show();
+        modalFuncionalidades.show();
     }
 
 

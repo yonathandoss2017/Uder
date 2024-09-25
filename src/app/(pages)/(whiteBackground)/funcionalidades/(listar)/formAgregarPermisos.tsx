@@ -1,4 +1,4 @@
-import React, { ChangeEvent, ReactElement, useEffect, useState } from "react";
+/*import React, { ChangeEvent, ReactElement, useEffect, useState } from "react";
 import { useModal } from "@/app/hooks/modals/useModal";
 import PermisoEnum from "@/types/enums/PermisoEnum";
 import FetchAPIError, { isFetchAPIError } from "@/types/errors/FetchAPIError";
@@ -90,4 +90,4 @@ function AgregarPermisosForm(props: Readonly<AgregarPermisosFormProps>): ReactEl
     );
 }
 
-export default AgregarPermisosForm;
+export default AgregarPermisosForm;*/
