@@ -14,13 +14,13 @@ interface ModalViewFuncionalidadFC{
 
 const ModalViewFuncionalidadFC = ({funcionalidad, sessionAPIToken}: ModalViewFuncionalidadFC): ReactElement => {
 
-    const [permisos, setPermisos] = useState<PermisoEnum[]>([]);
+    const [permisos, setPermisos] = useState<string[]>([]);
     //Bandera de cargando
     const [loaded, setLoaded]: [boolean,(value: boolean) => void] = useState<boolean>(false);
 
     useEffect(() => {
         (async (): Promise<void> => {
-            const response: PermisoEnum[] | FetchAPIError = await obtenerPermisosFuncionalidad(funcionalidad);
+            const response: string[] | FetchAPIError = await obtenerPermisosFuncionalidad(funcionalidad);
             if (isFetchAPIError(response)) {
                 console.error("ERROR - obtenerPermisos: ", response);
                 setPermisos([]);
@@ -44,9 +44,9 @@ const ModalViewFuncionalidadFC = ({funcionalidad, sessionAPIToken}: ModalViewFun
                     {permisos.length > 0 ? (
                         <div className={styles.permisosContainer}>
                             <label className={styles.details}>Permisos</label>
-                            {permisos.map((permiso: PermisoEnum, index: number) => (
+                            {permisos.map((permiso: string, index: number) => (
                                 <div className={styles.detailsValue} key={index}>
-                                    <p>{permiso.valueOf()}</p>
+                                    <p>{permiso}</p>
                                 </div>
                             ))}
                         </div>

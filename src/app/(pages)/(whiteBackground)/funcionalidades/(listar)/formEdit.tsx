@@ -25,8 +25,6 @@ function EditFuncionalidadForm(props: Readonly<EditFuncionalidadFormProps>): Rea
 
     const {createModal} = useModal();
 
-    console.log("ID INSTITUCION",props.editingFuncionalidad.idInstitucion)
-
     // -------------------- Formulario de modificación de funcionalidades--------------------
     // Obtenemos los métodos y propiedades necesarios del hook useForm para el formulario
     const {

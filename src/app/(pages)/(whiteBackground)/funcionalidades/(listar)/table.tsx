@@ -85,7 +85,6 @@ function TableFuncionalidadFC(props: Readonly<TableFuncionalidadFCProps>): React
                 console.log("PROBANDO")
                 console.log("Funcionalidad: ", funcionalidad.idInstitucion);
             });
-            console.log(response);
             calcularPaginas();
         })();
     }, [appliedSearchTerms]); // Cuando cambian los términos de búsqueda
