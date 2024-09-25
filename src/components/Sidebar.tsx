@@ -122,6 +122,7 @@ const sidebarConfig = [
             },
         ]
     }
+
 ];
 
 const Sidebar = (): ReactElement | null => {

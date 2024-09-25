@@ -82,7 +82,7 @@ export async function darBajaTipoEquipo(id: number, token: string): Promise<void
  * @returns Promise<TipoEquipoDTO[]> - Lista de tipos de equipo
  * @returns Promise<FetchAPIError> - Si ocurre un error en la solicitud o en el procesamiento de la respuesta.
  */
-export async function listarTiposEquipo(token: string, filter: EquipoFilter = {}): Promise<TipoEquipoDTO[] | FetchAPIError> {
+export async function listarTiposEquipo(token: string, filter: TipoEquipoFilter = {}): Promise<TipoEquipoDTO[] | FetchAPIError> {
     // Parámetros de la URL de la petición a la API
     const queryParams: URLSearchParams = new URLSearchParams({
         // Parámetros de búsqueda adicionales de filtrado (si existen)
