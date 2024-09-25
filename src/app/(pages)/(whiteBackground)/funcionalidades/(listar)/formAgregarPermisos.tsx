@@ -1,8 +1,8 @@
-import React, {ChangeEvent, ReactElement, useEffect, useState} from "react";
-import {useModal} from "@/app/hooks/modals/useModal";
+import React, { ChangeEvent, ReactElement, useEffect, useState } from "react";
+import { useModal } from "@/app/hooks/modals/useModal";
 import PermisoEnum from "@/types/enums/PermisoEnum";
-import FetchAPIError, {isFetchAPIError} from "@/types/errors/FetchAPIError";
-import {obtenerPermisosFuncionalidad} from "@/services/FuncionalidadService";
+import FetchAPIError, { isFetchAPIError } from "@/types/errors/FetchAPIError";
+import { obtenerPermisosFuncionalidad } from "@/services/FuncionalidadService";
 import FuncionalidadDTO from "@/types/dtos/FuncionalidadDTO";
 import styles from "@public/styles/modules/table/table.tipoequipos.module.css";
 import LoadingPage from "@/app/(pages)/loading";
@@ -15,38 +15,41 @@ interface AgregarPermisosFormProps {
     onCancel?: () => void;
 }
 
-interface FormValues extends FuncionalidadDTO {
-}
-
 function AgregarPermisosForm(props: Readonly<AgregarPermisosFormProps>): ReactElement {
+    const { createModal } = useModal();
 
-    const {createModal} = useModal();
+    // Obtener los nombres de los permisos del enum
+    const permisosNames = Object.keys(PermisoEnum).filter((key) => isNaN(Number(key)));
+    console.log("TODOS PERMISOS", permisosNames)
 
-    //Todos los permisos
-    const [permisos, setPermisos] = useState<string[]>([]);
-    const [permisosFuncionalidad, setPermisosFuncionalidad]= useState<string[]>([]);
-    const [loaded, setLoaded]: [boolean, (value: boolean) => void] = useState<boolean>(false);
+    const [permisosFuncionalidad, setPermisosFuncionalidad] = useState<String[]>([]);
+    const [permisosNombres, setPermisosNombres] = useState<string[]>([]);
+    const [loaded, setLoaded] = useState<boolean>(false);
 
     useEffect(() => {
-        const allPermisos = Object.entries(PermisoEnum)
-            .filter(([key, value]) => typeof value === 'number') // Ensure you're only working with the numeric values.
-            .map(([key]) => key); // Extract the keys (permission names).
-
-        setPermisos(allPermisos);
         (async (): Promise<void> => {
-            const response: string[] | FetchAPIError = await obtenerPermisosFuncionalidad(props.funcionalidad);
+            const response: String[] | FetchAPIError = await obtenerPermisosFuncionalidad(props.funcionalidad);
             if (isFetchAPIError(response)) {
                 console.error("ERROR - obtenerPermisos: ", response);
                 setPermisosFuncionalidad([]);
+                setPermisosNombres([]);
+                setLoaded(true);
                 return;
             }
             setPermisosFuncionalidad(response);
+            console.log("PERMISOS FUNCIONALIDAD", permisosFuncionalidad)
+
+            //setPermisosNombres(response);
+            console.log("PERMISOS FUN NOMBRES", permisosNombres)
             setLoaded(true);
         })();
+    }, [props.funcionalidad]);
 
-    }, [props.funcionalidad, props.sessionAPIToken]);
+    console.log("PERMISOS FUNCIONALIDAD", permisosFuncionalidad)
+    console.log("PERMISOS FUN NOMBRES", permisosNombres)
 
-    if (!loaded) return <LoadingPage/>
+    if (!loaded) return <LoadingPage />;
+
 
     return (
         <form>
@@ -54,31 +57,37 @@ function AgregarPermisosForm(props: Readonly<AgregarPermisosFormProps>): ReactEl
             <div className={styles.inputBox}>
                 <div className={styles.scroll}>
                     <label className={styles.details}>Permisos</label>
-                    {loaded && permisos.length > 0 ? (
+                    {permisosNames.length > 0 ? (
                         <div className={styles.permisosContainer}>
-                            {permisos.map((permiso: string, index: number) => (
+                            {permisosNames.map((permiso: string, index: number) => (
                                 <div className={styles.detailsValue} key={index}>
                                     <label htmlFor={permiso}>{permiso}</label>
                                     <input
                                         type="checkbox"
                                         id={permiso}
-                                        checked={permisosFuncionalidad.includes(permiso)}
-                                        onChange={() => {
+                                        checked={permisosNombres.includes(permiso)}
+                                        onChange={(e) => {
+                                            if (e.target.checked) {
+                                                setPermisosNombres([...permisosNombres, permiso]);
+                                            } else {
+                                                setPermisosNombres(permisosNombres.filter((p) => p !== permiso));
+                                            }
                                         }}
                                     />
                                 </div>
                             ))}
-
                         </div>
                     ) : (
                         <p>No hay permisos disponibles para asignar.</p>
                     )}
-
                 </div>
             </div>
             <button type="submit">Guardar</button>
+            <button type="button" onClick={props.onCancel}>
+                Cancelar
+            </button>
         </form>
     );
-};
+}
 
 export default AgregarPermisosForm;

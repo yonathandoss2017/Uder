@@ -79,7 +79,7 @@ export async function contarFuncionalidades(idInstitucion:number): Promise<numbe
  * @returns Promise<PermisoEnum[]> - Lista de permisos de la funcionalidad
  * @returns Promise<FetchAPIError> - Si ocurre un error en la solicitud o en el procesamiento de la respuesta.
  */
-export async function obtenerPermisosFuncionalidad(funcionalidad: FuncionalidadDTO): Promise<string[] | FetchAPIError> {
+export async function obtenerPermisosFuncionalidad(funcionalidad: FuncionalidadDTO): Promise<String[] | FetchAPIError> {
     const url: string = `${SERVICE_PATH}/permisos?id=${funcionalidad.id}`; // URL de la petición a la API
     // Opciones de la petición
     const options: RequestInit = {
@@ -90,7 +90,7 @@ export async function obtenerPermisosFuncionalidad(funcionalidad: FuncionalidadD
     };
 
     // Realiza la petición a la API y retorna el resultado
-    return await fetchBodyWithErrorHandling<string[]>(url, options);
+    return await fetchBodyWithErrorHandling<String[]>(url, options);
 }
 
 /**

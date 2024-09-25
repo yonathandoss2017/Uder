@@ -59,26 +59,4 @@ enum PermisoEnum {
 
 }
 
-/*
-export function obtenerEnum(nombre: string | null): PermisoEnum {
-    // Si el nombre buscado es nulo, lanza un error.
-    if (nombre === null) {
-        throw new Error("Nombre de permiso no especificado");
-    }
-
-    // Recorre todos los valores de la enumeración, buscando el nombre del permiso.
-    for (const oe of Object.keys(PermisoEnum)) {
-        // Verifica si el valor actual coincide con el nombre buscado (ignorando mayúsculas/minúsculas).
-        if (oe.toLowerCase() === nombre.toLowerCase()) {
-            // Retorna el valor numérico correspondiente al nombre del permiso.
-            return PermisoEnum[oe as keyof typeof PermisoEnum];
-        }
-    }
-
-    // Si no se encontró el valor buscado, lanza un error.
-    throw new Error("No se encontró el permiso buscado");
-}*/
-
-
-
 export default PermisoEnum;
