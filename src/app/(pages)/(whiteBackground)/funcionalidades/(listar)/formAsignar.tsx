@@ -28,6 +28,7 @@ function AsignarFuncionalidadesForm(props: Readonly<AsignarFuncionalidadesFormPr
 
     const [perfiles, setPerfiles] = useState<PerfilDTO[]>([]);
     const [perfilesFuncionalidad, setPerfilesFuncionalidad] = useState<PerfilDTO[]>([]);
+    const [perfilesSeleccionados, setPerfilesSeleccionados] = useState<PerfilDTO[]>([]);
     const [loaded, setLoaded] = useState<boolean>(false);
 
     useEffect(() => {
@@ -48,6 +49,7 @@ function AsignarFuncionalidadesForm(props: Readonly<AsignarFuncionalidadesFormPr
                     return;
                 }
                 setPerfilesFuncionalidad(response);
+                setPerfilesSeleccionados(response)
             }
 
             setLoaded(true);
@@ -60,6 +62,11 @@ function AsignarFuncionalidadesForm(props: Readonly<AsignarFuncionalidadesFormPr
         console.log("perfiles", perfiles)
         console.log("perfilesFuncionalidad", perfilesFuncionalidad)
     }, [perfilesFuncionalidad, perfiles]);
+
+    useEffect(() => {
+        console.log("perfilesSeleccionados", perfilesSeleccionados)
+    }, [perfilesSeleccionados]);
+
 
     if(!loaded) return <LoadingPage/>
     return (
@@ -76,13 +83,13 @@ function AsignarFuncionalidadesForm(props: Readonly<AsignarFuncionalidadesFormPr
                                     <input
                                         type="checkbox"
                                         id={perfil.nombre}
-                                        checked={perfilesFuncionalidad.some((p) => p.id === perfil.id)}
+                                        checked={perfilesSeleccionados.some((p) => p.id === perfil.id)}
                                         onChange={
                                             (e) => {
                                                 if(e.target.checked) {
-                                                    setPerfilesFuncionalidad([...perfilesFuncionalidad, perfil]);
+                                                    setPerfilesSeleccionados([...perfilesSeleccionados, perfil]);
                                                 } else {
-                                                    setPerfilesFuncionalidad(perfilesFuncionalidad.filter((perfilFuncionalidad: PerfilDTO) => perfilFuncionalidad.id !== perfil.id));
+                                                    setPerfilesSeleccionados(perfilesSeleccionados.filter((perfilS: PerfilDTO) => perfilS.id !== perfil.id));
                                                 }
                                             }
                                         }
