@@ -69,7 +69,7 @@ function TableEquiposFC(props: Readonly<TableEquiposFCProps>): ReactElement {
 
     const {createModal} = useModal();
 
-    // ----------------------- Términos de búsqueda  -----------------------
+    // ----------------------- Términos de paginación -----------------------
 
     const [currentPage, setCurrentPage] = useState<number>(1);
     const [npage, setNpage] = useState<number>(1);
@@ -234,9 +234,9 @@ function TableEquiposFC(props: Readonly<TableEquiposFCProps>): ReactElement {
                     console.error("ERROR: " + response.errorMessage)
                     return 0;
                 }
-                //Obtenemos el total de usuarios de la respuesta
+                //Obtenemos el total de equipos de la respuesta
                 const total = Number(response);
-                //La cantidad de paginas es el total de usuarios dividido la cantidad de usuarios por pagina que se muestran
+                //La cantidad de paginas es el total de equipos dividido la cantidad de usuarios por pagina que se muestran
                 const totalPages = Math.ceil(total / recordsPerPage)
                 setNpage(totalPages); //Seteamos el numero de paginas
                 if (totalPages > 0 && currentPage > totalPages) { //Si el total de paginas es mayor a 0 y la pagina actual es mayor al total de las paginas
@@ -380,17 +380,13 @@ function TableEquiposFC(props: Readonly<TableEquiposFCProps>): ReactElement {
                                         return tipo.id === equipo.idTipoEquipo
                                     })?.nombre
                                     }</td>
-                                    <td>
-                                        {props.hasPermissionView && (
-                                            <>
-                                                {(
-                                                    <button onClick={() => handleVerClick(equipo)}>
-                                                        Ver
-                                                    </button>
-                                                )}
-                                            </>
-                                        )}
-                                    </td>
+                                    {props.hasPermissionView ?
+                                        <td>
+                                            <button onClick={() => handleVerClick(equipo)}>Ver</button>
+                                        </td>
+                                        :
+                                        <td></td>
+                                    }
                                     {props.hasPermissionEdit ?
                                         <td>
                                             <button onClick={() => handleEditClick(equipo)}>Modificar</button>

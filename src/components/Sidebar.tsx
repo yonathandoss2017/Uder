@@ -76,11 +76,30 @@ const sidebarConfig = [
         ]
     },
     {
+        title: "Gestión Perfiles",
+
+        key: "perfiles",
+
+        submenus: [
+
+            {
+                title: "Registro Perfiles", path: "/perfiles/agregar", permission: PermisoEnum.ALTA_PERFIL
+
+            },
+            {
+                title: "Listado Perfiles", path: "/perfiles", permission: PermisoEnum.OBTENER_PERFILES
+
+            },
+        ]
+
+    },
+
+    {
         title: "Gestión Proveedores",
         key: "proveedores",
         submenus: [
             {
-                title: "Ingreso de Proveedor", path: "/proveedores/agregar", permission: PermisoEnum.ALTA_PROVEEDOR
+                title: "Ingreso Proveedor", path: "/proveedores/agregar", permission: PermisoEnum.ALTA_PROVEEDOR
             },
             {
                 title: "Listado Proveedores", path: "/proveedores", permission: PermisoEnum.OBTENER_PROVEEDORES
@@ -88,14 +107,18 @@ const sidebarConfig = [
         ]
     },
     {
-        title: "Gestión Perfiles",
-        key: "perfiles",
+        title: "Gestión Funcionalidades",
+        key: "funcionalidades",
         submenus: [
             {
-                title: "Registro Perfiles", path: "/perfiles/agregar", permission: PermisoEnum.ALTA_PERFIL
+                title: "Ingreso Funcionalidad",
+                path: "/funcionalidades/agregar",
+                permission: PermisoEnum.ALTA_FUNCIONALIDAD
             },
             {
-                title: "Listado Perfiles", path: "/perfiles", permission: PermisoEnum.OBTENER_PERFILES
+                title: "Listado Funcionalidades",
+                path: "/funcionalidades",
+                permission: PermisoEnum.OBTENER_FUNCIONALIDADES
             },
         ]
     }
@@ -134,7 +157,6 @@ const Sidebar = (): ReactElement | null => {
         })();
     }, [sessionData]); // Agrego sessionData como dependencia
 
-    // eslint-disable-next-line react-hooks/rules-of-hooks
     useEffect(() => {
         // Encuentra la sección cuyo submenú está siendo visualizado actualmente
         const matchedSection = sidebarConfig.find(section =>
