@@ -5,6 +5,7 @@ import {fetchBodyWithErrorHandling, fetchVoidWithErrorHandling} from "@/utils/Se
 import FuncionalidadDTO from "@/types/dtos/FuncionalidadDTO";
 import EquipoFieldSortEnum from "@/types/enums/EquipoFieldSortEnum";
 import PermisoEnum from "@/types/enums/PermisoEnum";
+import PerfilDTO from "@/types/dtos/PerfilDTO";
 
 // URL base de la API REST de la API para las funcionalidades
 const SERVICE_PATH: string = process.env.NEXT_PUBLIC_BACKEND_API_URL + "/funcionalidades";
@@ -156,4 +157,17 @@ export async function darBajaFuncionalidad(id: number, token: string): Promise<v
 
     // Realiza la petición a la API y retorna el resultado
     return await fetchVoidWithErrorHandling(url, options);
+}
+
+export async function listarPerfilesFuncionalidad(id: number): Promise<PerfilDTO[] | FetchAPIError> {
+    const url: string = `${SERVICE_PATH}/perfiles/${id}`; // URL de la petición a la API
+    const options: RequestInit = { // Opciones de la petición
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json' // Tipo de contenido JSON
+        }
+    };
+
+    // Realiza la petición a la API y retorna el resultado
+    return await fetchBodyWithErrorHandling<PerfilDTO[]>(url, options);
 }
