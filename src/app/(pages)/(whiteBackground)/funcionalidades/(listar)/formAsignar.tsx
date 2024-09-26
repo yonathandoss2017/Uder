@@ -77,7 +77,7 @@ function AsignarFuncionalidadesForm(props: Readonly<AsignarFuncionalidadesFormPr
 
     const onSubmit = async (formValues: FormValues): Promise<void> => {
         if(!props.funcionalidad.id) return;
-        const response: void | FetchAPIError = await asignarFuncionalidad(props.funcionalidad.id, perfilesSeleccionados);
+        const response: void | FetchAPIError = await asignarFuncionalidad(props.funcionalidad.id, perfilesSeleccionados, props.sessionAPIToken);
         if (isFetchAPIError(response)) {
             createModal({
                 children: (

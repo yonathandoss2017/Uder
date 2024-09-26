@@ -114,11 +114,12 @@ export async function modificarFuncionalidad(funcionalidad: FuncionalidadDTO, to
     return await fetchVoidWithErrorHandling(url, options);
 }
 
-export async function asignarFuncionalidad(idFuncionalidad: number, perfiles: PerfilDTO[]){
+export async function asignarFuncionalidad(idFuncionalidad: number, perfiles: PerfilDTO[], token: string){
     const url: string = `${SERVICE_PATH}/asignar/${idFuncionalidad}`; // URL de la petición a la API
     const options: RequestInit = { // Opciones de la petición
         method: 'POST',
         headers: {
+            'Authorization': 'Bearer ' + token, // Cabecera de autorización con el token de sesión
             'Content-Type': 'application/json' // Tipo de contenido JSON
         },
         body: JSON.stringify(perfiles) // Cuerpo de la petición
