@@ -48,15 +48,17 @@ export async function listarFuncionalidades(
 /**
  * Función para contar las funcionalidades de una institucion
  * @param idInstitucion
+ * @param token
  * @returns Promise<number> - Cantidad de funcionalidades registradas
  * @returns Promise<FetchAPIError> - Si ocurre un error en la solicitud o en el procesamiento de la respuesta.
  */
-export async function contarFuncionalidades(idInstitucion:number): Promise<number> {
+export async function contarFuncionalidades(idInstitucion:number, token: string): Promise<number> {
     const url: string = `${SERVICE_PATH}/contar?idInstitucion=${idInstitucion}`; // URL de la petición a la API
     // Opciones de la petición
     const options: RequestInit = {
         method: 'GET',
         headers: {
+            'Authorization': 'Bearer ' + token, // Cabecera de autorización con el token de sesión
             'Content-Type': 'application/json' // Tipo de contenido JSON
         }
     };
@@ -78,18 +80,19 @@ export async function contarFuncionalidades(idInstitucion:number): Promise<numbe
  * @returns Promise<PermisoEnum[]> - Lista de permisos de la funcionalidad
  * @returns Promise<FetchAPIError> - Si ocurre un error en la solicitud o en el procesamiento de la respuesta.
  */
-export async function obtenerPermisosFuncionalidad(funcionalidad: FuncionalidadDTO): Promise<String[] | FetchAPIError> {
+export async function obtenerPermisosFuncionalidad(funcionalidad: FuncionalidadDTO, token: string): Promise<string[] | FetchAPIError> {
     const url: string = `${SERVICE_PATH}/permisos?id=${funcionalidad.id}`; // URL de la petición a la API
     // Opciones de la petición
     const options: RequestInit = {
         method: 'GET',
         headers: {
+            'Authorization': 'Bearer ' + token, // Cabecera de autorización con el token de sesión
             'Content-Type': 'application/json' // Tipo de contenido JSON
         }
     };
 
     // Realiza la petición a la API y retorna el resultado
-    return await fetchBodyWithErrorHandling<String[]>(url, options);
+    return await fetchBodyWithErrorHandling<string[]>(url, options);
 }
 
 /**
@@ -172,11 +175,12 @@ export async function darBajaFuncionalidad(id: number, token: string): Promise<v
     return await fetchVoidWithErrorHandling(url, options);
 }
 
-export async function listarPerfilesFuncionalidad(id: number): Promise<PerfilDTO[] | FetchAPIError> {
+export async function listarPerfilesFuncionalidad(id: number, token: string): Promise<PerfilDTO[] | FetchAPIError> {
     const url: string = `${SERVICE_PATH}/perfiles/${id}`; // URL de la petición a la API
     const options: RequestInit = { // Opciones de la petición
         method: 'GET',
         headers: {
+            'Authorization': 'Bearer ' + token, // Cabecera de autorización con el token de sesión
             'Content-Type': 'application/json' // Tipo de contenido JSON
         }
     };

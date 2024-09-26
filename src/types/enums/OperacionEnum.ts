@@ -27,10 +27,8 @@ enum OperacionEnum {
     ALTA_FUNCIONALIDAD=23,
     MODIFICAR_FUNCIONALIDAD=24,
     BAJA_FUNCIONALIDAD=25,
-    ASIGNAR_FUNCIONALIDAD=26,
-    REVOCAR_FUNCIONALIDAD=27,
-    AGREGAR_PERMISO_FUNCIONALIDAD=28,
-    REVOCAR_PERMISO_FUNCIONALIDAD=29
+    ASIGNAR_FUNCIONALIDADES=26,
+    ASIGNAR_PERMISOS=27
 
 }
 
@@ -91,14 +89,10 @@ export function translateOperacionEnum(operacionEnum: OperacionEnum | string): s
             return "Modificación de funcionalidad";
         case OperacionEnum.BAJA_FUNCIONALIDAD:
             return "Baja de funcionalidad";
-        case OperacionEnum.ASIGNAR_FUNCIONALIDAD:
+        case OperacionEnum.ASIGNAR_FUNCIONALIDADES:
             return "Asignar funcionalidad";
-        case OperacionEnum.REVOCAR_FUNCIONALIDAD:
-            return "Revocar funcionalidad";
-        case OperacionEnum.AGREGAR_PERMISO_FUNCIONALIDAD:
-            return "Agregar permiso a funcionalidad";
-        case OperacionEnum.REVOCAR_PERMISO_FUNCIONALIDAD:
-            return "Revocar permiso a funcionalidad";
+        case OperacionEnum.ASIGNAR_PERMISOS:
+            return "Asignar permisos";
         default:
             return "-";
     }

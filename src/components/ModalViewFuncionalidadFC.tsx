@@ -20,7 +20,7 @@ const ModalViewFuncionalidadFC = ({funcionalidad, sessionAPIToken}: ModalViewFun
 
     useEffect(() => {
         (async (): Promise<void> => {
-            const response: string[] | FetchAPIError = await obtenerPermisosFuncionalidad(funcionalidad);
+            const response: string[] | FetchAPIError = await obtenerPermisosFuncionalidad(funcionalidad, sessionAPIToken);
             if (isFetchAPIError(response)) {
                 console.error("ERROR - obtenerPermisos: ", response);
                 setPermisos([]);

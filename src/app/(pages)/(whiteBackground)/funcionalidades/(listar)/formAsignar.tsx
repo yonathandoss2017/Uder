@@ -50,7 +50,7 @@ function AsignarFuncionalidadesForm(props: Readonly<AsignarFuncionalidadesFormPr
             setPerfiles(response);
 
             if(props.funcionalidad.id) {
-                const response: PerfilDTO[] | FetchAPIError = await listarPerfilesFuncionalidad(props.funcionalidad.id);
+                const response: PerfilDTO[] | FetchAPIError = await listarPerfilesFuncionalidad(props.funcionalidad.id, props.sessionAPIToken);
                 if (isFetchAPIError(response)) {
                     console.error("ERROR - obtenerPerfilesFuncionalidad: ", response);
                     setPerfilesFuncionalidad([]);

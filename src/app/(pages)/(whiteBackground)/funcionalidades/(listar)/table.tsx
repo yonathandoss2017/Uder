@@ -18,8 +18,7 @@ interface TableFuncionalidadFCProps {
     hasPermissionEdit: boolean;
     hasPermissionBaja: boolean;
     hasPermissionView: boolean;
-    hasPermissionAsignar: boolean;
-    hasPermissionRevocar: boolean;
+    hasPermissionAsignarFuncionalidades: boolean;
     idInstitucion: number;
 }
 
@@ -92,7 +91,7 @@ function TableFuncionalidadFC(props: Readonly<TableFuncionalidadFCProps>): React
     // ----------------------- Paginacion -----------------------
     //Metodo para calcular paginas disponibles
     function calcularPaginas(): void {
-        contarFuncionalidades(props.idInstitucion)
+        contarFuncionalidades(props.idInstitucion, props.sessionAPIToken)
             .then((response: number | FetchAPIError) => {
                 if (isFetchAPIError(response)) { //Si hay error
                     console.error("ERROR: " + response.errorMessage)
@@ -251,7 +250,7 @@ function TableFuncionalidadFC(props: Readonly<TableFuncionalidadFCProps>): React
     }
 
     const handleAsignarFuncionalidades = (funcionalidad: FuncionalidadDTO): void => {
-        if (!props.hasPermissionAsignar && !props.hasPermissionRevocar) {
+        if (!props.hasPermissionAsignarFuncionalidades) {
             createModal({
                 children: (
                     <p>No tienes permisos para asignar o revocar funcionalidades a perfiles</p>
@@ -324,7 +323,7 @@ function TableFuncionalidadFC(props: Readonly<TableFuncionalidadFCProps>): React
                                         :
                                         <td></td>
                                     }
-                                    {props.hasPermissionAsignar || props.hasPermissionRevocar ?
+                                    {props.hasPermissionAsignarFuncionalidades  ?
                                         <td>
                                             <button onClick={(): void => handleAsignarFuncionalidades(funcionalidad)}>Perfiles
                                             </button>
