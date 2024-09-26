@@ -25,9 +25,6 @@ const SchemaUser: ZodObject<any> = z.object({
         .refine((value: string) => !value.includes(" "), {
             message: "No debe contener espacios en blanco",
         })
-        .refine((value: string) => !/^\d+$/.test(value), {
-            message: "El primer nombre no puede contener solo números",
-        })
         // Validación para que no contenga caracteres especiales ni números (solo letras y letras acentuadas)
         .refine((value: string) => /^[A-Za-zÁÉÍÓÚáéíóúÑñ]+$/.test(value), {
             message: "El primer nombre no debe contener números ni caracteres especiales",
@@ -41,9 +38,6 @@ const SchemaUser: ZodObject<any> = z.object({
                 .max(30, "El segundo nombre no puede tener más de 30 caracteres")
                 .refine((value: string) => value === '' || !value.includes(" "), {
                     message: "No debe contener espacios en blanco",
-                })
-                .refine((value: string) => value === '' || !/^\d+$/.test(value), {
-                    message: "El segundo nombre no puede contener solo números",
                 })
                 // Validación para que no contenga caracteres especiales ni números (solo letras y letras acentuadas)
                 .refine((value: string) => /^[A-Za-zÁÉÍÓÚáéíóúÑñ]+$/.test(value), {
@@ -59,8 +53,6 @@ const SchemaUser: ZodObject<any> = z.object({
         .max(30, "El primer apellido no puede tener más de 30 caracteres")
         .refine((value: string) => !value.includes(" "), {
             message: "No debe contener espacios en blanco",
-        }).refine((value: string) => !/^\d+$/.test(value), {
-            message: "El primer nombre no puede contener solo números",
         })
     // Validación para que no contenga caracteres especiales ni números (solo letras y letras acentuadas)
     .refine((value: string) => /^[A-Za-zÁÉÍÓÚáéíóúÑñ]+$/.test(value), {
@@ -75,9 +67,6 @@ const SchemaUser: ZodObject<any> = z.object({
                 .max(30, "El segundo apellido no puede tener más de 30 caracteres")
                 .refine((value: string) => value === '' || !value.includes(" "), {
                     message: "No debe contener espacios en blanco",
-                })
-                .refine((value: string) => value === '' || !/^\d+$/.test(value), {
-                    message: "El segundo apellido no puede contener solo números",
                 })
                 // Validación para que no contenga caracteres especiales ni números (solo letras y letras acentuadas)
                 .refine((value: string) => /^[A-Za-zÁÉÍÓÚáéíóúÑñ]+$/.test(value), {

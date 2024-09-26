@@ -17,9 +17,6 @@ const SchemaPerfil: ZodObject<any> = z.object({
         // Validación para que no contenga caracteres especiales ni números (solo letras y letras acentuadas)
         .refine((value: string) => /^[A-Za-zÁÉÍÓÚáéíóúÑñ]+$/.test(value), {
             message: "El primer nombre no debe contener números ni caracteres especiales",
-        })
-        .refine((value: string) => !/^\d+$/.test(value), {
-            message: "El primer nombre no puede contener solo números",
         }),
 
     nivel: z
