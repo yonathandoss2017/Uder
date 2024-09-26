@@ -4,7 +4,7 @@ import React, {ChangeEvent, MutableRefObject, ReactElement, useEffect, useRef, u
 import {useModal} from "@/app/hooks/modals/useModal";
 import TipoEquipoDTO from "@/types/dtos/TipoEquipoDTO";
 import FetchAPIError, {isFetchAPIError} from "@/types/errors/FetchAPIError";
-import {darBajaTipoEquipo, listarTiposEquipo} from "@/services/TipoEquipoService";
+import {darBajaTipoEquipo, listarTiposEquipo, reactivarTipoEquipo} from "@/services/TipoEquipoService";
 import TipoEquipoFilter from "@/types/filters/TipoEquipoFilter";
 import stylesTable from "@public/styles/modules/table/table.tipoequipos.module.css";
 import {ModalInstance} from "@/app/hooks/modals/ModalProvider";
@@ -25,6 +25,7 @@ interface TableTiposEquipoFCProps {
     sessionAPIToken: string;
     hasPermissionEdit: boolean;
     hasPermissionBaja: boolean;
+    hasPermissionReactivar: boolean;
     hasPermissionView: boolean;
     idInstitucion: number;
 }
@@ -152,69 +153,132 @@ function TableTiposEquiposFC(props: Readonly<TableTiposEquipoFCProps>): ReactEle
 
     // Procedimiento que se ejecuta al hacer clic en el botón 'Eliminar'
     const handleEliminarClick = (tipoEquipoSelected: TipoEquipoDTO): void => {
-        if (!props.hasPermissionBaja) { // Si el cliente no tiene permisos para dar de baja, muestra un mensaje de error
+        if (!tipoEquipoSelected.activo) { // Si el tipo de equipo está inactivo, entonces se reactiva
+            if (!props.hasPermissionReactivar) { // Verifica si el usuario tiene permiso para reactivar
+                createModal({
+                    children: (
+                        <p>No tienes permisos para reactivar el tipo de equipo</p>
+                    ),
+                    buttonsType: ModalButtonsType.CONFIRM
+                }).show();
+                return;
+            }
+
+            // Crea un modal para confirmar la reactivación del tipo de equipo
             createModal({
+                title: `Reactivando "${tipoEquipoSelected.nombre}"`,
                 children: (
-                    <p>No tienes permisos para dar de baja tipos de equipos</p>
+                    <>
+                        <p>Estás por reactivar el tipo de equipo <b>&quot;{tipoEquipoSelected.nombre}&quot;</b>.</p>
+                        <p>¿Desea continuar?</p>
+                    </>
                 ),
-                buttonsType: ModalButtonsType.CONFIRM
-            }).show();
+                buttonsType: ModalButtonsType.CONFIRM_CANCEL,
+                async onConfirm(): Promise<void> { // Acción al confirmar
+                    // Realiza la reactivación del tipo de equipo en la API
+                    const response: void | FetchAPIError = await reactivarTipoEquipo(tipoEquipoSelected.id as number, props.sessionAPIToken);
+                    if (isFetchAPIError(response)) {
+                        // Si ocurre un error en la solicitud, muestra un mensaje de error
+                        const errorMessage: string = response.errorMessage;
+                        createModal({
+                            children: (
+                                <p>Error al reactivar el tipo de equipo: {errorMessage}</p>
+                            ),
+                            buttonsType: ModalButtonsType.CONFIRM
+                        }).show();
+                        console.error('ERROR - Reactivar Tipo de Equipo - table.tsx - handleEliminarClick - reactivarTipoEquipo', response);
+                        return;
+                    }
 
-            return;
-        }
+                    tipoEquipoSelected.activo = true; // Actualiza el estado del tipo de equipo a activo
 
-        // Crea un modal para confirmar la baja del tipo de equipo
-        createModal({
-            title: "Dando de baja a \"" + tipoEquipoSelected.nombre + "\"",
-            children: (
-                <>
-                    <p>Estas por dar de baja el tipo de equipo <b>&quot;{tipoEquipoSelected.nombre}&quot;</b>.</p>
-                    <p>¿Desea continuar?</p>
-                </>
-            ),
-            buttonsType: ModalButtonsType.CONFIRM_CANCEL,
-            async onConfirm(): Promise<void> { //Acción al confirmar
-                // Realiza la baja del tipo de equipo en la API
-                const response: void | FetchAPIError = await darBajaTipoEquipo(tipoEquipoSelected.id as number, props.sessionAPIToken);
-                if (isFetchAPIError(response)){
-                    // Si ocurre un error en la solicitud, muestra un mensaje de error
-                    const errorMessage: string = response.errorMessage;
+                    // Muestra un mensaje de éxito al reactivar el tipo de equipo
                     createModal({
                         children: (
-                            <p>Error al dar de baja el tipo de equipo: {errorMessage}</p>
+                            <p>Tipo de equipo con nombre: &quot;{tipoEquipoSelected.nombre}&quot; reactivado correctamente</p>
                         ),
                         buttonsType: ModalButtonsType.CONFIRM
                     }).show();
-                    console.error('ERROR - Dar de baja Tipo de Equipo - table.tsx - handleEliminarClick - darBajaTipoEquipo', response);
-                    return;
+
+                    refSearchTermsTimer.current = setTimeout((): void => {
+                        setAppliedSearchTerms({...appliedSearchTerms}); // Actualiza los términos de búsqueda
+                    }, 1000);
+                },
+                onCancel(): void { // Acción al cancelar
+                    // Muestra un mensaje de cancelación
+                    createModal({
+                        children: (
+                            <p>Reactivación cancelada</p>
+                        ),
+                        buttonsType: ModalButtonsType.CONFIRM
+                    }).show();
                 }
-
-                tipoEquipoSelected.activo = false; // Actualiza el estado del tipo de equipo a inactivo
-
-                // Muestra un mensaje de éxito al dar de baja el tipo de equipo
+            }).show();
+        } else { // Si el tipo de equipo está activo, entonces se da de baja
+            if (!props.hasPermissionBaja) { // Si el cliente no tiene permisos para dar de baja, muestra un mensaje de error
                 createModal({
                     children: (
-                        <p>Tipo de equipo con nombre: &quot;{tipoEquipoSelected.nombre}&quot; dado de baja correctamente</p>
+                        <p>No tienes permisos para dar de baja tipos de equipos</p>
                     ),
                     buttonsType: ModalButtonsType.CONFIRM
                 }).show();
-
-                refSearchTermsTimer.current = setTimeout((): void => {
-                    setAppliedSearchTerms({...appliedSearchTerms}); // Actualiza los términos de búsqueda
-                }, 1000);
-            },
-            onCancel(): void { //Acción al cancelar
-                // Muestra un mensaje de cancelación
-                createModal({
-                    title: "Baja Cancelada",
-                    children: (
-                        <p>Baja cancelada</p>
-                    ),
-                    buttonsType: ModalButtonsType.CONFIRM
-                }).show();
+                return;
             }
-        }).show();
-    }
+
+            // Crea un modal para confirmar la baja del tipo de equipo
+            createModal({
+                title: `Dando de baja a "${tipoEquipoSelected.nombre}"`,
+                children: (
+                    <>
+                        <p>Estás por dar de baja el tipo de equipo <b>&quot;{tipoEquipoSelected.nombre}&quot;</b>.</p>
+                        <p>¿Desea continuar?</p>
+                    </>
+                ),
+                buttonsType: ModalButtonsType.CONFIRM_CANCEL,
+                async onConfirm(): Promise<void> { // Acción al confirmar
+                    // Realiza la baja del tipo de equipo en la API
+                    const response: void | FetchAPIError = await darBajaTipoEquipo(tipoEquipoSelected.id as number, props.sessionAPIToken);
+                    if (isFetchAPIError(response)) {
+                        // Si ocurre un error en la solicitud, muestra un mensaje de error
+                        const errorMessage: string = response.errorMessage;
+                        createModal({
+                            children: (
+                                <p>Error al dar de baja el tipo de equipo: {errorMessage}</p>
+                            ),
+                            buttonsType: ModalButtonsType.CONFIRM
+                        }).show();
+                        console.error('ERROR - Dar de baja Tipo de Equipo - table.tsx - handleEliminarClick - darBajaTipoEquipo', response);
+                        return;
+                    }
+
+                    tipoEquipoSelected.activo = false; // Actualiza el estado del tipo de equipo a inactivo
+
+                    // Muestra un mensaje de éxito al dar de baja el tipo de equipo
+                    createModal({
+                        children: (
+                            <p>Tipo de equipo con nombre: &quot;{tipoEquipoSelected.nombre}&quot; dado de baja correctamente</p>
+                        ),
+                        buttonsType: ModalButtonsType.CONFIRM
+                    }).show();
+
+                    refSearchTermsTimer.current = setTimeout((): void => {
+                        setAppliedSearchTerms({...appliedSearchTerms}); // Actualiza los términos de búsqueda
+                    }, 1000);
+                },
+                onCancel(): void { // Acción al cancelar
+                    // Muestra un mensaje de cancelación
+                    createModal({
+                        title: "Baja Cancelada",
+                        children: (
+                            <p>Baja cancelada</p>
+                        ),
+                        buttonsType: ModalButtonsType.CONFIRM
+                    }).show();
+                }
+            }).show();
+        }
+    };
+
 
     return(
         <div className={stylesTable.containerPage}>
@@ -239,14 +303,15 @@ function TableTiposEquiposFC(props: Readonly<TableTiposEquipoFCProps>): ReactEle
                                         :
                                         <td></td>
                                     }
-                                    {props.hasPermissionBaja ?
+                                    {props.hasPermissionBaja || props.hasPermissionReactivar ? (
                                         <td>
-                                            <button onClick={(): void => handleEliminarClick(tiposEquipo)}>Eliminar
+                                            <button onClick={(): void => handleEliminarClick(tiposEquipo)}>
+                                                {tiposEquipo.activo ? 'Eliminar' : 'Reactivar'}
                                             </button>
                                         </td>
-                                        :
+                                    ) : (
                                         <td></td>
-                                    }
+                                    )}
                                 </tr>
                             ))}
                             </tbody>

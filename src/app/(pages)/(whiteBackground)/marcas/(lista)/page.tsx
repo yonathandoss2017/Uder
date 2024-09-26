@@ -27,6 +27,7 @@ const MarcaPage = async (): Promise<ReactElement> => {
     const hasPermissionEdit: boolean = await verificarPermiso(sessionAPIToken, PermisoEnum.MODIFICAR_MARCA);
     const hasPermissionBaja: boolean = await verificarPermiso(sessionAPIToken, PermisoEnum.BAJA_MARCA);
     const hasPermissionView: boolean = await verificarPermiso(sessionAPIToken, PermisoEnum.OBTENER_MARCAS);
+    const hasPermissionReactivar: boolean = await verificarPermiso(sessionAPIToken, PermisoEnum.REACTIVAR_MARCA);
 
     return (
         <main>
@@ -36,6 +37,7 @@ const MarcaPage = async (): Promise<ReactElement> => {
                 hasPermissionEdit={hasPermissionEdit}
                 hasPermissionView={hasPermissionView}
                 idInstitucion={clientData.idInstitucion}
+                hasPermissionReactivar={hasPermissionReactivar}
             />
         </main>
     );

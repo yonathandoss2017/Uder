@@ -22,7 +22,8 @@ export async function listarProveedores(token: string, filter: ProveedorFilter =
         // Parámetros de búsqueda adicionales de filtrado (si existen)
         ...(!!filter.id && {filter_id: filter.id.toString()}),
         ...(!!filter.nombre && {filter_nombre: filter.nombre}),
-        ...(filter.activo != undefined && {filter_activo: filter.activo.toString()})
+        ...(filter.activo != undefined && {filter_activo: filter.activo.toString()}),
+        ...(!!filter.paisOrigen && {filter_paisOrigen: filter.paisOrigen})
     });
     const url: string = `${SERVICE_PATH}/listar?${queryParams}`; // URL de la petición a la API
 
@@ -117,6 +118,28 @@ export async function darBajaProveedor(id: number, token: string): Promise<void 
         method: 'POST',
         headers: {
             'Authorization': 'Bearer ' + token, // Cabecera de autorización con el token de sesión
+            'Content-Type': 'application/json' // Tipo de contenido JSON
+        }
+    };
+    // Realiza la petición a la API y retorna el resultado
+    return await fetchVoidWithErrorHandling(url, options);
+}
+
+/**
+ *
+ * @param id
+ * @param token
+ * @returns Promise<void> - Si la solicitud se realiza correctamente.
+ * @returns Promise<FetchAPIError>
+ */
+export async function reactivarProveedor(id: number, token: string): Promise<void | FetchAPIError>{
+    const url: string = `${SERVICE_PATH}/reactivar/${id}`; // URL de la petición a la API
+
+    // Opciones de la petición
+    const options: RequestInit = {
+        method: 'POST',
+        headers: {
+            'Authorization': 'Bearer ' + token, // Authorization header con token JWT
             'Content-Type': 'application/json' // Tipo de contenido JSON
         }
     };

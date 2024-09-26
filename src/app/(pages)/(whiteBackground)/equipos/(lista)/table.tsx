@@ -131,7 +131,7 @@ function TableEquiposFC(props: Readonly<TableEquiposFCProps>): ReactElement {
                 modelos.current = response;
             });
 
-            await listarPaises(props.idInstitucion).then((response: PaisDTO[] | FetchAPIError): void => {
+            await listarPaises(props.sessionAPIToken).then((response: PaisDTO[] | FetchAPIError): void => {
                 if (isFetchAPIError(response)) {
                     console.error("ERROR - lista de equipos - table.tsx - listarPaises", response.errorMessage);
                     return;
