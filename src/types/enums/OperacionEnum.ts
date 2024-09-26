@@ -24,14 +24,17 @@ enum OperacionEnum {
     ALTA_MODELO = 20,
     MODIFICAR_MODELO = 21,
     BAJA_MODELO = 22,
-    ALTA_FUNCIONALIDAD=23,
-    MODIFICAR_FUNCIONALIDAD=24,
-    BAJA_FUNCIONALIDAD=25,
-    ASIGNAR_FUNCIONALIDADES=26,
-    ASIGNAR_PERMISOS=27,
-    ALTA_INTERVENCION = 28,
-    TRABAJAR_INTERVENCION = 29
-
+    REACTIVAR_PROVEEDOR=23,
+    REACTIVAR_MODELO=24,
+    REACTIVAR_MARCA=25,
+    REACTIVAR_TIPO_EQUIPO=26,
+    ALTA_FUNCIONALIDAD=27,
+    MODIFICAR_FUNCIONALIDAD=29,
+    BAJA_FUNCIONALIDAD=29,
+    ASIGNAR_FUNCIONALIDADES=30,
+    ASIGNAR_PERMISOS=31,
+    ALTA_INTERVENCION = 32,
+    TRABAJAR_INTERVENCION = 33
 
 }
 
@@ -86,6 +89,14 @@ export function translateOperacionEnum(operacionEnum: OperacionEnum | string): s
             return "Modificación de modelo";
         case OperacionEnum.BAJA_MODELO:
             return "Baja de modelo";
+        case OperacionEnum.REACTIVAR_MARCA:
+            return "Reactivar marca";
+        case OperacionEnum.REACTIVAR_MODELO:
+            return "Reactivar modelo";
+        case OperacionEnum.REACTIVAR_TIPO_EQUIPO:
+            return "Reactivar tipo de equipo";
+        case OperacionEnum.REACTIVAR_PROVEEDOR:
+            return "Reactivar proveedor";
         case OperacionEnum.ALTA_FUNCIONALIDAD:
             return "Alta de funcionalidad";
         case OperacionEnum.MODIFICAR_FUNCIONALIDAD:
