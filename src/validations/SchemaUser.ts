@@ -28,8 +28,9 @@ const SchemaUser: ZodObject<any> = z.object({
         .refine((value: string) => !/^\d+$/.test(value), {
             message: "El primer nombre no puede contener solo números",
         })
-        .refine((value: string) => /^[A-Za-zÁÉÍÓÚáéíóúÑñ0-9]+$/.test(value), {
-            message: "No debe contener caracteres especiales",
+        // Validación para que no contenga caracteres especiales ni números (solo letras y letras acentuadas)
+        .refine((value: string) => /^[A-Za-zÁÉÍÓÚáéíóúÑñ]+$/.test(value), {
+            message: "El primer nombre no debe contener números ni caracteres especiales",
         }),
 
     // Validación del campo de segundo nombre (opcional)
@@ -44,8 +45,9 @@ const SchemaUser: ZodObject<any> = z.object({
                 .refine((value: string) => value === '' || !/^\d+$/.test(value), {
                     message: "El segundo nombre no puede contener solo números",
                 })
-                .refine((value: string) => value === '' || /^[A-Za-zÁÉÍÓÚáéíóúÑñ0-9]+$/.test(value), {
-                    message: "No debe contener caracteres especiales",
+                // Validación para que no contenga caracteres especiales ni números (solo letras y letras acentuadas)
+                .refine((value: string) => /^[A-Za-zÁÉÍÓÚáéíóúÑñ]+$/.test(value), {
+                    message: "El primer nombre no debe contener números ni caracteres especiales",
                 })
                 .optional()
         ),
@@ -60,9 +62,10 @@ const SchemaUser: ZodObject<any> = z.object({
         }).refine((value: string) => !/^\d+$/.test(value), {
             message: "El primer nombre no puede contener solo números",
         })
-        .refine((value: string) => /^[A-Za-zÁÉÍÓÚáéíóúÑñ0-9]+$/.test(value), {
-            message: "No debe contener caracteres especiales",
-        }),
+    // Validación para que no contenga caracteres especiales ni números (solo letras y letras acentuadas)
+    .refine((value: string) => /^[A-Za-zÁÉÍÓÚáéíóúÑñ]+$/.test(value), {
+        message: "El primer nombre no debe contener números ni caracteres especiales",
+    }),
 
     // Validación del campo de segundo apellido (opcional)
     segundoApellido: z
@@ -76,8 +79,9 @@ const SchemaUser: ZodObject<any> = z.object({
                 .refine((value: string) => value === '' || !/^\d+$/.test(value), {
                     message: "El segundo apellido no puede contener solo números",
                 })
-                .refine((value: string) => value === '' || /^[A-Za-zÁÉÍÓÚáéíóúÑñ0-9]+$/.test(value), {
-                    message: "No debe contener caracteres especiales",
+                // Validación para que no contenga caracteres especiales ni números (solo letras y letras acentuadas)
+                .refine((value: string) => /^[A-Za-zÁÉÍÓÚáéíóúÑñ]+$/.test(value), {
+                    message: "El primer nombre no debe contener números ni caracteres especiales",
                 })
                 .optional()
         ),

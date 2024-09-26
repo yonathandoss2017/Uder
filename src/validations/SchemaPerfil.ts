@@ -13,15 +13,32 @@ const SchemaPerfil: ZodObject<any> = z.object({
         .max(50, "El nombre no puede tener más de 50 caracteres")
         .refine((value: string) => value.replaceAll(" ", "").length != 0, {
             message: "El nombre no puede estar vacío",
+        })
+        // Validación para que no contenga caracteres especiales ni números (solo letras y letras acentuadas)
+        .refine((value: string) => /^[A-Za-zÁÉÍÓÚáéíóúÑñ]+$/.test(value), {
+            message: "El primer nombre no debe contener números ni caracteres especiales",
+        })
+        .refine((value: string) => !/^\d+$/.test(value), {
+            message: "El primer nombre no puede contener solo números",
         }),
 
     nivel: z
         .preprocess(((val): string => val ? String(val) : ''), // Convierte el valor a string
             z.string()
-                .regex(/^\d+$/, 'El nivel debe contener solo números')
+                .min(1, "El nivel no puede estar vacío")
+                .regex(/^\d+$/, 'El nivel debe contener solo números enteros')
                 .refine((value: string) => !value.includes(" "), {
                     message: "No debe contener espacios en blanco",
-                })),
+                })
+                .refine((value: string) => value.replaceAll(" ", "").length != 0, {
+                    message: "El nivel no puede estar vacío",
+                })
+                .refine((value: string) => Number(value) >= 1, {
+                    message: "El nivel debe ser mayor o igual a 1",
+                })
+        ),
+
+
 
 });
 
