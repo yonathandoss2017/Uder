@@ -96,6 +96,10 @@ export function translateOperacionEnum(operacionEnum: OperacionEnum | string): s
             return "Asignar funcionalidad";
         case OperacionEnum.ASIGNAR_PERMISOS:
             return "Asignar permisos";
+        case OperacionEnum.ALTA_INTERVENCION:
+            return "Alta de intervención";
+        case OperacionEnum.TRABAJAR_INTERVENCION:
+            return "Trabajar intervención";
         default:
             return "-";
     }
