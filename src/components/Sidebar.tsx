@@ -107,6 +107,18 @@ const sidebarConfig = [
         ]
     },
     {
+        title: "Gestión Intervenciones",
+        key: "intervenciones",
+        submenus: [
+            {
+                title: "Ingreso Intervencion", path: "/intervenciones/agregar", permission: PermisoEnum.ALTA_INTERVENCION
+            },
+            {
+                title: "Listado Intervenciones", path: "/intervenciones", permission: PermisoEnum.OBTENER_INTERVENCIONES
+            },
+        ]
+    },
+    {
         title: "Gestión Funcionalidades",
         key: "funcionalidades",
         submenus: [
