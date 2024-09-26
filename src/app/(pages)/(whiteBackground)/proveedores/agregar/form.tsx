@@ -6,7 +6,7 @@ import ProveedorDTO from "@/types/dtos/ProveedorDTO";
 import {useModal} from "@/app/hooks/modals/useModal";
 import {SubmitHandler, useForm, UseFormReturn} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
-import styles from "@public/styles/modules/register.tiposequipo.module.css"; // Cambiar el archivo CSS para usar el mismo
+import styles from "@public/styles/modules/register.tiposequipo.module.css";
 import SchemaProveedor from "@/validations/SchemaProveedor";
 import FetchAPIError, {isFetchAPIError} from "@/types/errors/FetchAPIError";
 import {agregarProveedor} from "@/services/ProveedorService";
