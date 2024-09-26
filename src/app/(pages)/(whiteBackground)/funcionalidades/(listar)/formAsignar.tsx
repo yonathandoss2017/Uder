@@ -5,8 +5,10 @@ import FuncionalidadDTO from "@/types/dtos/FuncionalidadDTO";
 import PerfilDTO from "@/types/dtos/PerfilDTO";
 import FetchAPIError, {isFetchAPIError} from "@/types/errors/FetchAPIError";
 import {listarPerfiles} from "@/services/PerfilService";
-import {listarPerfilesFuncionalidad} from "@/services/FuncionalidadService";
+import {asignarFuncionalidad, listarPerfilesFuncionalidad} from "@/services/FuncionalidadService";
 import LoadingPage from "@/app/(pages)/loading";
+import {useForm, UseFormReturn} from "react-hook-form";
+import {ModalButtonsType} from "@/components/ModalFC";
 
 interface AsignarFuncionalidadesFormProps {
     sessionAPIToken: string;
@@ -25,6 +27,12 @@ function AsignarFuncionalidadesForm(props: Readonly<AsignarFuncionalidadesFormPr
     // ----------------------- Modales -----------------------
 
     const {createModal} = useModal();
+
+    const {
+        register,               // Método para registrar los inputs del formulario
+        handleSubmit,           // Método para manejar el envío del formulario
+    }:  UseFormReturn<FuncionalidadDTO> = useForm<FuncionalidadDTO>(
+    );
 
     const [perfiles, setPerfiles] = useState<PerfilDTO[]>([]);
     const [perfilesFuncionalidad, setPerfilesFuncionalidad] = useState<PerfilDTO[]>([]);
@@ -67,10 +75,32 @@ function AsignarFuncionalidadesForm(props: Readonly<AsignarFuncionalidadesFormPr
         console.log("perfilesSeleccionados", perfilesSeleccionados)
     }, [perfilesSeleccionados]);
 
+    const onSubmit = async (formValues: FormValues): Promise<void> => {
+        if(!props.funcionalidad.id) return;
+        const response: void | FetchAPIError = await asignarFuncionalidad(props.funcionalidad.id, perfilesSeleccionados);
+        if (isFetchAPIError(response)) {
+            createModal({
+                children: (
+                    <p>Error al asignar los perfiles a la funcionalidad: {response.errorMessage}</p>
+                ),
+                buttonsType: ModalButtonsType.CONFIRM
+            }).show();
+            console.error('ERROR - Asignar Perfiles Funcionalidad - formAsignar.tsx - onSubmit - asignarPerfilesFuncionalidad', response);
+            return;
+        }
+
+        createModal({
+            children: (
+                <p>Perfiles asignados correctamente</p>
+            ),
+            buttonsType: ModalButtonsType.CONFIRM
+        }).show();
+        if (props.onSave) props.onSave(formValues);
+    }
 
     if(!loaded) return <LoadingPage/>
     return (
-        <form>
+        <form onSubmit={handleSubmit(onSubmit)}>
             <p>Asignar funcionalidades</p>
             <div className={styles.inputBox}>
                 <div className={styles.scroll}>

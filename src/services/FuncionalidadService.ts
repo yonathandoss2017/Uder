@@ -1,11 +1,9 @@
-import EquipoFilter from "@/types/filters/EquipoFilter";
-import TipoEquipoDTO from "@/types/dtos/TipoEquipoDTO";
+
 import FetchAPIError, {isFetchAPIError} from "@/types/errors/FetchAPIError";
 import {fetchBodyWithErrorHandling, fetchVoidWithErrorHandling} from "@/utils/ServiceMethods";
 import FuncionalidadDTO from "@/types/dtos/FuncionalidadDTO";
-import EquipoFieldSortEnum from "@/types/enums/EquipoFieldSortEnum";
-import PermisoEnum from "@/types/enums/PermisoEnum";
 import PerfilDTO from "@/types/dtos/PerfilDTO";
+
 
 // URL base de la API REST de la API para las funcionalidades
 const SERVICE_PATH: string = process.env.NEXT_PUBLIC_BACKEND_API_URL + "/funcionalidades";
@@ -110,6 +108,20 @@ export async function modificarFuncionalidad(funcionalidad: FuncionalidadDTO, to
             'Content-Type': 'application/json' // Tipo de contenido JSON
         },
         body: JSON.stringify(funcionalidad) // Cuerpo de la petición
+    };
+
+    // Realiza la petición a la API y retorna el resultado
+    return await fetchVoidWithErrorHandling(url, options);
+}
+
+export async function asignarFuncionalidad(idFuncionalidad: number, perfiles: PerfilDTO[]){
+    const url: string = `${SERVICE_PATH}/asignar/${idFuncionalidad}`; // URL de la petición a la API
+    const options: RequestInit = { // Opciones de la petición
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json' // Tipo de contenido JSON
+        },
+        body: JSON.stringify(perfiles) // Cuerpo de la petición
     };
 
     // Realiza la petición a la API y retorna el resultado
