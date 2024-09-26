@@ -10,7 +10,7 @@ import ErrorFC from "@/components/ErrorFC";
 import TableMarcaFC from "@/app/(pages)/(whiteBackground)/marcas/(lista)/table";
 
 export const metadata: Metadata = {
-    title: 'PInfra DD - Lista de equipos',
+    title: 'PFT - Lista de equipos',
 };
 
 const MarcaPage = async (): Promise<ReactElement> => {

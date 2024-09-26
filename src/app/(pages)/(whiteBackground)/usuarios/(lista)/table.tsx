@@ -495,17 +495,14 @@ function TableUsersFC(props: Readonly<TableUsersFCProps>): ReactElement {
                                         <td>Dado de baja</td>
                                     )
                                 }
-                                <td>
-                                    {props.hasPermissionObtenerUsuarios && (
-                                        <>
-                                            {(
-                                                <button onClick={() => handleVerClick(usuario)}>
-                                                    Ver
-                                                </button>
-                                            )}
-                                        </>
-                                    )}
-                                </td>
+
+                                {props.hasPermissionObtenerUsuarios ?
+                                    <td>
+                                        <button onClick={() => handleVerClick(usuario)}>Ver</button>
+                                    </td>
+                                    :
+                                    <td></td>
+                                }
                                 <td>
                                     {props.hasPermissionEdit && usuario.id !== props.clientID && usuario.id !== props.idAdministrador && (
                                         <>

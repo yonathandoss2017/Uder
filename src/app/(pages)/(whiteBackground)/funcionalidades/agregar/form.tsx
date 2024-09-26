@@ -1,16 +1,16 @@
-'use client';
+"use client"
 
-import React from "react";
+import FuncionalidadDTO from "@/types/dtos/FuncionalidadDTO";
 import UsuarioDTO from "@/types/dtos/UsuarioDTO";
-import TipoEquipoDTO from "@/types/dtos/TipoEquipoDTO";
 import {useModal} from "@/app/hooks/modals/useModal";
-import {SubmitHandler, useForm, UseFormReturn} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
-import styles from "@public/styles/modules/register.tiposequipo.module.css";
-import SchemaTipoEquipo from "@/validations/SchemaTipoEquipo";
+import SchemaFuncionalidad from "@/validations/SchemaFuncionalidad";
+import {SubmitHandler, useForm, UseFormReturn} from "react-hook-form";
 import FetchAPIError, {isFetchAPIError} from "@/types/errors/FetchAPIError";
-import {agregarTipoEquipo} from "@/services/TipoEquipoService";
 import {ModalButtonsType} from "@/components/ModalFC";
+import React from "react";
+import styles from "@public/styles/modules/register.tiposequipo.module.css";
+import {agregarFuncionalidad} from "@/services/FuncionalidadService";
 
 /**
  * Propiedades del componente
@@ -18,27 +18,27 @@ import {ModalButtonsType} from "@/components/ModalFC";
  * @property {string} sessionAPIToken Token de sesión del cliente en la API
  * @property {UsuarioDTO} clientData Datos del usuario cliente (Usuario que está editando)
  */
-interface RegisterTipoEquipoFormProps {
+interface RegisterFuncionalidadFormProps {
     sessionAPIToken: string;
     clientData: UsuarioDTO;
 }
 
-interface FormValues extends TipoEquipoDTO{
+interface FormValues extends FuncionalidadDTO{
 
 }
 
 /**
- * Formulario de registro de tipos de equipos
+ * Formulario de registro de funcionalidades
  *
- * @param {RegisterTipoEquipoFormProps} props - Propiedades del componente
+ * @param {RegisterFuncionalidadFormProps} props - Propiedades del componente
  */
-const RegisterTipoEquipoForm : React.FC<RegisterTipoEquipoFormProps> = (props: RegisterTipoEquipoFormProps) => {
+
+const RegisterFuncionalidadForm : React.FC<RegisterFuncionalidadFormProps> = (props: RegisterFuncionalidadFormProps) => {
 
     // ----------------------- Modales -----------------------
-
     const {createModal} = useModal();
 
-    // -------------------- Formulario de registro de tipos de equipos --------------------
+    // -------------------- Formulario de registro de funcionalidades --------------------
 
     // Obtenemos los métodos y propiedades necesarios del hook useForm para el formulario
     const {
@@ -47,7 +47,7 @@ const RegisterTipoEquipoForm : React.FC<RegisterTipoEquipoFormProps> = (props: R
         formState: {errors},     // Propiedad que contiene los errores del formulario
         reset                   // Método para resetear los valores del formulario
     }: UseFormReturn<FormValues> = useForm<FormValues>({ // Inicializamos useForm
-        resolver: zodResolver(SchemaTipoEquipo),    // Usamos zodResolver para la validación del formulario con el esquema de Zod schemaTipoEquipo
+        resolver: zodResolver(SchemaFuncionalidad),    // Usamos zodResolver para la validación del formulario con el esquema de Zod schemaFuncionalidad
         mode: 'all',                            // Configuramos el modo de validación a "all", lo que válida en cada cambio de valor y al salir del campo
         defaultValues: {}
     });
@@ -55,22 +55,20 @@ const RegisterTipoEquipoForm : React.FC<RegisterTipoEquipoFormProps> = (props: R
     // Función que se ejecuta al enviar el formulario
     const onSubmit: SubmitHandler<FormValues> = async (formValues: FormValues): Promise<void> => {
 
-        const nuevoTipoEquipo: TipoEquipoDTO = {
+        const nuevaFuncionalidad: FuncionalidadDTO = {
             nombre: formValues.nombre,
-            activo: true,
             idInstitucion: props.clientData.idInstitucion
-        };
+        }
 
-        // Se registra el equipo en la API
-        const response: TipoEquipoDTO | FetchAPIError = await agregarTipoEquipo(nuevoTipoEquipo, props.sessionAPIToken);
+        const response: FuncionalidadDTO | FetchAPIError = await agregarFuncionalidad(nuevaFuncionalidad,props.sessionAPIToken);
 
         //Si ocurre un error al registrar el tipo de equipo se muestra un mensaje de error
         if (isFetchAPIError(response)){
-            console.error('ERROR - Registro de tipo de equipo - agregarTipoEquipo:', response);
+            console.error('ERROR - Registro de funcionalidad - agregarFuncionalidad:', response);
             createModal({
                 children: (
                     <div>
-                        <h2>Error al registrar el tipo de equipo</h2>
+                        <h2>Error al registrar la funcionalidad</h2>
                         <p>{response.errorMessage}</p>
                     </div>
                 ),
@@ -84,7 +82,7 @@ const RegisterTipoEquipoForm : React.FC<RegisterTipoEquipoFormProps> = (props: R
         createModal({
             children: (
                 <div>
-                        <h2>Tipo de equipo registrado correctamente</h2>
+                    <h2>Funcionalidad registrada correctamente</h2>
                 </div>
             ),
             buttonsType: ModalButtonsType.CONFIRM
@@ -94,35 +92,30 @@ const RegisterTipoEquipoForm : React.FC<RegisterTipoEquipoFormProps> = (props: R
         reset();
     }
 
-    // ------------------------------------------------------------------------
-
     return(
         <form onSubmit={handleSubmit(onSubmit)} className={styles.equipoForm}>
-            <h2>Registro de Tipo de Equipo</h2>
+            <h2>Registro de Funcionalidad</h2>
             <div className={styles.userDetailsRe}>
-            <div className={styles.inputBoxRe}>
-                <label className={styles.details}>
-                    <span>Nombre <span className={styles.requiredField}>*</span></span>
-                    <input
-                        {...register("nombre", {required: "Este campo es requerido"})}
-                        type="text"
-                        placeholder="Nombre del Tipo de Equipo"
-                    />
-                </label>
+                <div className={styles.inputBoxRe}>
+                    <label className={styles.details}>
+                        <span>Nombre <span className={styles.requiredField}>*</span></span>
+                        <input
+                            {...register("nombre", {required: "Este campo es requerido"})}
+                            type="text"
+                            placeholder="Nombre de la funcionalidad"
+                        />
+                    </label>
 
-                {errors.nombre &&
-                    <label className={styles.error}>{errors.nombre.message}</label>}
-            </div>
+                    {errors.nombre &&
+                        <label className={styles.error}>{errors.nombre.message}</label>}
+                </div>
                 <div className={styles.buttomAe}>
-                <button type="submit">Agregar</button>
+                    <button type="submit">Agregar</button>
                 </div>
             </div>
         </form>
     )
 
 }
-export default RegisterTipoEquipoForm;
 
-
-
-
+export default RegisterFuncionalidadForm;

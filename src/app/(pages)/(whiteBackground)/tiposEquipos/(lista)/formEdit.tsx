@@ -67,6 +67,7 @@ function EditTipoEquipoForm(props: Readonly<EditTipoEquipoFormProps>): ReactElem
         createModal({
             title: "Modificando tipo de equipo \"" + props.editingTipoEquipo + "\"",
             children: ModalChangesFC(changes),
+            buttonsType: ModalButtonsType.CONFIRM_CANCEL,
             async onConfirm(): Promise<void> {
                 // Realiza la modificación del tipo de equipo en la API
                 const response: void | FetchAPIError = await modificarTipoEquipo(modifiedTipoEquipo, props.sessionAPIToken);

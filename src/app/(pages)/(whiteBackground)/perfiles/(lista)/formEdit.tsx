@@ -1,25 +1,25 @@
-import React, {ChangeEvent, ReactElement} from "react";
+import React, {ReactElement} from "react";
 import {useModal} from "@/app/hooks/modals/useModal";
 import {SubmitHandler, useForm, UseFormReturn} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
-import SchemaProveedor from "@/validations/SchemaProveedor";
+import SchemaPerfil from "@/validations/SchemaPerfil";
 import styles from "@public/styles/modules/table/table.editformequipo.module.css";
-import ProveedorDTO from "@/types/dtos/ProveedorDTO";
+import PerfilDTO from "@/types/dtos/PerfilDTO";
 import ChangeEntry from "@/types/ChangeEntry";
 import {ModalButtonsType} from "@/components/ModalFC";
 import FetchAPIError, {isFetchAPIError} from "@/types/errors/FetchAPIError";
 import ModalChangesFC from "@/components/ModalChangesFC";
-import {modificarProveedor} from "@/services/ProveedorService";
+import {modificarPerfil} from "@/services/PerfilService";
 
-interface EditProveedorFormProps {
+interface EditPerfilFormProps {
     sessionAPIToken: string;
     idInstitucion: number;
-    editingProveedor: ProveedorDTO;
-    onSave?: (proveedorModified: ProveedorDTO) => void;
+    editingPerfil: PerfilDTO;
+    onSave?: (perfilModified: PerfilDTO) => void;
     onCancel?: () => void;
 }
 
-function EditProveedorForm(props: Readonly<EditProveedorFormProps>): ReactElement {
+function EditPerfilForm(props: Readonly<EditPerfilFormProps>): ReactElement {
 
     const {createModal} = useModal();
 
@@ -27,22 +27,22 @@ function EditProveedorForm(props: Readonly<EditProveedorFormProps>): ReactElemen
         register,
         handleSubmit,
         formState: {errors}
-    }:  UseFormReturn<ProveedorDTO> = useForm<ProveedorDTO>({
-        resolver: zodResolver(SchemaProveedor),
+    }: UseFormReturn<PerfilDTO> = useForm<PerfilDTO>({
+        resolver: zodResolver(SchemaPerfil),
         mode: 'all',
         defaultValues: {}
     });
 
-    const onSubmit: SubmitHandler<ProveedorDTO> = async (formValues: ProveedorDTO): Promise<void> => {
+    const onSubmit: SubmitHandler<PerfilDTO> = async (formValues: PerfilDTO): Promise<void> => {
 
-        const modifiedProveedor: ProveedorDTO = {
-            ...props.editingProveedor,
-            nombre: formValues.nombre
+        const modifiedPerfil: PerfilDTO = {
+            ...props.editingPerfil,
+            nombre: formValues.nombre,
         };
 
         const changes: ChangeEntry[] = await obtenerCambios(
-            modifiedProveedor,
-            props.editingProveedor
+            modifiedPerfil,
+            props.editingPerfil
         );
 
         if (changes.length === 0) {
@@ -56,32 +56,31 @@ function EditProveedorForm(props: Readonly<EditProveedorFormProps>): ReactElemen
         }
 
         createModal({
-            title: `Modificando proveedor "${props.editingProveedor.nombre}"`,
+            title: `Modificando perfil "${props.editingPerfil.nombre}"`,
             children: ModalChangesFC(changes),
-            buttonsType: ModalButtonsType.CONFIRM_CANCEL,
             async onConfirm(): Promise<void> {
-                const response: void | FetchAPIError = await modificarProveedor(modifiedProveedor, props.sessionAPIToken);
+                const response: void | FetchAPIError = await modificarPerfil(modifiedPerfil, props.sessionAPIToken);
 
                 if (isFetchAPIError(response)) {
                     createModal({
                         children: (
-                            <p>Error al modificar el proveedor: {response.errorMessage}</p>
+                            <p>Error al modificar el perfil: {response.errorMessage}</p>
                         ),
                         buttonsType: ModalButtonsType.CONFIRM
                     }).show();
-                    console.error('ERROR - Modificar Proveedor - form.tsx - handleSave - modificarProveedor', response);
+                    console.error('ERROR - Modificar Perfil - form.tsx - handleSave - modificarPerfil', response);
                     return;
                 }
 
                 createModal({
                     children: (
-                        <p>Proveedor con nombre: &quot;{props.editingProveedor.nombre}&quot; modificado correctamente</p>
+                        <p>Perfil con nombre: &quot;{props.editingPerfil.nombre}&quot; modificado correctamente</p>
                     ),
                     buttonsType: ModalButtonsType.CONFIRM
                 }).show();
 
                 if (props.onSave) {
-                    props.onSave(modifiedProveedor);
+                    props.onSave(modifiedPerfil);
                 }
             },
             onCancel(): void {
@@ -97,16 +96,16 @@ function EditProveedorForm(props: Readonly<EditProveedorFormProps>): ReactElemen
 
     return (
         <form onSubmit={handleSubmit(onSubmit)} className={`${styles.formContainer} ${styles.aparecer}`}>
-            <h2>Modificación de Proveedor</h2>
+            <h2>Modificación de Perfil</h2>
             <div className={styles.detailsContainer}>
                 <div className={styles.inputBox}>
                     <label className={styles.details}>Nombre<span className={styles.requiredField}>*</span></label>
                     <input
                         {...register("nombre", {required: "Este campo es requerido"})}
                         type="text"
-                        placeholder="Nombre del Proveedor"
+                        placeholder="Nombre del Perfil"
                         className="nombre"
-                        defaultValue={props.editingProveedor.nombre}
+                        defaultValue={props.editingPerfil.nombre}
                     />
                     {errors.nombre &&
                         <label className={styles.error} style={{color: 'red'}}>{errors.nombre.message}</label>}
@@ -121,17 +120,17 @@ function EditProveedorForm(props: Readonly<EditProveedorFormProps>): ReactElemen
     );
 }
 
-export default EditProveedorForm;
+export default EditPerfilForm;
 
-async function obtenerCambios(editingProveedor: ProveedorDTO, originalData: ProveedorDTO): Promise<ChangeEntry[]> {
+async function obtenerCambios(editingPerfil: PerfilDTO, originalData: PerfilDTO): Promise<ChangeEntry[]> {
 
     const changes: ChangeEntry[] = [];
 
-    if (originalData.nombre !== editingProveedor.nombre) {
+    if (originalData.nombre !== editingPerfil.nombre) {
         changes.push({
             field: "Nombre",
             previousValue: originalData.nombre,
-            nextValue: editingProveedor.nombre
+            nextValue: editingPerfil.nombre
         });
     }
 
