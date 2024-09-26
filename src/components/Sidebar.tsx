@@ -149,11 +149,12 @@ const Sidebar = (): ReactElement | null => {
     // Estado para gestionar qué menú está abierto
     const [openMenu, setOpenMenu] = useState<string | null>(null);
 
-    // No renderiza nada si sessionData es null (usuario no autenticado)
-    if (!sessionData) return null;
-
     // eslint-disable-next-line react-hooks/rules-of-hooks
     useEffect(() => {
+
+        // No renderiza nada si sessionData es null (usuario no autenticado)
+        if (!sessionData) return;
+
         // Solo obtener permisos si sessionData está disponible
         (async (): Promise<void> => {
             if (sessionData) {

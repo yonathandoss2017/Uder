@@ -72,8 +72,8 @@ export async function listarIntervenciones(token: string, filter: IntervencionFi
     const queryParams: URLSearchParams = new URLSearchParams({
         ...(filter.fechaDesde && { filter_fechaDesde: filter.fechaDesde.toISOString().split('T')[0] }),
         ...(filter.fechaHasta && { filter_fechaHasta: filter.fechaHasta.toISOString().split('T')[0] }),
-        ...(filter.idEquipo && { filter_idEquipo: filter.idEquipo.toString() }),
-        ...(filter.idTipoIntervencion && { filter_idTipoIntervencion: filter.idTipoIntervencion.toString() })
+        ...(filter.equipo && { filter_idEquipo: filter.equipo.toString() }),
+        ...(filter.tipoIntervencion && { filter_idTipoIntervencion: filter.tipoIntervencion.toString() })
     });
 
     // Construcción de la URL con los parámetros correctos
@@ -88,6 +88,7 @@ export async function listarIntervenciones(token: string, filter: IntervencionFi
 
     return await fetchBodyWithErrorHandling<IntervencionDTO[]>(url, options);
 }
+
 
 /**
  * Función para modificar datos de una intervención.

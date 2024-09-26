@@ -203,7 +203,7 @@ function TableUsersFC(props: Readonly<TableUsersFCProps>): ReactElement {
 
         (async (): Promise<void> => {
             //Obtener perfiles
-            await listarPerfiles(props.client.idInstitucion).then((response: PerfilDTO[] | FetchAPIError): void => {
+            await listarPerfiles(props.sessionAPIToken).then((response: PerfilDTO[] | FetchAPIError): void => {
                 if (isFetchAPIError(response)) {
                     console.error("ERROR - lista de usuarios - table.tsx - listarPerfiles", response.errorMessage);
                     return;

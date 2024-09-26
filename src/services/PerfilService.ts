@@ -52,6 +52,23 @@ export async function listarPerfiles(
 }
 
 /**
+ * Función para listar todos los perfiles con opciones de filtrado y orden.
+ * @param idInstitucion
+ * @returns Promise<PerfilDTO[]> - Lista de perfiles recuperada de la API.
+ */
+export async function listarPorInstitucion(idInstitucion: number){
+    const url: string = `${SERVICE_PATH}/listarPorInstitucion/${idInstitucion}`; // URL de la petición a la API
+    const options: RequestInit = {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    };
+
+    return await fetchBodyWithErrorHandling<PerfilDTO[]>(url, options);
+}
+
+/**
  * Función para buscar un perfil por su ID.
  * @param id - ID del perfil a buscar.
  * @returns Promise<PerfilDTO> - Perfil encontrado en la API.
