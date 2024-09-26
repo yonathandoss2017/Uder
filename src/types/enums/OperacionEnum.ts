@@ -24,10 +24,17 @@ enum OperacionEnum {
     ALTA_MODELO = 20,
     MODIFICAR_MODELO = 21,
     BAJA_MODELO = 22,
-    REACTIVAR_PROVEEDOR = 23,
-    REACTIVAR_MODELO = 24,
-    REACTIVAR_MARCA = 25,
-    REACTIVAR_TIPO_EQUIPO = 26
+    REACTIVAR_PROVEEDOR=23,
+    REACTIVAR_MODELO=24,
+    REACTIVAR_MARCA=25,
+    REACTIVAR_TIPO_EQUIPO=26,
+    ALTA_FUNCIONALIDAD=27,
+    MODIFICAR_FUNCIONALIDAD=29,
+    BAJA_FUNCIONALIDAD=29,
+    ASIGNAR_FUNCIONALIDADES=30,
+    ASIGNAR_PERMISOS=31,
+    ALTA_INTERVENCION = 32,
+    TRABAJAR_INTERVENCION = 33
 
 }
 
@@ -82,14 +89,28 @@ export function translateOperacionEnum(operacionEnum: OperacionEnum | string): s
             return "Modificación de modelo";
         case OperacionEnum.BAJA_MODELO:
             return "Baja de modelo";
-        case OperacionEnum.REACTIVAR_PROVEEDOR:
-            return "Reactivación de proveedor";
-        case OperacionEnum.REACTIVAR_MODELO:
-            return "Reactivación de modelo";
         case OperacionEnum.REACTIVAR_MARCA:
-            return "Reactivación de marca";
+            return "Reactivar marca";
+        case OperacionEnum.REACTIVAR_MODELO:
+            return "Reactivar modelo";
         case OperacionEnum.REACTIVAR_TIPO_EQUIPO:
-            return "Reactivación de tipo de equipo";
+            return "Reactivar tipo de equipo";
+        case OperacionEnum.REACTIVAR_PROVEEDOR:
+            return "Reactivar proveedor";
+        case OperacionEnum.ALTA_FUNCIONALIDAD:
+            return "Alta de funcionalidad";
+        case OperacionEnum.MODIFICAR_FUNCIONALIDAD:
+            return "Modificación de funcionalidad";
+        case OperacionEnum.BAJA_FUNCIONALIDAD:
+            return "Baja de funcionalidad";
+        case OperacionEnum.ASIGNAR_FUNCIONALIDADES:
+            return "Asignar funcionalidad";
+        case OperacionEnum.ASIGNAR_PERMISOS:
+            return "Asignar permisos";
+        case OperacionEnum.ALTA_INTERVENCION:
+            return "Alta de intervención";
+        case OperacionEnum.TRABAJAR_INTERVENCION:
+            return "Trabajar intervención";
         default:
             return "-";
     }

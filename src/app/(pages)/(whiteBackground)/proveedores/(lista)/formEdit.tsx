@@ -85,6 +85,7 @@ function EditProveedorForm(props: Readonly<EditProveedorFormProps>): ReactElemen
         createModal({
             title: `Modificando proveedor "${props.editingProveedor.nombre}"`,
             children: ModalChangesFC(changes),
+            buttonsType: ModalButtonsType.CONFIRM_CANCEL,
             async onConfirm(): Promise<void> {
                 const response: void | FetchAPIError = await modificarProveedor(modifiedProveedor, props.sessionAPIToken);
 

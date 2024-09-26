@@ -25,7 +25,7 @@ function AuthLayout({children}: Readonly<{ children: ReactNode }>) {
     if (sessionData?.user?.error === "expired_token") return <ErrorFC customContent={(
         <>
             <h1>Error</h1>
-            <h2>La sesión expiro por inactividad</h2>
+            <h2>La sesión expiró por inactividad</h2>
             <h3>Por favor inicie sesión nuevamente.</h3>
             <br/>
             <button onClick={async (): Promise<void> => {

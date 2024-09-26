@@ -7,40 +7,35 @@ import LoadingPage from "@/app/(pages)/loading";
 import { verificarPermiso } from "@/services/SessionService";
 import PermisoEnum from "@/types/enums/PermisoEnum";
 import ErrorFC from "@/components/ErrorFC";
-import TableMarcaFC from "@/app/(pages)/(whiteBackground)/marcas/(lista)/table";
+import TableIntervencionFC from "@/app/(pages)/(whiteBackground)/intervenciones/(lista)/table";
 
 export const metadata: Metadata = {
-    title: 'PFT - Lista de equipos',
+    title: 'PInfra DD - Lista de Intervenciones',
 };
 
-const MarcaPage = async (): Promise<ReactElement> => {
+const IntervencionPage = async (): Promise<ReactElement> => {
     const sessionData: Session | null = await getServerSession(authOptions);
     const sessionAPIToken: string | undefined = sessionData?.user?.sessionAPIToken;
     const clientData: UsuarioDTO | undefined = sessionData?.user?.data;
 
     if (!sessionAPIToken || !clientData) return <LoadingPage />;
 
-    if (!(await verificarPermiso(sessionAPIToken, PermisoEnum.OBTENER_MARCAS))) {
+    if (!(await verificarPermiso(sessionAPIToken, PermisoEnum.OBTENER_INTERVENCIONES))) {
         return <ErrorFC message={"Acceso denegado"} />;
     }
 
-    const hasPermissionEdit: boolean = await verificarPermiso(sessionAPIToken, PermisoEnum.MODIFICAR_MARCA);
-    const hasPermissionBaja: boolean = await verificarPermiso(sessionAPIToken, PermisoEnum.BAJA_MARCA);
-    const hasPermissionView: boolean = await verificarPermiso(sessionAPIToken, PermisoEnum.OBTENER_MARCAS);
-    const hasPermissionReactivar: boolean = await verificarPermiso(sessionAPIToken, PermisoEnum.REACTIVAR_MARCA);
+    const hasPermissionEdit: boolean = await verificarPermiso(sessionAPIToken, PermisoEnum.TRABAJAR_INTERVENCION);
+    const hasPermissionView: boolean = await verificarPermiso(sessionAPIToken, PermisoEnum.OBTENER_INTERVENCIONES);
 
     return (
         <main>
-            <TableMarcaFC
+            <TableIntervencionFC
                 sessionAPIToken={sessionAPIToken}
-                hasPermissionBaja={hasPermissionBaja}
                 hasPermissionEdit={hasPermissionEdit}
                 hasPermissionView={hasPermissionView}
-                idInstitucion={clientData.idInstitucion}
-                hasPermissionReactivar={hasPermissionReactivar}
             />
         </main>
     );
 };
 
-export default MarcaPage;
+export default IntervencionPage;

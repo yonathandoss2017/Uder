@@ -65,6 +65,7 @@ function EditModeloForm(props: Readonly<EditModeloFormProps>): ReactElement {
         createModal({
             title: `Modificando modelo "${props.editingModelo.nombre}"`,
             children: ModalChangesFC(changes),
+            buttonsType: ModalButtonsType.CONFIRM_CANCEL,
             async onConfirm(): Promise<void> {
                 // Realiza la modificación de modelo en la API
                 const response: void | FetchAPIError = await modificarModelo(modifiedModelo, props.sessionAPIToken);
