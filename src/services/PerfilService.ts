@@ -57,7 +57,7 @@ export async function listarPerfiles(
  * @returns Promise<PerfilDTO[]> - Lista de perfiles recuperada de la API.
  */
 export async function listarPorInstitucion(idInstitucion: number){
-    const url: string = `${SERVICE_PATH}/listarPorInstitucion/${idInstitucion}`; // URL de la petición a la API
+    const url: string = `${SERVICE_PATH}/listar-institucion/${idInstitucion}`; // URL de la petición a la API
     const options: RequestInit = {
         method: 'GET',
         headers: {

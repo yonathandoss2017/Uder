@@ -24,7 +24,14 @@ const SchemaUser: ZodObject<any> = z.object({
         .max(30, "El primer nombre no puede tener más de 30 caracteres")
         .refine((value: string) => !value.includes(" "), {
             message: "No debe contener espacios en blanco",
+        })
+        .refine((value: string) => !/^\d+$/.test(value), {
+            message: "El primer nombre no puede contener solo números",
+        })
+        .refine((value: string) => /^[A-Za-zÁÉÍÓÚáéíóúÑñ]+$/.test(value), {
+            message: "No debe contener caracteres especiales",
         }),
+
 
     // Validación del campo de segundo nombre (opcional)
     segundoNombre: z
