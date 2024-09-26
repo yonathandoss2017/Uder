@@ -17,6 +17,12 @@ const SignOut = () => {
     // Obtiene la sesión del usuario (NextAuth)
     const {data: sessionData}: { data: Session | null } = useSession();
 
+    if(sessionData) sessionData.user.sessionAPIToken = undefined;
+
+    if (document.cookie.includes('sessionToken')) {
+        document.cookie = `sessionToken=;max-age=0;path=/;samesite=lax;secure`;
+    }
+
     // Define el efecto secundario del componente (Cerrar sesión)
     useEffect((): void => {
         (async (): Promise<void> => {

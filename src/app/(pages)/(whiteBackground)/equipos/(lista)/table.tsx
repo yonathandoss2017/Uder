@@ -30,6 +30,7 @@ import UbicacionDTO from "@/types/dtos/UbicacionDTO";
 import {listarUbicaciones} from "@/services/UbicacionService";
 import LoadingPage from "@/app/(pages)/loading";
 import ModeloFilter from "@/types/filters/ModeloFilter";
+import {renovarToken} from "@/services/SessionService";
 
 /**
  * Propiedades del componente Table
