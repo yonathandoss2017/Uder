@@ -5,8 +5,8 @@ import React, { ChangeEvent, MutableRefObject, ReactElement, useEffect, useRef, 
 import { useModal } from "@/app/hooks/modals/useModal";
 import ModeloDTO from "@/types/dtos/ModeloDTO";
 import FetchAPIError, { isFetchAPIError } from "@/types/errors/FetchAPIError";
-import { darBajaModelo, listarModelos } from "@/services/ModeloService";
-import stylesTable from "@public/styles/modules/table/table.equipos.module.css";
+import {darBajaModelo, listarModelos, reactivarModelo} from "@/services/ModeloService";
+import stylesTable from "@public/styles/modules/table/table.tipoequipos.module.css";
 import { ModalInstance } from "@/app/hooks/modals/ModalProvider";
 import { ModalButtonsType } from "@/components/ModalFC";
 import EditModeloForm from "@/app/(pages)/(whiteBackground)/modelos/(lista)/formEdit";
@@ -25,6 +25,7 @@ interface TableModeloFCProps {
     sessionAPIToken: string;
     hasPermissionEdit: boolean;
     hasPermissionBaja: boolean;
+    hasPermissionReactivar: boolean;
     hasPermissionView: boolean;
     idInstitucion: number;
 }
@@ -119,68 +120,132 @@ function TableModeloFC(props: Readonly<TableModeloFCProps>): ReactElement {
 
     // Procedimiento que se ejecuta al hacer clic en el botón 'Eliminar'
     const handleEliminarClick = (modeloSelected: ModeloDTO): void => {
-        if (!props.hasPermissionBaja) { // Si el cliente no tiene permisos para dar de baja, muestra un mensaje de error
-            createModal({
-                children: (
-                    <p>No tienes permisos para dar de baja el modelo</p>
-                ),
-                buttonsType: ModalButtonsType.CONFIRM
-            }).show();
-            return;
-        }
+        if (!modeloSelected.activo) { // Si el modelo está inactivo, se reactiva
+            if (!props.hasPermissionReactivar) { // Verifica si el usuario tiene permiso para reactivar
+                createModal({
+                    children: (
+                        <p>No tienes permisos para reactivar el modelo</p>
+                    ),
+                    buttonsType: ModalButtonsType.CONFIRM
+                }).show();
+                return;
+            }
 
-        // Crea un modal para confirmar la baja de modelo
-        createModal({
-            title: "Dando de baja a \"" + modeloSelected.nombre + "\"",
-            children: (
-                <>
-                    <p>Estas por dar de baja el modelo <b>&quot;{modeloSelected.nombre}&quot;</b>.</p>
-                    <p>¿Desea continuar?</p>
-                </>
-            ),
-            buttonsType: ModalButtonsType.CONFIRM_CANCEL,
-            async onConfirm(): Promise<void> { //Acción al confirmar
-                // Realiza la baja de modelo en la API
-                const response: void | FetchAPIError = await darBajaModelo(modeloSelected.id as number, props.sessionAPIToken);
-                if (isFetchAPIError(response)) {
-                    // Si ocurre un error en la solicitud, muestra un mensaje de error
-                    const errorMessage: string = response.errorMessage;
+            // Crea un modal para confirmar la reactivación del modelo
+            createModal({
+                title: `Reactivando "${modeloSelected.nombre}"`,
+                children: (
+                    <>
+                        <p>Estás por reactivar el modelo <b>&quot;{modeloSelected.nombre}&quot;</b>.</p>
+                        <p>¿Desea continuar?</p>
+                    </>
+                ),
+                buttonsType: ModalButtonsType.CONFIRM_CANCEL,
+                async onConfirm(): Promise<void> { // Acción al confirmar
+                    // Realiza la reactivación del modelo en la API
+                    const response: void | FetchAPIError = await reactivarModelo(modeloSelected.id as number, props.sessionAPIToken);
+                    if (isFetchAPIError(response)) {
+                        // Si ocurre un error en la solicitud, muestra un mensaje de error
+                        const errorMessage: string = response.errorMessage;
+                        createModal({
+                            children: (
+                                <p>Error al reactivar el modelo: {errorMessage}</p>
+                            ),
+                            buttonsType: ModalButtonsType.CONFIRM
+                        }).show();
+                        console.error('ERROR - Reactivar Modelo - table.tsx - handleEliminarClick - reactivarModelo', response);
+                        return;
+                    }
+
+                    modeloSelected.activo = true; // Actualiza el estado del modelo a activo
+
+                    // Muestra un mensaje de éxito al reactivar el modelo
                     createModal({
                         children: (
-                            <p>Error al dar de baja de modelo: {errorMessage}</p>
+                            <p>Modelo con nombre: &quot;{modeloSelected.nombre}&quot; reactivado correctamente</p>
                         ),
                         buttonsType: ModalButtonsType.CONFIRM
                     }).show();
-                    console.error('ERROR - Dar de baja Modelo - table.tsx - handleEliminarClick - darBajaModelo', response);
-                    return;
+
+                    refSearchTermsTimer.current = setTimeout((): void => {
+                        setAppliedSearchTerms({ ...appliedSearchTerms }); // Actualiza los términos de búsqueda
+                    }, 1000);
+                },
+                onCancel(): void { // Acción al cancelar
+                    // Muestra un mensaje de cancelación
+                    createModal({
+                        children: (
+                            <p>Reactivación cancelada</p>
+                        ),
+                        buttonsType: ModalButtonsType.CONFIRM
+                    }).show();
                 }
-
-                modeloSelected.activo = false; // Actualiza el estado de modelo a inactivo
-
-                // Muestra un mensaje de éxito al dar de baja el modelo
+            }).show();
+        } else { // Si el modelo está activo, entonces se da de baja
+            if (!props.hasPermissionBaja) { // Si el cliente no tiene permisos para dar de baja, muestra un mensaje de error
                 createModal({
                     children: (
-                        <p>Modelo con nombre: &quot;{modeloSelected.nombre}&quot; dado de baja correctamente</p>
+                        <p>No tienes permisos para dar de baja el modelo</p>
                     ),
                     buttonsType: ModalButtonsType.CONFIRM
                 }).show();
-
-                refSearchTermsTimer.current = setTimeout((): void => {
-                    setAppliedSearchTerms({ ...appliedSearchTerms }); // Actualiza los términos de búsqueda
-                }, 1000);
-            },
-            onCancel(): void { //Acción al cancelar
-                // Muestra un mensaje de cancelación
-                createModal({
-                    title: "Baja Cancelada",
-                    children: (
-                        <p>Baja cancelada</p>
-                    ),
-                    buttonsType: ModalButtonsType.CONFIRM
-                }).show();
+                return;
             }
-        }).show();
-    }
+
+            // Crea un modal para confirmar la baja del modelo
+            createModal({
+                title: `Dando de baja a "${modeloSelected.nombre}"`,
+                children: (
+                    <>
+                        <p>Estás por dar de baja el modelo <b>&quot;{modeloSelected.nombre}&quot;</b>.</p>
+                        <p>¿Desea continuar?</p>
+                    </>
+                ),
+                buttonsType: ModalButtonsType.CONFIRM_CANCEL,
+                async onConfirm(): Promise<void> { // Acción al confirmar
+                    // Realiza la baja del modelo en la API
+                    const response: void | FetchAPIError = await darBajaModelo(modeloSelected.id as number, props.sessionAPIToken);
+                    if (isFetchAPIError(response)) {
+                        // Si ocurre un error en la solicitud, muestra un mensaje de error
+                        const errorMessage: string = response.errorMessage;
+                        createModal({
+                            children: (
+                                <p>Error al dar de baja el modelo: {errorMessage}</p>
+                            ),
+                            buttonsType: ModalButtonsType.CONFIRM
+                        }).show();
+                        console.error('ERROR - Dar de baja Modelo - table.tsx - handleEliminarClick - darBajaModelo', response);
+                        return;
+                    }
+
+                    modeloSelected.activo = false; // Actualiza el estado del modelo a inactivo
+
+                    // Muestra un mensaje de éxito al dar de baja el modelo
+                    createModal({
+                        children: (
+                            <p>Modelo con nombre: &quot;{modeloSelected.nombre}&quot; dado de baja correctamente</p>
+                        ),
+                        buttonsType: ModalButtonsType.CONFIRM
+                    }).show();
+
+                    refSearchTermsTimer.current = setTimeout((): void => {
+                        setAppliedSearchTerms({ ...appliedSearchTerms }); // Actualiza los términos de búsqueda
+                    }, 1000);
+                },
+                onCancel(): void { // Acción al cancelar
+                    // Muestra un mensaje de cancelación
+                    createModal({
+                        title: "Baja Cancelada",
+                        children: (
+                            <p>Baja cancelada</p>
+                        ),
+                        buttonsType: ModalButtonsType.CONFIRM
+                    }).show();
+                }
+            }).show();
+        }
+    };
+
 
     return (
         <div className={stylesTable.containerPage}>
@@ -205,13 +270,15 @@ function TableModeloFC(props: Readonly<TableModeloFCProps>): ReactElement {
                                         :
                                         <td></td>
                                     }
-                                    {props.hasPermissionBaja ?
+                                    {props.hasPermissionBaja || props.hasPermissionReactivar ? (
                                         <td>
-                                            <button onClick={(): void => handleEliminarClick(modelo)}>Eliminar</button>
+                                            <button onClick={(): void => handleEliminarClick(modelo)}>
+                                                {modelo.activo ? 'Eliminar' : 'Reactivar'}
+                                            </button>
                                         </td>
-                                        :
+                                    ) : (
                                         <td></td>
-                                    }
+                                    )}
                                 </tr>
 
                             ))}

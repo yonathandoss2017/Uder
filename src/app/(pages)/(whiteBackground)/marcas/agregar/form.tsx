@@ -10,7 +10,7 @@ import { agregarMarca } from "@/services/MarcaService";
 import FetchAPIError, { isFetchAPIError } from "@/types/errors/FetchAPIError";
 import { ModalButtonsType } from "@/components/ModalFC";
 import SchemaMarca from "@/validations/SchemaMarca";
-import styles from "@public/styles/modules/register.equipo.module.css";
+import styles from "@public/styles/modules/register.tiposequipo.module.css";
 
 // Definición del tipo FormValues para el formulario
 interface FormValues {

@@ -72,7 +72,7 @@ const RegisterModeloForm: React.FC<RegisterModeloFormProps> = (props: RegisterMo
 
         const nuevoModel: ModeloDTO = {
             nombre: formValues.nombre,
-            activo: formValues.activo,
+            activo: true,
             idMarca: selectedMarcaId,
         };
 
@@ -101,6 +101,7 @@ const RegisterModeloForm: React.FC<RegisterModeloFormProps> = (props: RegisterMo
 
     return (
         <form onSubmit={handleSubmit(onSubmit)} className={styles.equipoForm}>
+            <h2>Registro de Modelo</h2>
             <div className={styles.userDetailsRe}>
                 <div className={styles.inputBoxRe}>
                     <label className={styles.details}>

@@ -37,6 +37,7 @@ const ProveedoresPage = async (): Promise<ReactElement> => {
     const hasPermissionEdit: boolean = await verificarPermiso(sessionAPIToken, PermisoEnum.MODIFICAR_PROVEEDOR);
     const hasPermissionBaja: boolean = await verificarPermiso(sessionAPIToken, PermisoEnum.BAJA_PROVEEDOR);
     const hasPermissionView: boolean = await verificarPermiso(sessionAPIToken, PermisoEnum.OBTENER_PROVEEDORES);
+    const hasPermissionReactivar: boolean = await verificarPermiso(sessionAPIToken, PermisoEnum.REACTIVAR_PROVEEDOR);
 
     // Retorna el JSX de la página de lista de proveedores
     return (
@@ -48,6 +49,7 @@ const ProveedoresPage = async (): Promise<ReactElement> => {
                 hasPermissionEdit={hasPermissionEdit}
                 hasPermissionView={hasPermissionView}
                 idInstitucion={clientData.idInstitucion}
+                hasPermissionReactivar={hasPermissionReactivar}
             />
         </main>
     );

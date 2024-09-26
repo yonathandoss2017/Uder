@@ -38,6 +38,7 @@ const TiposEquipoPage = async (): Promise<ReactElement> => {
     const hasPermissionEdit: boolean = await verificarPermiso(sessionAPIToken, PermisoEnum.MODIFICAR_TIPO_EQUIPO);
     const hasPermissionBaja: boolean = await verificarPermiso(sessionAPIToken, PermisoEnum.BAJA_TIPO_EQUIPO);
     const hasPermissionView: boolean = await verificarPermiso(sessionAPIToken, PermisoEnum.OBTENER_TIPO_EQUIPOS);
+    const hasPermissionReactivar: boolean = await verificarPermiso(sessionAPIToken, PermisoEnum.REACTIVAR_MARCA);
 
     // Retorna el JSX de la página de lista de usuarios
     return (
@@ -49,6 +50,7 @@ const TiposEquipoPage = async (): Promise<ReactElement> => {
                 hasPermissionEdit={hasPermissionEdit}
                 hasPermissionView={hasPermissionView}
                 idInstitucion={clientData.idInstitucion}
+                hasPermissionReactivar={hasPermissionReactivar}
             />
         </main>
     );

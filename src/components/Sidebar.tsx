@@ -56,38 +56,85 @@ const sidebarConfig = [
         key: "marcas",
         submenus: [
             {
-                title: "Ingreso de Marca", path: "/marcas/agregar", permission: PermisoEnum.ALTA_MARCA
+                title: "Ingreso Marca", path: "/marcas/agregar", permission: PermisoEnum.ALTA_MARCA
             },
             {
-                title: "Listado de Marcas", path: "/marcas", permission: PermisoEnum.OBTENER_MARCAS
+                title: "Listado Marcas", path: "/marcas", permission: PermisoEnum.OBTENER_MARCAS
             },
         ]
     },
+    {
+        title: "Gestión Modelos",
+        key: "modelos",
+        submenus: [
+            {
+                title: "Ingreso Modelo", path: "/modelos/agregar", permission: PermisoEnum.ALTA_MODELO
+            },
+            {
+                title: "Listado Modelos", path: "/modelos", permission: PermisoEnum.OBTENER_MODELOS
+            },
+        ]
+    },
+    {
+        title: "Gestión Perfiles",
+
+        key: "perfiles",
+
+        submenus: [
+
+            {
+                title: "Registro Perfiles", path: "/perfiles/agregar", permission: PermisoEnum.ALTA_PERFIL
+
+            },
+            {
+                title: "Listado Perfiles", path: "/perfiles", permission: PermisoEnum.OBTENER_PERFILES
+
+            },
+        ]
+
+    },
+
     {
         title: "Gestión Proveedores",
         key: "proveedores",
         submenus: [
             {
-                title: "Ingreso de Proveedor", path: "/proveedores/agregar", permission: PermisoEnum.ALTA_PROVEEDOR
+                title: "Ingreso Proveedor", path: "/proveedores/agregar", permission: PermisoEnum.ALTA_PROVEEDOR
             },
             {
                 title: "Listado Proveedores", path: "/proveedores", permission: PermisoEnum.OBTENER_PROVEEDORES
             },
         ]
     },
-
     {
-        title: "Gestión Modelos",
-        key: "modelos",
+        title: "Gestión Intervenciones",
+        key: "intervenciones",
         submenus: [
             {
-                title: "Ingreso de Modelo", path: "/modelos/agregar", permission: PermisoEnum.ALTA_MODELO
+                title: "Ingreso Intervencion", path: "/intervenciones/agregar", permission: PermisoEnum.ALTA_INTERVENCION
             },
             {
-                title: "Listado Modelos", path: "/modelos", permission: PermisoEnum.OBTENER_MODELOS
+                title: "Listado Intervenciones", path: "/intervenciones", permission: PermisoEnum.OBTENER_INTERVENCIONES
+            },
+        ]
+    },
+    {
+        title: "Gestión Funcionalidades",
+        key: "funcionalidades",
+        submenus: [
+            {
+                title: "Ingreso Funcionalidad",
+                path: "/funcionalidades/agregar",
+                permission: PermisoEnum.ALTA_FUNCIONALIDAD
+            },
+            {
+                title: "Listado Funcionalidades",
+                path: "/funcionalidades",
+                permission: PermisoEnum.OBTENER_FUNCIONALIDADES
             },
         ]
     }
+
 ];
 
 const Sidebar = (): ReactElement | null => {
@@ -122,7 +169,6 @@ const Sidebar = (): ReactElement | null => {
         })();
     }, [sessionData]); // Agrego sessionData como dependencia
 
-    // eslint-disable-next-line react-hooks/rules-of-hooks
     useEffect(() => {
         // Encuentra la sección cuyo submenú está siendo visualizado actualmente
         const matchedSection = sidebarConfig.find(section =>
@@ -145,7 +191,7 @@ const Sidebar = (): ReactElement | null => {
     return (
         <nav className={styles.sidebarContainer}>
             {/* Título de la barra lateral */}
-            <div className={styles.sidebarTitle}>Digital Disruption</div>
+            <div className={styles.sidebarTitle}>Hospital</div>
             <ul className={styles.sidebarList}>
                 {/* Mapea la configuración de la barra lateral */}
                 {sidebarConfig.map((section) => {
