@@ -13,6 +13,8 @@ const SchemaTipoEquipo: ZodObject<any> = z.object({
         .max(30, "El nombre no puede tener más de 30 caracteres")
         .refine((value: string) => value.replaceAll(" ", "").length != 0, {
             message: "El nombre no puede estar vacío",
+        }).refine((value: string) => /^[A-Za-zÁÉÍÓÚáéíóúÑñ]+$/.test(value), {
+            message: "El primer nombre no debe contener números ni caracteres especiales",
         })
 });
 
