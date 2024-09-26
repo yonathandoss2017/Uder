@@ -9,7 +9,8 @@ import { useModal } from "@/app/hooks/modals/useModal";
 import { ModalButtonsType } from "@/components/ModalFC";
 import ComboBoxFC from "@/components/ComboBoxFC"; // Componente para listas desplegables
 import FetchAPIError, { isFetchAPIError } from "@/types/errors/FetchAPIError"; // Asegúrate de importar esto
-import styles from "@public/styles/modules/register.tiposequipo.module.css"; // Importar el CSS de modelo
+import styles from "@public/styles/modules/register.tiposequipo.module.css";
+import LoadingPage from "@/app/(pages)/loading"; // Importar el CSS de modelo
 
 interface FormValues {
     fechaHora: string;
@@ -31,9 +32,11 @@ const RegisterIntervencionForm: React.FC<RegisterIntervencionFormProps> = ({ ses
     const [selectedEquipoId, setSelectedEquipoId] = useState<number | undefined>(undefined);
     const [tiposIntervencion, setTiposIntervencion] = useState<any[]>([]);
     const [selectedTipoIntervencionId, setSelectedTipoIntervencionId] = useState<number | undefined>(undefined);
+    const [loaded, setLoaded] = useState<boolean>(false);
 
     // Cargar equipos y tipos de intervención al montar el componente
     useEffect(() => {
+        (async (): Promise<void> => {
         // Cargar equipos
         listarEquipos(sessionAPIToken)
             .then((response) => {
@@ -59,6 +62,8 @@ const RegisterIntervencionForm: React.FC<RegisterIntervencionFormProps> = ({ ses
                 }
                 setTiposIntervencion(response);
             });
+        setLoaded(true);
+        })();
     }, [sessionAPIToken, createModal]);
 
     // Función de envío del formulario
@@ -68,7 +73,20 @@ const RegisterIntervencionForm: React.FC<RegisterIntervencionFormProps> = ({ ses
                 children: (
                     <div>
                         <h2>Error</h2>
-                        <p>Debe seleccionar un equipo y un tipo de intervención</p>
+                        <p>Debe seleccionar un equipo</p>
+                    </div>
+                ),
+                buttonsType: ModalButtonsType.CONFIRM,
+            }).show();
+            return;
+        }
+
+        if (!selectedTipoIntervencionId) {
+            createModal({
+                children: (
+                    <div>
+                        <h2>Error</h2>
+                        <p>Debe seleccionar un tipo de intervención</p>
                     </div>
                 ),
                 buttonsType: ModalButtonsType.CONFIRM,
@@ -110,6 +128,7 @@ const RegisterIntervencionForm: React.FC<RegisterIntervencionFormProps> = ({ ses
         reset(); // Reinicia el formulario después del éxito
     };
 
+    if(!loaded) return <LoadingPage/>
     return (
         <form onSubmit={handleSubmit(onSubmit)} className={styles.equipoForm}>
             <h2>Registro de Intervención</h2>
