@@ -7,6 +7,7 @@ import FetchAPIError from "@/types/errors/FetchAPIError";
 import EquipoFieldSortEnum from "@/types/enums/EquipoFieldSortEnum";
 import EquipoFilter from "@/types/filters/EquipoFilter";
 import EquipoDTO from "@/types/dtos/EquipoDTO";
+import TipoEquipoFilter from "@/types/filters/TipoEquipoFilter";
 
 // URL base de la API REST de la API para los tipos de equipo
 const SERVICE_PATH: string = process.env.NEXT_PUBLIC_BACKEND_API_URL + "/equipos/tipos";
@@ -82,7 +83,7 @@ export async function darBajaTipoEquipo(id: number, token: string): Promise<void
  * @returns Promise<TipoEquipoDTO[]> - Lista de tipos de equipo
  * @returns Promise<FetchAPIError> - Si ocurre un error en la solicitud o en el procesamiento de la respuesta.
  */
-export async function listarTiposEquipo(token: string, filter: EquipoFilter = {}): Promise<TipoEquipoDTO[] | FetchAPIError> {
+export async function listarTiposEquipo(token: string, filter: TipoEquipoFilter = {}): Promise<TipoEquipoDTO[] | FetchAPIError> {
     // Parámetros de la URL de la petición a la API
     const queryParams: URLSearchParams = new URLSearchParams({
         // Parámetros de búsqueda adicionales de filtrado (si existen)
@@ -124,4 +125,27 @@ export async function buscarTipoEquipoPorId(id: number): Promise<TipoEquipoDTO |
 
     // Realiza la petición a la API y retorna el resultado
     return await fetchBodyWithErrorHandling<TipoEquipoDTO>(url, options);
+}
+
+/**
+ *
+ * @param id
+ * @param token
+ * @returns Promise<void> - Si la solicitud se realiza correctamente.
+ * @returns Promise<FetchAPIError>
+ */
+export async function reactivarTipoEquipo(id: number, token: string): Promise<void | FetchAPIError>{
+    const url: string = `${SERVICE_PATH}/reactivar/${id}`; // URL de la petición a la API
+
+    // Opciones de la petición
+    const options: RequestInit = {
+        method: 'POST',
+        headers: {
+            'Authorization': 'Bearer ' + token, // Authorization header con token JWT
+            'Content-Type': 'application/json' // Tipo de contenido JSON
+        }
+    };
+
+    // Realiza la petición a la API y retorna el resultado
+    return await fetchVoidWithErrorHandling(url, options);
 }

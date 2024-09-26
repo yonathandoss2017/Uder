@@ -27,6 +27,7 @@ const ModeloPage = async (): Promise<ReactElement> => {
     const hasPermissionEdit: boolean = await verificarPermiso(sessionAPIToken, PermisoEnum.MODIFICAR_MODELO);
     const hasPermissionBaja: boolean = await verificarPermiso(sessionAPIToken, PermisoEnum.BAJA_MODELO);
     const hasPermissionView: boolean = await verificarPermiso(sessionAPIToken, PermisoEnum.OBTENER_MODELOS);
+    const hasPermissionReactivar: boolean = await verificarPermiso(sessionAPIToken, PermisoEnum.REACTIVAR_MARCA);
 
     return (
         <main>
@@ -36,6 +37,7 @@ const ModeloPage = async (): Promise<ReactElement> => {
                 hasPermissionEdit={hasPermissionEdit}
                 hasPermissionView={hasPermissionView}
                 idInstitucion={clientData.idInstitucion}
+                hasPermissionReactivar={hasPermissionReactivar}
             />
         </main>
     );

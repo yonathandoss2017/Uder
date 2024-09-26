@@ -23,15 +23,21 @@ export const metadata: Metadata = {
 // Define la página de lista de usuarios
 const UsuariosPage = async (): Promise<ReactElement> => {
     // Obtiene la información de la sesión del cliente (Desde la API)
-    const sessionData: Session | null = await getServerSession(authOptions).then(
-        (session: Session | null): Session | null => {
-            return session;
-        }
-    );
+    let sessionData: Session | null = await getServerSession(authOptions);
 
     // Obtiene el token de sesión del cliente en la API y sus datos de usuario
-    const sessionAPIToken: string | undefined = sessionData?.user?.sessionAPIToken;
-    const clientData: UsuarioDTO | undefined = sessionData?.user?.data;
+    let sessionAPIToken: string | undefined = sessionData?.user?.sessionAPIToken;
+    let clientData: UsuarioDTO | undefined = sessionData?.user?.data;
+
+    /*
+    setTimeout(async () => {
+         sessionData = await getServerSession(authOptions);
+         sessionAPIToken = sessionData?.user?.sessionAPIToken;
+         clientData = sessionData?.user?.data;
+    }, 10000);
+
+     */
+
 
     // Si no se obtiene el token de sesión o el usuario, muestra la página de carga hasta obtenerlos
     if (!sessionAPIToken || !clientData?.id) return <LoadingPage/>

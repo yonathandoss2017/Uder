@@ -76,7 +76,7 @@ function EditUserForm(props: Readonly<EditUserFormProps>): ReactElement {
         (async (): Promise<void> => {
 
             // Obtiene la lista de perfiles para el combobox
-            await listarPerfiles(props.editingUser.idInstitucion).then((response: PerfilDTO[] | FetchAPIError): void => {
+            await listarPerfiles(props.sessionAPIToken).then((response: PerfilDTO[] | FetchAPIError): void => {
                 if (isFetchAPIError(response)) {
                     console.error('Error al obtener los perfiles:', response);
                     setPerfiles([]);

@@ -14,7 +14,7 @@ import RegisterTipoEquipoForm from "@/app/(pages)/(whiteBackground)/tiposEquipos
 
 // Define la metadata de la página
 export const metadata: Metadata = {
-    title: 'PInfra DD - Agregar tipo de equipo'
+    title: 'PFT - Agregar tipo de equipo'
 };
 
 // Define la página de registro de tipos de equipos
