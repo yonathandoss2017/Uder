@@ -7,6 +7,7 @@ import FetchAPIError from "@/types/errors/FetchAPIError";
 import EquipoFieldSortEnum from "@/types/enums/EquipoFieldSortEnum";
 import EquipoFilter from "@/types/filters/EquipoFilter";
 import EquipoDTO from "@/types/dtos/EquipoDTO";
+import TipoEquipoFilter from "@/types/filters/TipoEquipoFilter";
 
 // URL base de la API REST de la API para los tipos de equipo
 const SERVICE_PATH: string = process.env.NEXT_PUBLIC_BACKEND_API_URL + "/equipos/tipos";

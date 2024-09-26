@@ -14,6 +14,9 @@ import { ModalButtonsType } from "@/components/ModalFC";
 import EditIntervencionForm from "@/app/(pages)/(whiteBackground)/intervenciones/(lista)/formEdit";
 import EquipoDTO from "@/types/dtos/EquipoDTO";
 import TipoIntervencionDTO from "@/types/dtos/TipoIntervencionDTO";
+import TipoEquipoDTO from "@/types/dtos/TipoEquipoDTO";
+import ComboBoxFC from "@/components/ComboBoxFC";
+import PaisDTO from "@/types/dtos/PaisDTO";
 
 interface TableIntervencionFCProps {
     sessionAPIToken: string;
@@ -53,9 +56,10 @@ function TableIntervencionFC(props: Readonly<TableIntervencionFCProps>): ReactEl
         }, 500);
     }, [searchTerms]);
 
+
     const [intervenciones, setIntervenciones] = useState<IntervencionDTO[]>([]);
-    const [equipos, setEquipos] = useState<Equipo[]>([]);
-    const [tiposIntervencion, setTiposIntervencion] = useState<TipoIntervencion[]>([]);
+    const [equipos, setEquipos] = useState<EquipoDTO[]>([]);
+    const [tiposIntervencion, setTiposIntervencion] = useState<TipoIntervencionDTO[]>([]);
 
     useEffect(() => {
         (async () => {
@@ -77,31 +81,13 @@ function TableIntervencionFC(props: Readonly<TableIntervencionFCProps>): ReactEl
                 return;
             }
 
-            setIntervenciones(intervResponse as IntervencionDTO[]);
-            setEquipos((equiposResponse as EquipoDTO[]).map(dtoToEquipo));
-            setTiposIntervencion((tiposResponse as TipoIntervencionDTO[]).map(dtoToTipoIntervencion));
+            setIntervenciones(intervResponse);
+            setEquipos(equiposResponse);
+            setTiposIntervencion(tiposResponse);
         })();
     }, [appliedSearchTerms, props.sessionAPIToken]);
 
-    function dtoToEquipo(equipoDTO: EquipoDTO): Equipo {
-        if (equipoDTO.id === undefined) {
-            throw new Error("EquipoDTO.id is undefined");
-        }
-        return {
-            id: equipoDTO.id,
-            nombre: equipoDTO.nombre
-        };
-    }
 
-    function dtoToTipoIntervencion(tipoIntervencionDTO: TipoIntervencionDTO): TipoIntervencion {
-        if (tipoIntervencionDTO.id === undefined) {
-            throw new Error("TipoIntervencionDTO.id is undefined");
-        }
-        return {
-            id: tipoIntervencionDTO.id,
-            nombre: tipoIntervencionDTO.nombre
-        };
-    }
 
     async function handleEditClick(intervencion: IntervencionDTO): Promise<void> {
         if (!props.hasPermissionEdit) { return; }
@@ -237,42 +223,44 @@ function TableIntervencionFC(props: Readonly<TableIntervencionFCProps>): ReactEl
                                 });
                             }}
                         />
-                        <select
-                            name="idEquipo"
-                            value={searchTerms.filter.idEquipo || ''}
-                            onChange={(event: ChangeEvent<HTMLSelectElement>): void => {
+                        <ComboBoxFC
+                            message={"Todos los tipos de intervenciones"}
+                            messageSelectable={true}
+                            elements={tiposIntervencion.map((tipoIntervenion: TipoIntervencionDTO): {
+                                key: number,
+                                value: string
+                            } => ({
+                                key: tipoIntervenion.id as number,
+                                value: tipoIntervenion.nombre
+                            }))}
+                            onChange={(e: React.ChangeEvent<HTMLSelectElement>): void => {
                                 setSearchTerms({
                                     ...searchTerms,
                                     filter: {
                                         ...searchTerms.filter,
-                                        idEquipo: event.target.value ? parseInt(event.target.value) : undefined
+                                        tipoIntervencion: e.target.value !== "" ? tiposIntervencion.find((tipo: TipoIntervencionDTO):
+                                        boolean => tipo.id === Number(e.target.value))?.nombre : undefined
                                     }
                                 });
                             }}
-                        >
-                            <option value="">Todos los equipos</option>
-                            {equipos.map((equipo) => (
-                                <option key={equipo.id} value={equipo.id}>{equipo.nombre}</option>
-                            ))}
-                        </select>
-                        <select
-                            name="idTipoIntervencion"
-                            value={searchTerms.filter.idTipoIntervencion || ''}
-                            onChange={(event: ChangeEvent<HTMLSelectElement>): void => {
+                        />
+
+                        <input
+                            type="text"
+                            name="id del equipo"
+                            placeholder="Buscar por equipo"
+                            value={searchTerms.filter.equipo ? searchTerms.filter.equipo : ''}
+                            onChange={(event: ChangeEvent<HTMLInputElement>): void => {
                                 setSearchTerms({
                                     ...searchTerms,
                                     filter: {
                                         ...searchTerms.filter,
-                                        idTipoIntervencion: event.target.value ? parseInt(event.target.value) : undefined
+                                        equipo: event.target.value ? event.target.value : undefined
                                     }
                                 });
                             }}
-                        >
-                            <option value="">Todos los tipos</option>
-                            {tiposIntervencion.map((tipo) => (
-                                <option key={tipo.id} value={tipo.id}>{tipo.nombre}</option>
-                            ))}
-                        </select>
+                        />
+
                     </div>
                 </div>
             </div>

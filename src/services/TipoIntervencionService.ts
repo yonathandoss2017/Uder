@@ -77,15 +77,9 @@ export async function darBajaTipoIntervencion(id: number, token: string): Promis
  * @param filter - Opcional: Filtros para la búsqueda
  * @returns Promise<TipoIntervencionDTO[] | FetchAPIError> - Lista de tipos de intervención o error
  */
-export async function listarTiposIntervencion(token: string, filter: TipoIntervencionFilter = {}): Promise<TipoIntervencionDTO[] | FetchAPIError> {
-    // Parámetros de la URL de la petición a la API
-    const queryParams: URLSearchParams = new URLSearchParams({
-        ...(!!filter.id && { filter_id: filter.id.toString() }),
-        ...(!!filter.nombre && { filter_nombre: filter.nombre }),
-        ...(filter.activo != undefined && { filter_activo: filter.activo.toString() }),
-    });
+export async function listarTiposIntervencion(token: string): Promise<TipoIntervencionDTO[] | FetchAPIError> {
 
-    const url: string = `${SERVICE_PATH}/listar?${queryParams}`;
+    const url: string = `${SERVICE_PATH}/listar`;
 
     // Opciones de la petición
     const options: RequestInit = {
@@ -93,7 +87,7 @@ export async function listarTiposIntervencion(token: string, filter: TipoInterve
         headers: {
             'Authorization': 'Bearer ' + token,
             'Content-Type': 'application/json',
-        },
+        }
     };
 
     return await fetchBodyWithErrorHandling<TipoIntervencionDTO[]>(url, options);
