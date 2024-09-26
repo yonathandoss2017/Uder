@@ -13,6 +13,10 @@ const SchemaFuncionalidad: ZodObject<any> = z.object({
         .refine((value: string) => value.replaceAll(" ", "").length != 0, {
             message: "El nombre no puede estar vacío",
         })
+        // Validación para que no contenga caracteres especiales ni números (solo letras y letras acentuadas)
+        .refine((value: string) => /^[A-Za-zÁÉÍÓÚáéíóúÑñ]+$/.test(value), {
+            message: "El nombre no debe contener números ni caracteres especiales",
+        })
 });
 
 export default SchemaFuncionalidad;
