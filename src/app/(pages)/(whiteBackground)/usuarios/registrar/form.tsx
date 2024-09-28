@@ -12,7 +12,7 @@ import UsuarioEstadoEnum from "@/types/enums/UsuarioEstadoEnum";
 import ComboBoxFC from "@/components/ComboBoxFC";
 import SchemaUserRegister from "@/validations/SchemaUserRegister";
 import {registrarUsuario} from "@/services/UsuarioService";
-import {listarPerfiles} from "@/services/PerfilService";
+import {listarPerfiles, listarPorInstitucion} from "@/services/PerfilService";
 import FetchAPIError, {isFetchAPIError} from "@/types/errors/FetchAPIError";
 import {useModal} from "@/app/hooks/modals/useModal";
 import {ModalButtonsType} from "@/components/ModalFC";
@@ -69,7 +69,7 @@ const RegisterUserForm = (props: RegisterUserFormProps) => {
         // Prócedimiento asíncrono autoinvocado que actualiza la lista de perfiles
         (async (): Promise<void> => {
             // Obtiene la lista de perfiles de la API
-            const response: PerfilDTO[] | FetchAPIError = await listarPerfiles(props.clientData.idInstitucion);
+            const response: PerfilDTO[] | FetchAPIError = await listarPorInstitucion(props.clientData.idInstitucion);
 
             if (isFetchAPIError(response)) {
                 // Si hay un error en la respuesta, muestra un mensaje en la consola y no actualiza la lista de perfiles

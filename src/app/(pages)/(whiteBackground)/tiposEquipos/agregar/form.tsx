@@ -38,7 +38,7 @@ const RegisterTipoEquipoForm : React.FC<RegisterTipoEquipoFormProps> = (props: R
 
     const {createModal} = useModal();
 
-    // -------------------- Formulario de registro de equipos --------------------
+    // -------------------- Formulario de registro de tipos de equipos --------------------
 
     // Obtenemos los métodos y propiedades necesarios del hook useForm para el formulario
     const {
@@ -46,7 +46,7 @@ const RegisterTipoEquipoForm : React.FC<RegisterTipoEquipoFormProps> = (props: R
         handleSubmit,           // Método para manejar el envío del formulario
         formState: {errors},     // Propiedad que contiene los errores del formulario
         reset                   // Método para resetear los valores del formulario
-    }: UseFormReturn<FormValues> = useForm<FormValues>({ // Inicializamos useForm con el tipo EquipoFormData
+    }: UseFormReturn<FormValues> = useForm<FormValues>({ // Inicializamos useForm
         resolver: zodResolver(SchemaTipoEquipo),    // Usamos zodResolver para la validación del formulario con el esquema de Zod schemaTipoEquipo
         mode: 'all',                            // Configuramos el modo de validación a "all", lo que válida en cada cambio de valor y al salir del campo
         defaultValues: {}

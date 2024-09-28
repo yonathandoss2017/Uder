@@ -152,7 +152,7 @@ const RegisterEquipoForm: React.FC<RegisterEquipoFormProps> = (props: RegisterEq
 
             // ------------------- Cargar países de origen -------------------
 
-            setPaisesOrigen(await listarPaises(props.clientData.idInstitucion).then((response: PaisDTO[] | FetchAPIError): PaisDTO[] => {
+            setPaisesOrigen(await listarPaises(props.sessionAPIToken).then((response: PaisDTO[] | FetchAPIError): PaisDTO[] => {
                 if (isFetchAPIError(response)) return [];
                 return response;
             }));

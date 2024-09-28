@@ -10,7 +10,7 @@
 
 .sidebarList {
     width: 100%;
-    height: 70%;
+    height: 75%;
     background: #1b1b1b;
     list-style: none;
     margin: 0;
@@ -18,7 +18,7 @@
 }
 
 .sidebarListItem {
-    line-height: 60px;
+    line-height: 35px;
     border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
@@ -28,9 +28,10 @@
 
 .sidebarTitle {
     color: white;
-    font-size: 21px;
+    font-size: 17px;
     font-weight: 600;
-    line-height: 65px;
+    margin-top: 3px;
+    line-height: 40px;
     text-align: center;
     background: #1e1e1e;
     letter-spacing: 1px;
@@ -40,9 +41,9 @@
     width: 100%;
     padding-left: 15px;
     color: white;
-    font-size: 18px;
+    font-size: 16px;
     font-weight: 500;
-    line-height: 60px;
+    line-height: 55px;
     background: #1e1e1e;
     letter-spacing: 1px;
     text-decoration: none;
@@ -89,7 +90,7 @@
 }
 
 .subMenuOption {
-    font-size: 17px;
+    font-size: 15px;
     color: #e6e6e6;
     padding-left: 15px;
 }
@@ -151,4 +152,9 @@
 
 .sidebarListItem button {
     border: none;
+}
+
+/* Estilos predeterminados (para pantallas más grandes) */
+.sidebarContainer {
+    width: 250px;
 }

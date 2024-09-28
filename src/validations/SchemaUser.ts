@@ -24,18 +24,29 @@ const SchemaUser: ZodObject<any> = z.object({
         .max(30, "El primer nombre no puede tener más de 30 caracteres")
         .refine((value: string) => !value.includes(" "), {
             message: "No debe contener espacios en blanco",
+        })
+        .refine((value: string) => value.replaceAll(" ", "").length != 0, {
+            message: "El primer nombre no puede estar vacío",
+        })
+        // Validación para que no contenga caracteres especiales ni números (solo letras y letras acentuadas)
+        .refine((value: string) => /^[A-Za-zÁÉÍÓÚáéíóúÑñ]+$/.test(value), {
+            message: "El primer nombre no debe contener números ni caracteres especiales",
         }),
 
     // Validación del campo de segundo nombre (opcional)
     segundoNombre: z
         .preprocess(((val): string => val ? String(val) : ''), // Convierte el valor a string
             z
-        .string()
-        .max(30, "El segundo nombre no puede tener más de 30 caracteres")
-        .refine((value: string) => !value.includes(" "), {
-            message: "No debe contener espacios en blanco",
-        })
-        .optional()
+                .string()
+                .max(30, "El segundo nombre no puede tener más de 30 caracteres")
+                .refine((value: string) => value === '' || !value.includes(" "), {
+                    message: "No debe contener espacios en blanco",
+                })
+                // Validación para que no contenga caracteres especiales ni números (solo letras y letras acentuadas)
+                .refine((value: string) => /^[A-Za-zÁÉÍÓÚáéíóúÑñ]+$/.test(value), {
+                    message: "El primer nombre no debe contener números ni caracteres especiales",
+                })
+                .optional()
         ),
 
     // Validación del campo de primer apellido
@@ -45,18 +56,26 @@ const SchemaUser: ZodObject<any> = z.object({
         .max(30, "El primer apellido no puede tener más de 30 caracteres")
         .refine((value: string) => !value.includes(" "), {
             message: "No debe contener espacios en blanco",
-        }),
+        })
+    // Validación para que no contenga caracteres especiales ni números (solo letras y letras acentuadas)
+    .refine((value: string) => /^[A-Za-zÁÉÍÓÚáéíóúÑñ]+$/.test(value), {
+        message: "El primer nombre no debe contener números ni caracteres especiales",
+    }),
 
     // Validación del campo de segundo apellido (opcional)
     segundoApellido: z
         .preprocess(((val): string => val ? String(val) : ''), // Convierte el valor a string
             z
-        .string()
-        .max(30, "El segundo apellido no puede tener más de 30 caracteres")
-        .refine((value: string) => !value.includes(" "), {
-            message: "No debe contener espacios en blanco",
-        })
-        .optional()
+                .string()
+                .max(30, "El segundo apellido no puede tener más de 30 caracteres")
+                .refine((value: string) => value === '' || !value.includes(" "), {
+                    message: "No debe contener espacios en blanco",
+                })
+                // Validación para que no contenga caracteres especiales ni números (solo letras y letras acentuadas)
+                .refine((value: string) => /^[A-Za-zÁÉÍÓÚáéíóúÑñ]+$/.test(value), {
+                    message: "El primer nombre no debe contener números ni caracteres especiales",
+                })
+                .optional()
         ),
 
     // Validación del campo de fecha de nacimiento

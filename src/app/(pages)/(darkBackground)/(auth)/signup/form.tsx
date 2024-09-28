@@ -16,7 +16,7 @@ import FetchAPIError, {isFetchAPIError} from "@/types/errors/FetchAPIError";
 import UsuarioEstadoEnum from "@/types/enums/UsuarioEstadoEnum";
 import ComboBoxFC from "@/components/ComboBoxFC";
 import InstitucionDTO from "@/types/dtos/InstitucionDTO";
-import {listarPerfiles} from "@/services/PerfilService";
+import {listarPerfiles, listarPorInstitucion} from "@/services/PerfilService";
 import {listarInstituciones} from "@/services/InstitucionService";
 import {registrarUsuario} from "@/services/UsuarioService";
 import {signOut, useSession} from "next-auth/react";
@@ -122,7 +122,7 @@ const RegisterFormClient = () => {
         (async (): Promise<void> => {
 
             // Obtiene la lista de perfiles de la API
-            const response: PerfilDTO[] | FetchAPIError = await listarPerfiles(idInstitucionSelected);
+            const response: PerfilDTO[] | FetchAPIError = await listarPorInstitucion(idInstitucionSelected);
 
             if (isFetchAPIError(response)) {
                 console.error("ERROR - Registro propio - useEffect - listarPerfiles: ", response);

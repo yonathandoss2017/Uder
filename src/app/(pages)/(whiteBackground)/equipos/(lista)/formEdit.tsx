@@ -210,7 +210,7 @@ function EditEquipoForm(props: Readonly<EditEquipoFormProps>): ReactElement {
 
             // ------------------- Cargar países de origen -------------------
 
-            setPaisesOrigen(await listarPaises(props.idInstitucion).then((response: PaisDTO[] | FetchAPIError): PaisDTO[] => {
+            setPaisesOrigen(await listarPaises(props.sessionAPIToken).then((response: PaisDTO[] | FetchAPIError): PaisDTO[] => {
                 if (isFetchAPIError(response)) {
                     console.error("ERROR - Modificar Equipo - listarPaises: ", response);
                     return [];
