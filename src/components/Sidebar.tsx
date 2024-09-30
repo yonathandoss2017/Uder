@@ -11,6 +11,9 @@ import {Session} from "next-auth";
 import PermisoEnum from "@/types/enums/PermisoEnum";
 import {obtenerPermisos} from "@/services/SessionService";
 import FetchAPIError, {isFetchAPIError} from "@/types/errors/FetchAPIError";
+import AuthLayout from "@/app/(pages)/AuthLayout";
+import LoadingPage from "@/app/(pages)/loading";
+import {GiFloatingGhost} from "react-icons/gi";
 
 // Configuración de los ítems de la barra lateral
 const sidebarConfig = [
@@ -188,7 +191,7 @@ const Sidebar = (): ReactElement | null => {
         }
         return openMenu === sectionKey ? styles.subMenuTitleOpen : "";
     };
-
+if (!clientData) return <LoadingPage/>
     return (
         <nav className={styles.sidebarContainer}>
             {/* Título de la barra lateral */}

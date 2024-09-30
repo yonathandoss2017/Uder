@@ -95,7 +95,6 @@ function AuthLayout({children}: Readonly<{ children: ReactNode }>) {
 
         if (pathname === "/login" || pathname === "/login/google" || pathname === "/signup" || pathname === "/signup/google") {
             return;
-
         }
         console.log("HAY TOKEN BOOLEAN", document.cookie.includes('sessionToken'));
         const expiresTimeTimestamp = Date.now() + 30000;
@@ -110,12 +109,13 @@ function AuthLayout({children}: Readonly<{ children: ReactNode }>) {
                 console.log("DENTRO DEL PRIMER IF")
                 if (!isIdle() && timeRemaining < CHECK_SESSION_EXP_TIME) {
                     console.log("entre a no idle")
-                    if (session?.user.sessionAPIToken) {
+                    if (session?.user?.sessionAPIToken && !session.user.error) {
                         console.log("no idle con token renovando")
                         const response: string | FetchAPIError = await renovarToken(session?.user.sessionAPIToken);
                         if (isFetchAPIError(response)) {
                             console.error("ERROR - EquiposPage_renovarToken: ", response);
-                            throw new Error(response.errorMessage);
+                            sessionModal.close();
+                            return;
                         }
                         document.cookie = `sessionToken=${response};path=/;max-age=30;samesite=lax;secure`;
                         session.user.sessionAPIToken = response;
@@ -161,8 +161,10 @@ function AuthLayout({children}: Readonly<{ children: ReactNode }>) {
 
 // Muestra un mensaje de error si se produce un error de sesión
     // Muestra un mensaje de error si se produce un error de sesión
-    if (showSessionExpiredError) {
-        return renderSessionExpiredError(); // Renderiza el error si la sesión ha expirado
+    if (showSessionExpiredError || session?.user?.error) {
+        if(pathname != "/login" && pathname != "/login/google" && pathname != "/signup" && pathname != "/signup/google") {
+            signOut({redirect: true, callbackUrl: "/login"})
+        }
     }
 
 // Muestra el contenido de la página
