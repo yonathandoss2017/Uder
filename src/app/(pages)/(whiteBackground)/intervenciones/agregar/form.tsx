@@ -9,7 +9,7 @@ import { ModalButtonsType } from "@/components/ModalFC";
 import styles from "@public/styles/modules/register.tiposequipo.module.css";
 import LoadingPage from "@/app/(pages)/loading";
 import ComboBoxFC from "@/components/ComboBoxFC";
-import {isFetchAPIError} from "@/types/errors/FetchAPIError";
+import { isFetchAPIError } from "@/types/errors/FetchAPIError";
 
 interface FormValues {
     fechaHora: string;
@@ -33,31 +33,31 @@ const RegisterIntervencionForm: React.FC<RegisterIntervencionFormProps> = ({ ses
     const [selectedTipoIntervencionId, setSelectedTipoIntervencionId] = useState<number | undefined>(undefined);
     const [loaded, setLoaded] = useState<boolean>(false);
 
+    // Paginación
+    const [paginaActual, setPaginaActual] = useState<number>(1);
+    const equiposPorPagina = 5;
+
     useEffect(() => {
         (async (): Promise<void> => {
-            listarEquipos(sessionAPIToken)
-                .then((response) => {
-                    if (isFetchAPIError(response)) {
-                        createModal({
-                            children: <div>Error al cargar los equipos: {response.errorMessage}</div>,
-                            buttonsType: ModalButtonsType.CONFIRM,
-                        }).show();
-                        return;
-                    }
-                    setEquipos(response);
-                });
+            const equiposResponse = await listarEquipos(sessionAPIToken);
+            if (isFetchAPIError(equiposResponse)) {
+                createModal({
+                    children: <div>Error al cargar los equipos: {equiposResponse.errorMessage}</div>,
+                    buttonsType: ModalButtonsType.CONFIRM,
+                }).show();
+                return;
+            }
+            setEquipos(equiposResponse);
 
-            listarTiposIntervencion(sessionAPIToken)
-                .then((response) => {
-                    if (isFetchAPIError(response)) {
-                        createModal({
-                            children: <div>Error al cargar los tipos de intervención: {response.errorMessage}</div>,
-                            buttonsType: ModalButtonsType.CONFIRM,
-                        }).show();
-                        return;
-                    }
-                    setTiposIntervencion(response);
-                });
+            const tiposResponse = await listarTiposIntervencion(sessionAPIToken);
+            if (isFetchAPIError(tiposResponse)) {
+                createModal({
+                    children: <div>Error al cargar los tipos de intervención: {tiposResponse.errorMessage}</div>,
+                    buttonsType: ModalButtonsType.CONFIRM,
+                }).show();
+                return;
+            }
+            setTiposIntervencion(tiposResponse);
 
             setLoaded(true);
         })();
@@ -118,24 +118,43 @@ const RegisterIntervencionForm: React.FC<RegisterIntervencionFormProps> = ({ ses
                 <div>
                     <h2>Seleccionar Equipo</h2>
                     <ul>
-                        {equipos.map(equipo => (
+                        {equipos.slice((paginaActual - 1) * equiposPorPagina, paginaActual * equiposPorPagina).map(equipo => (
                             <li key={equipo.id} onClick={() => handleSelectEquipo(equipo, modalInstance)}>
                                 {equipo.nombre}
                             </li>
                         ))}
                     </ul>
+                    <div>
+                        <button onClick={handleAnterior} disabled={paginaActual === 1}>
+                            Anterior
+                        </button>
+                        <button onClick={handleSiguiente} disabled={paginaActual * equiposPorPagina >= equipos.length}>
+                            Siguiente
+                        </button>
+                    </div>
                 </div>
             ),
             buttonsType: ModalButtonsType.NONE // Sin botones adicionales, solo la lista de equipos
         });
         modalInstance.show(); // Mostrar el modal
     };
-
-    // Función para seleccionar un equipo desde el modal
     const handleSelectEquipo = (equipo: any, modalInstance: any) => {
         setSelectedEquipoId(equipo.id);
         setSelectedEquipoName(equipo.nombre); // Mostrar el nombre del equipo seleccionado
         modalInstance.close(); // Cerrar el modal una vez seleccionado el equipo
+    };
+
+    // Navegación entre páginas
+    const handleSiguiente = () => {
+        if (paginaActual * equiposPorPagina < equipos.length) {
+            setPaginaActual(prevPage => prevPage + 1);
+        }
+    };
+
+    const handleAnterior = () => {
+        if (paginaActual > 1) {
+            setPaginaActual(prevPage => prevPage - 1);
+        }
     };
 
     return (
