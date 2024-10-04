@@ -14,7 +14,6 @@ import { ModalButtonsType } from "@/components/ModalFC";
 import EditIntervencionForm from "@/app/(pages)/(whiteBackground)/intervenciones/(lista)/formEdit";
 import EquipoDTO from "@/types/dtos/EquipoDTO";
 import TipoIntervencionDTO from "@/types/dtos/TipoIntervencionDTO";
-import ComboBoxFC from "@/components/ComboBoxFC";
 import styles from "@public/styles/modules/table/table.tipoequipos.module.css";
 
 interface TableIntervencionFCProps {
@@ -27,15 +26,6 @@ interface TableSearchTermsProps {
     filter: IntervencionFilter;
 }
 
-interface Equipo {
-    id: number;
-    nombre: string;
-}
-
-interface TipoIntervencion {
-    id: number;
-    nombre: string;
-}
 
 function TableIntervencionFC(props: Readonly<TableIntervencionFCProps>): ReactElement {
     const { createModal } = useModal();
@@ -267,24 +257,6 @@ function TableIntervencionFC(props: Readonly<TableIntervencionFCProps>): ReactEl
                                 });
                             }}
                         />
-                        <select
-                            name="idEquipo"
-                            value={searchTerms.filter.idEquipo || ''}
-                            onChange={(event: ChangeEvent<HTMLSelectElement>): void => {
-                                setSearchTerms({
-                                    ...searchTerms,
-                                    filter: {
-                                        ...searchTerms.filter,
-                                        idEquipo: event.target.value ? parseInt(event.target.value) : undefined
-                                    }
-                                });
-                            }}
-                        >
-                            <option value="">Todos los equipos</option>
-                            {equipos.map((equipo) => (
-                                <option key={equipo.id} value={equipo.id}>{equipo.nombre}</option>
-                            ))}
-                        </select>
                          <select
                             name="idTipoIntervencion"
                             value={searchTerms.filter.idTipoIntervencion || ''}
@@ -298,7 +270,7 @@ function TableIntervencionFC(props: Readonly<TableIntervencionFCProps>): ReactEl
                                 });
                             }}
                         >
-                            <option value="">Todos los tipos</option>
+                            <option value="">Tipo de Intervencion</option>
                             {tiposIntervencion.map((tipo) => (
                                 <option key={tipo.id} value={tipo.id}>{tipo.nombre}</option>
                             ))}
