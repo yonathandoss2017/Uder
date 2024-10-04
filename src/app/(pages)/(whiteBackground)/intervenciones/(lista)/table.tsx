@@ -267,44 +267,42 @@ function TableIntervencionFC(props: Readonly<TableIntervencionFCProps>): ReactEl
                                 });
                             }}
                         />
-                        <ComboBoxFC
-                            message={"Todos los tipos de intervenciones"}
-                            messageSelectable={true}
-                            elements={tiposIntervencion.map((tipoIntervenion: TipoIntervencionDTO): {
-                                key: number,
-                                value: string
-                            } => ({
-                                key: tipoIntervenion.id as number,
-                                value: tipoIntervenion.nombre
-                            }))}
-                            onChange={(e: React.ChangeEvent<HTMLSelectElement>): void => {
+                        <select
+                            name="idEquipo"
+                            value={searchTerms.filter.idEquipo || ''}
+                            onChange={(event: ChangeEvent<HTMLSelectElement>): void => {
                                 setSearchTerms({
                                     ...searchTerms,
                                     filter: {
                                         ...searchTerms.filter,
-                                        tipoIntervencion: e.target.value !== "" ? tiposIntervencion.find((tipo: TipoIntervencionDTO):
-                                        boolean => tipo.id === Number(e.target.value))?.nombre : undefined
+                                        idEquipo: event.target.value ? parseInt(event.target.value) : undefined
                                     }
                                 });
                             }}
-                        />
-
-                        <input
-                            type="text"
-                            name="id del equipo"
-                            placeholder="Buscar por equipo"
-                            value={searchTerms.filter.equipo ? searchTerms.filter.equipo : ''}
-                            onChange={(event: ChangeEvent<HTMLInputElement>): void => {
+                        >
+                            <option value="">Todos los equipos</option>
+                            {equipos.map((equipo) => (
+                                <option key={equipo.id} value={equipo.id}>{equipo.nombre}</option>
+                            ))}
+                        </select>
+                         <select
+                            name="idTipoIntervencion"
+                            value={searchTerms.filter.idTipoIntervencion || ''}
+                            onChange={(event: ChangeEvent<HTMLSelectElement>): void => {
                                 setSearchTerms({
                                     ...searchTerms,
                                     filter: {
                                         ...searchTerms.filter,
-                                        equipo: event.target.value ? event.target.value : undefined
+                                        idTipoIntervencion: event.target.value ? parseInt(event.target.value) : undefined
                                     }
                                 });
                             }}
-                        />
-
+                        >
+                            <option value="">Todos los tipos</option>
+                            {tiposIntervencion.map((tipo) => (
+                                <option key={tipo.id} value={tipo.id}>{tipo.nombre}</option>
+                            ))}
+                        </select>
                     </div>
                 </div>
             </div>
