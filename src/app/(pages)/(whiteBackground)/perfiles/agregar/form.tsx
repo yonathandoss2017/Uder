@@ -5,7 +5,8 @@ import PerfilDTO from "@/types/dtos/PerfilDTO";
 import { useModal } from "@/app/hooks/modals/useModal";
 import { SubmitHandler, useForm, UseFormReturn } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import styles from "@public/styles/modules/register.perfiles.module.css"
+import styles from "@public/styles/modules/register.tiposequipo.module.css";
+import stylesTable from "@public/styles/modules/table/table.tipoequipos.module.css";
 import SchemaPerfil from "@/validations/SchemaPerfil";
 import FetchAPIError, { isFetchAPIError } from "@/types/errors/FetchAPIError";
 import { agregarPerfil, listarPerfiles } from "@/services/PerfilService";
@@ -69,8 +70,16 @@ const RegisterPerfilForm: React.FC<RegisterPerfilFormProps> = (props: RegisterPe
             buttonsType: ModalButtonsType.CONFIRM
         }).show();
 
+        // Refrescar la lista de perfiles
+        const perfilesActualizados = await listarPerfiles(props.sessionAPIToken, appliedSearchTerms);
+        if (!isFetchAPIError(perfilesActualizados)) {
+            const perfilesOrdenados = perfilesActualizados.sort((a, b) => (a.nivel ?? 0) - (b.nivel ?? 0));
+            setPerfiles(perfilesOrdenados);
+        }
+
         reset();
     };
+
 
     // ----------------------- Listado de Perfiles -----------------------
     const [searchTerms, setSearchTerms] = useState<PerfilFilter>({ activo: true });
@@ -96,14 +105,18 @@ const RegisterPerfilForm: React.FC<RegisterPerfilFormProps> = (props: RegisterPe
                 console.error("ERROR - listarPerfiles", response.errorMessage);
                 return;
             }
-            setPerfiles(response);
+
+            // Ordenar perfiles de menor a mayor nivel
+            const perfilesOrdenados = response.sort((a: PerfilDTO, b: PerfilDTO) => (a.nivel ?? 0) - (b.nivel ?? 0));
+
+            setPerfiles(perfilesOrdenados);
         })();
     }, [appliedSearchTerms]);
 
     return (
         <div className={styles.container}>
             {/* Formulario */}
-            <form onSubmit={handleSubmit(onSubmit)} className={styles.perfilForm}>
+            <form onSubmit={handleSubmit(onSubmit)} className={styles.form}>
                 <h2>Registro de Perfil</h2>
                 <div className={styles.userDetailsRe}>
                     <div className={styles.inputBoxRe}>
@@ -135,8 +148,8 @@ const RegisterPerfilForm: React.FC<RegisterPerfilFormProps> = (props: RegisterPe
             </form>
 
             {/* Listado */}
-            <div className={styles.containerTable}>
-                <div className={styles.scroll}>
+            <div className={stylesTable.containerTable}>
+                <div className={stylesTable.scroll}>
                     {perfiles.length > 0 ? (
                         <table style={{ width: "100%" }}>
                             <thead>

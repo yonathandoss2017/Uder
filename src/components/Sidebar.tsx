@@ -86,7 +86,7 @@ const sidebarConfig = [
         submenus: [
 
             {
-                title: "Registro Perfiles", path: "/perfiles/agregar", permission: PermisoEnum.ALTA_PERFIL
+                title: "Ingreso Perfiles", path: "/perfiles/agregar", permission: PermisoEnum.ALTA_PERFIL
 
             },
             {
