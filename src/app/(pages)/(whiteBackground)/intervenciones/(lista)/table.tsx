@@ -14,9 +14,7 @@ import { ModalButtonsType } from "@/components/ModalFC";
 import EditIntervencionForm from "@/app/(pages)/(whiteBackground)/intervenciones/(lista)/formEdit";
 import EquipoDTO from "@/types/dtos/EquipoDTO";
 import TipoIntervencionDTO from "@/types/dtos/TipoIntervencionDTO";
-import TipoEquipoDTO from "@/types/dtos/TipoEquipoDTO";
-import ComboBoxFC from "@/components/ComboBoxFC";
-import PaisDTO from "@/types/dtos/PaisDTO";
+import styles from "@public/styles/modules/table/table.tipoequipos.module.css";
 
 interface TableIntervencionFCProps {
     sessionAPIToken: string;
@@ -28,22 +26,12 @@ interface TableSearchTermsProps {
     filter: IntervencionFilter;
 }
 
-interface Equipo {
-    id: number;
-    nombre: string;
-}
-
-interface TipoIntervencion {
-    id: number;
-    nombre: string;
-}
 
 function TableIntervencionFC(props: Readonly<TableIntervencionFCProps>): ReactElement {
     const { createModal } = useModal();
 
     const [searchTerms, setSearchTerms] = useState<TableSearchTermsProps>({ filter: {} });
     const [appliedSearchTerms, setAppliedSearchTerms] = useState<TableSearchTermsProps>(searchTerms);
-
     const refSearchTermsTimer = useRef<NodeJS.Timeout | null>(null);
 
     useEffect(() => {
@@ -56,10 +44,28 @@ function TableIntervencionFC(props: Readonly<TableIntervencionFCProps>): ReactEl
         }, 500);
     }, [searchTerms]);
 
-
     const [intervenciones, setIntervenciones] = useState<IntervencionDTO[]>([]);
     const [equipos, setEquipos] = useState<EquipoDTO[]>([]);
     const [tiposIntervencion, setTiposIntervencion] = useState<TipoIntervencionDTO[]>([]);
+    const [currentPage, setCurrentPage] = useState<number>(1);
+    const [itemsPerPage] = useState<number>(5);
+
+    const indexOfLastIntervencion = currentPage * itemsPerPage;
+    const indexOfFirstIntervencion = indexOfLastIntervencion - itemsPerPage;
+    const currentIntervenciones = intervenciones.slice(indexOfFirstIntervencion, indexOfLastIntervencion);
+    const totalPages = Math.ceil(intervenciones.length / itemsPerPage);
+
+    const handleNextPage = () => {
+        if (currentPage < totalPages) {
+            setCurrentPage(currentPage + 1);
+        }
+    };
+
+    const handlePreviousPage = () => {
+        if (currentPage > 1) {
+            setCurrentPage(currentPage - 1);
+        }
+    };
 
     useEffect(() => {
         (async () => {
@@ -86,8 +92,6 @@ function TableIntervencionFC(props: Readonly<TableIntervencionFCProps>): ReactEl
             setTiposIntervencion(tiposResponse);
         })();
     }, [appliedSearchTerms, props.sessionAPIToken]);
-
-
 
     async function handleEditClick(intervencion: IntervencionDTO): Promise<void> {
         if (!props.hasPermissionEdit) { return; }
@@ -137,12 +141,13 @@ function TableIntervencionFC(props: Readonly<TableIntervencionFCProps>): ReactEl
         return tipoIntervencion ? tipoIntervencion.nombre : 'Desconocido';
     };
 
-    const handleViewCommentsClick = (comentarios: string): void => {
+    const handleViewDataClick = (intervencion: IntervencionDTO): void => {
         createModal({
             children: (
                 <div>
-                    <h3>Comentarios</h3>
-                    <p>{comentarios}</p>
+                    <h3>Detalles de la Intervención</h3>
+                    <p><strong>Motivo:</strong> {intervencion.motivo}</p>
+                    <p><strong>Comentarios:</strong> {intervencion.comentarios}</p>
                 </div>
             ),
             buttonsType: ModalButtonsType.CLOSE
@@ -158,28 +163,26 @@ function TableIntervencionFC(props: Readonly<TableIntervencionFCProps>): ReactEl
         <div className={stylesTable.containerPage}>
             <div className={stylesTable.containerTable}>
                 <div className={stylesTable.scroll}>
-                    {intervenciones.length > 0 ? (
+                    {currentIntervenciones.length > 0 ? (
                         <table style={{ width: "100%" }}>
                             <thead>
                             <tr>
                                 <th>Fecha</th>
-                                <th>Motivo</th>
                                 <th>Tipo Intervención</th>
                                 <th>Equipo</th>
-                                <th>Comentarios</th> {/* Nueva columna Comentarios */}
+                                <th>Ver Datos</th> {/* Cambiado de Comentarios a Ver Datos */}
                                 <th></th>
                             </tr>
                             </thead>
                             <tbody>
-                            {intervenciones.map((intervencion: IntervencionDTO) => (
+                            {currentIntervenciones.map((intervencion: IntervencionDTO) => (
                                 <tr key={intervencion.id}>
                                     <td>{formatDate(intervencion.fechaHora)}</td>
-                                    <td>{intervencion.motivo}</td>
                                     <td>{getTipoIntervencionNombre(intervencion.idTipoIntervencion)}</td>
                                     <td>{getEquipoNombre(intervencion.idEquipo)}</td>
                                     <td>
-                                        <button onClick={() => handleViewCommentsClick(intervencion.comentarios ?? '')}>Comentarios</button>
-                                    </td> {/* Botón Comentarios movido a la nueva columna */}
+                                        <button onClick={() => handleViewDataClick(intervencion)}>Ver Datos</button> {/* Cambiado el texto del botón */}
+                                    </td>
                                     <td>
                                         {props.hasPermissionEdit && !ID_TIPOS_INTERVENCION_RESOLUCION.includes(intervencion.idTipoIntervencion) ? (
                                             <button style={{ marginLeft: '10px' }} onClick={() => handleEditClick(intervencion)}>Trabajar</button>
@@ -191,6 +194,37 @@ function TableIntervencionFC(props: Readonly<TableIntervencionFCProps>): ReactEl
                         </table>
                     ) : <h3>No se encontraron intervenciones</h3>}
                 </div>
+
+                {/* Controles de Paginación */}
+                {intervenciones.length > 0 && (
+                    <div className={styles.pagination}>
+                        <button
+                            className={styles.paginationButton}
+                            onClick={handlePreviousPage}
+                            disabled={currentPage === 1}
+                        >
+                            Anterior
+                        </button>
+
+                        {Array.from({ length: totalPages }, (_, index) => (
+                            <button
+                                key={index + 1}
+                                className={`${styles.paginationButton} ${currentPage === index + 1 ? styles.activePage : ''}`}
+                                onClick={() => setCurrentPage(index + 1)}
+                            >
+                                {index + 1}
+                            </button>
+                        ))}
+
+                        <button
+                            className={styles.paginationButton}
+                            onClick={handleNextPage}
+                            disabled={currentPage === totalPages}
+                        >
+                            Siguiente
+                        </button>
+                    </div>
+                )}
                 <div className={stylesTable.filtersContainer}>
                     <div className={stylesTable.filtersContainerInputs}>
                         <label htmlFor="fechaDesde">Fecha Desde:</label>
@@ -223,44 +257,24 @@ function TableIntervencionFC(props: Readonly<TableIntervencionFCProps>): ReactEl
                                 });
                             }}
                         />
-                        <ComboBoxFC
-                            message={"Todos los tipos de intervenciones"}
-                            messageSelectable={true}
-                            elements={tiposIntervencion.map((tipoIntervenion: TipoIntervencionDTO): {
-                                key: number,
-                                value: string
-                            } => ({
-                                key: tipoIntervenion.id as number,
-                                value: tipoIntervenion.nombre
-                            }))}
-                            onChange={(e: React.ChangeEvent<HTMLSelectElement>): void => {
+                         <select
+                            name="idTipoIntervencion"
+                            value={searchTerms.filter.idTipoIntervencion || ''}
+                            onChange={(event: ChangeEvent<HTMLSelectElement>): void => {
                                 setSearchTerms({
                                     ...searchTerms,
                                     filter: {
                                         ...searchTerms.filter,
-                                        tipoIntervencion: e.target.value !== "" ? tiposIntervencion.find((tipo: TipoIntervencionDTO):
-                                        boolean => tipo.id === Number(e.target.value))?.nombre : undefined
+                                        idTipoIntervencion: event.target.value ? parseInt(event.target.value) : undefined
                                     }
                                 });
                             }}
-                        />
-
-                        <input
-                            type="text"
-                            name="id del equipo"
-                            placeholder="Buscar por equipo"
-                            value={searchTerms.filter.equipo ? searchTerms.filter.equipo : ''}
-                            onChange={(event: ChangeEvent<HTMLInputElement>): void => {
-                                setSearchTerms({
-                                    ...searchTerms,
-                                    filter: {
-                                        ...searchTerms.filter,
-                                        equipo: event.target.value ? event.target.value : undefined
-                                    }
-                                });
-                            }}
-                        />
-
+                        >
+                            <option value="">Tipo de Intervencion</option>
+                            {tiposIntervencion.map((tipo) => (
+                                <option key={tipo.id} value={tipo.id}>{tipo.nombre}</option>
+                            ))}
+                        </select>
                     </div>
                 </div>
             </div>

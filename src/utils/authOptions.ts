@@ -50,6 +50,8 @@ const authOptions: NextAuthOptions = {
                         name: 'sessionToken',
                         value: response,
                         httpOnly: false,
+                        //secure: false,
+                        sameSite: 'strict',
                         maxAge: 30,
                         path: '/',
                     })
@@ -144,10 +146,12 @@ const authOptions: NextAuthOptions = {
                 } catch (error) {
                     console.error("Error al buscar cliente por token: ", error);
                     session.user.sessionAPIToken = undefined;
+                    session.user.error = "invalid_token"
                 }
             } else {
                 console.log("EN EL ELSE DEL SESSION")
                 session.user.sessionAPIToken = undefined;
+                session.user.error = "invalid_token"
             }
             // Retornamos la sesión de cliente modificada
             console.log("SESSION", session)

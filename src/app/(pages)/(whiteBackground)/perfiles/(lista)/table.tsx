@@ -75,8 +75,10 @@ function TablePerfilesFC(props: Readonly<TablePerfilesFCProps>): ReactElement {
                 console.error("ERROR - lista de perfiles - table.tsx - listarPerfiles", response.errorMessage);
                 return;
             }
-            console.log(response);
-            setPerfiles(response);
+
+            // Ordenar perfiles por nivel de menor a mayor
+            const sortedPerfiles = response.sort((a: PerfilDTO, b: PerfilDTO) => (a.nivel || 0) - (b.nivel || 0));
+            setPerfiles(sortedPerfiles);
         })();
 
     }, [appliedSearchTerms]);
@@ -186,6 +188,7 @@ function TablePerfilesFC(props: Readonly<TablePerfilesFCProps>): ReactElement {
                             <thead>
                             <tr>
                                 <th>Nombre</th>
+                                <th>Nivel</th> {/* Nueva columna para mostrar el nivel */}
                                 <th></th>
                             </tr>
                             </thead>
@@ -193,11 +196,7 @@ function TablePerfilesFC(props: Readonly<TablePerfilesFCProps>): ReactElement {
                             {perfiles.map((perfil: PerfilDTO) => (
                                 <tr key={perfil.id}>
                                     <td>{perfil.nombre}</td>
-                                    {/*{props.hasPermissionEdit ? (*/}
-                                    {/*    <td>*/}
-                                    {/*        <button onClick={() => handleEditClick(perfil)}>Modificar</button>*/}
-                                    {/*    </td>*/}
-                                    {/*) : <td></td>}*/}
+                                    <td>{perfil.nivel}</td> {/* Mostrar el nivel del perfil */}
                                     {props.hasPermissionBaja ? (
                                         <td>
                                             <button onClick={(): void => handleEliminarClick(perfil)}>Eliminar</button>
