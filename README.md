@@ -3,7 +3,6 @@
 Proyecto Final de Tecnicatura (Proyecto LTI 4º semestre 2024)
 
 ### Servidor: https://git.utec.edu.uy/pft/servidor-api
-Este proyecto está desarrollado con Next.js con [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
 ## Tabla de Contenidos
 
@@ -19,16 +18,16 @@ Sigue los siguientes pasos para instalar el proyecto desde el IDE:
 Dentro del IDE dirígete a la parte superior izquierda, y presiona: 
 Menu -> New ->  Project form Version Control…  
 
-![New Project](https://git.utec.edu.uy/pft/proyecto-web/-/raw/modelo/documentos/screenshots%20ReadMe/Version_Control.JPG)
+![New Project](https://git.utec.edu.uy/pft/proyecto-web/-/raw/master/documentos/screenshots%20ReadMe/Version_Control.JPG?ref_type=heads)
 
 
 Luego, pegamos el link sobre el URL, y seleccionamos donde queremos guardar nuestro proyecto.
 
-![URL Git](https://git.utec.edu.uy/pft/proyecto-web/-/raw/modelo/documentos/screenshots%20ReadMe/URL-GIT.JPG)
+![URL Git](https://git.utec.edu.uy/pft/proyecto-web/-/raw/master/documentos/screenshots%20ReadMe/URL-GIT.JPG?ref_type=heads)
 
 Finalmente seleccionamos “Clone” para poder traer el proyecto a nuestro entorno de trabajo.
 
-![button Done](https://git.utec.edu.uy/pft/proyecto-web/-/raw/modelo/documentos/screenshots%20ReadMe/button-Done.JPG)
+![button Done](https://git.utec.edu.uy/pft/proyecto-web/-/raw/master/documentos/screenshots%20ReadMe/button-Done.JPG?ref_type=heads)
 
 </details>
 
@@ -42,7 +41,7 @@ Para ejecutar el programa en modo desarrollo:
 npm run dev
 ```
 
-![npm_dev](https://git.utec.edu.uy/pft/proyecto-web/-/raw/modelo/documentos/screenshots%20ReadMe/npm_dev.JPG)
+![npm_dev](https://git.utec.edu.uy/pft/proyecto-web/-/raw/master/documentos/screenshots%20ReadMe/npm_dev.JPG?ref_type=heads)
 
 Abra [http://localhost:3000](http://localhost:3000) con su navegador para ver el resultado.
 
