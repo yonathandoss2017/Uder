@@ -10,13 +10,14 @@ const SchemaFuncionalidad: ZodObject<any> = z.object({
     nombre: z.string()
         .min(1, "El nombre no puede estar vacío")
         .max(60, "El nombre no puede tener más de 60 caracteres")
-        .refine((value: string) => value.replaceAll(" ", "").length != 0, {
+        .refine((value: string) => value.trim().length != 0, {
             message: "El nombre no puede estar vacío",
         })
-        // Validación para que no contenga caracteres especiales ni números (solo letras y letras acentuadas)
-        .refine((value: string) => /^[A-Za-zÁÉÍÓÚáéíóúÑñ]+$/.test(value), {
+        // Validación para que no contenga caracteres especiales ni números (solo letras, letras acentuadas y espacios)
+        .refine((value: string) => /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/.test(value), {
             message: "El nombre no debe contener números ni caracteres especiales",
         })
 });
+
 
 export default SchemaFuncionalidad;

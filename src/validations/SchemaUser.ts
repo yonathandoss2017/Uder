@@ -99,7 +99,8 @@ const SchemaUser: ZodObject<any> = z.object({
                         return fechaNacimiento <= fecha18anios;
                     },
                     {message: "Debes tener al menos 18 años"}
-                )),
+                )
+    ),
 
     // Validación del campo de email
     email: z
