@@ -171,7 +171,7 @@ const Sidebar = (): ReactElement | null => {
                 setPermissions(response);
             }
         })();
-    }, [sessionData]); // Agrego sessionData como dependencia
+    }, [clientData.id]); // Agrego sessionData como dependencia
 
     useEffect(() => {
         // Encuentra la sección cuyo submenú está siendo visualizado actualmente

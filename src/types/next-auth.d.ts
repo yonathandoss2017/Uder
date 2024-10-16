@@ -45,6 +45,7 @@ declare module "next-auth" {
     interface User {
         sessionAPIToken?: string
         exp: number
+
     }
 
     interface Account {
@@ -75,6 +76,14 @@ declare module "next-auth/jwt" {
              * Fecha de expiración del token
              */
             exp: number
+
+            lastFetched?:number
+
+            /**
+             * Datos del usuario
+             */
+            data?: UsuarioDTO
+
 
             /**
              * Indica un error al iniciar sesión

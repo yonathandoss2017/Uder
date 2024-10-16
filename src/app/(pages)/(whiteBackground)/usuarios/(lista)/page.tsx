@@ -23,41 +23,28 @@ export const metadata: Metadata = {
 // Define la página de lista de usuarios
 const UsuariosPage = async (): Promise<ReactElement> => {
     // Obtiene la información de la sesión del cliente (Desde la API)
-    let sessionData: Session | null = await getServerSession(authOptions);
+    const sessionData: Session | null = await getServerSession(authOptions);
 
     // Obtiene el token de sesión del cliente en la API y sus datos de usuario
-    let sessionAPIToken: string | undefined = sessionData?.user?.sessionAPIToken;
-    let clientData: UsuarioDTO | undefined = sessionData?.user?.data;
+    const sessionAPIToken: string | undefined = sessionData?.user?.sessionAPIToken;
+    const clientData: UsuarioDTO | undefined = sessionData?.user?.data;
 
     // Si no se obtiene el token de sesión o el usuario, muestra la página de carga hasta obtenerlos
     if (!sessionAPIToken || !clientData?.id) return <LoadingPage/>
 
-    // Obtiene la institución del cliente
-    const institucion: InstitucionDTO | FetchAPIError = await buscarInstitucionPorId(clientData.idInstitucion, sessionAPIToken);
-
-    // Si ocurre un error al obtener la institución, muestra un mensaje de error
-    if (isFetchAPIError(institucion)) return <ErrorFC message={institucion.errorMessage}/>;
+    console.log("SESSION TOKEN ", sessionAPIToken)
 
     // Si no tiene permisos para acceder a la página, muestra un mensaje de acceso denegado
     if (!await verificarPermiso(sessionAPIToken, PermisoEnum.OBTENER_USUARIOS)) {
         return <ErrorFC message={"Acceso denegado"}/>;
     }
 
-    // Obtiene el perfil del cliente
-    const perfilCliente: PerfilDTO | undefined = clientData.idPerfil ? await buscarPerfilPorId(clientData.idPerfil, sessionAPIToken)
-        .then((response: PerfilDTO | FetchAPIError): PerfilDTO | undefined => {
-            if (isFetchAPIError(response)) {
-                console.error("ERROR - lista de usuarios - page.tsx - buscarPerfilPorId: ", response);
-                return undefined;
-            }
-            return response;
-        }) : undefined;
-
     // Obtiene los permisos del cliente para la página (Para ver qué opciones habilitar)
     const hasPermissionEdit: boolean = await verificarPermiso(sessionAPIToken, PermisoEnum.MODIFICAR_USUARIO);
     const hasPermissionBaja: boolean = await verificarPermiso(sessionAPIToken, PermisoEnum.BAJA_USUARIO);
     const hasPermissionReactivar: boolean = await verificarPermiso(sessionAPIToken, PermisoEnum.REACTIVAR_USUARIO);
     const hasPermissionObtenerUsuarios: boolean = await verificarPermiso(sessionAPIToken, PermisoEnum.OBTENER_USUARIOS)
+
 
     // Retorna el JSX de la página de lista de usuarios
     return (
@@ -66,12 +53,11 @@ const UsuariosPage = async (): Promise<ReactElement> => {
                 sessionAPIToken={sessionAPIToken}
                 clientID={clientData.id}
                 client={clientData}
-                perfilCliente={perfilCliente}
                 hasPermissionBaja={hasPermissionBaja}
                 hasPermissionEdit={hasPermissionEdit}
                 hasPermissionReactivar={hasPermissionReactivar}
                 hasPermissionObtenerUsuarios={hasPermissionObtenerUsuarios}
-                idAdministrador={institucion.idAdministrador}
+
             />
         </main>
     );

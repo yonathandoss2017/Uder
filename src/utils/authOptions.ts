@@ -103,10 +103,25 @@ const authOptions: NextAuthOptions = {
                 token.user = session.user;
             }
 
-                if(cookies().get('sessionToken')?.value !== undefined) {
+            const cacheDuration = 5 * 60 * 1000;
+
+            if(cookies().get('sessionToken')?.value !== undefined) {
+                // Si el token ya tiene un timestamp y está dentro del tiempo de caché, no hacer la llamada
+                if (token.user.lastFetched && (Date.now() - token.user.lastFetched < cacheDuration)) {
+                    console.log("estoy dentro del if no hago la llamada")
+                    return token;
+                }else {
                     console.log("ESTOY EN EL JWT ", cookies().get('sessionToken')?.value)
                     token.user.sessionAPIToken = cookies().get('sessionToken')?.value;
+
+                    const response = await buscarClientePorToken(cookies().get('sessionToken')!!.value);
+                    if (isFetchAPIError(response)) {
+                        throw new Error(response.errorMessage);
+                    }
+                    token.user.data = response;
+                    token.user.lastFetched = Date.now();
                 }
+            }
 
             return token;
 
@@ -133,12 +148,7 @@ const authOptions: NextAuthOptions = {
                 try {
                     if(cookies().get('sessionToken')?.value !== undefined) {
                         {
-                            console.log("POR OBTENER EL RESPONSE", cookies().get('sessionToken')?.value)
-                            const response = await buscarClientePorToken(cookies().get('sessionToken')!!.value);
-                            if (isFetchAPIError(response)) {
-                                throw new Error(response.errorMessage);
-                            }
-                            session.user.data = response;
+                            session.user.data = token.user.data;
                             session.user.sessionAPIToken = cookies().get('sessionToken')?.value;
                             console.log(session.expires, "Expiracion del session auth")
                         }

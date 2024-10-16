@@ -24,6 +24,9 @@ import {buscarPerfilPorId, listarPerfiles} from "@/services/PerfilService";
 import LoadingPage from "@/app/(pages)/loading";
 import {ModalInstance} from "@/app/hooks/modals/ModalProvider";
 import ComboBoxFC from "@/components/ComboBoxFC";
+import InstitucionDTO from "@/types/dtos/InstitucionDTO";
+import {buscarInstitucionPorId} from "@/services/InstitucionService";
+import ErrorFC from "@/components/ErrorFC";
 
 /**
  * Propiedades del componente Table
@@ -37,8 +40,6 @@ interface TableUsersFCProps {
     sessionAPIToken: string;
     clientID: number;
     client: UsuarioDTO;
-    perfilCliente?: PerfilDTO;
-    idAdministrador?: number;
     hasPermissionEdit: boolean;
     hasPermissionBaja: boolean;
     hasPermissionReactivar: boolean;
@@ -83,7 +84,48 @@ function TableUsersFC(props: Readonly<TableUsersFCProps>): ReactElement {
 
     const [currentPage, setCurrentPage] = useState<number>(1);
     const [npage, setNpage] = useState<number>(1);
+
+    const [idAdministrador, setIdAdministrador] = useState<number>(0);
+    const [perfilCliente, setPerfilCliente] = useState<PerfilDTO | undefined>(undefined);
+
     const recordsPerPage: number = 5;
+
+    useEffect(() => {
+        const obtenerDatosCliente = async () => {
+            try {
+                // Obtiene la institución del cliente
+                const institucion: InstitucionDTO | FetchAPIError = await buscarInstitucionPorId(props.client.idInstitucion, props.sessionAPIToken);
+
+                if (institucion && !isFetchAPIError(institucion)){
+                    setIdAdministrador(institucion.idAdministrador as number);
+                }
+
+
+                // Si ocurre un error al obtener la institución, muestra un mensaje de error
+                if (isFetchAPIError(institucion)) {
+                    console.error("ERROR - lista de usuarios - page.tsx - buscarInstitucionPorId: ", institucion);
+                    return <ErrorFC message={institucion.errorMessage} />;
+                }
+
+                if (props.client.idPerfil) {
+                    const response: PerfilDTO | FetchAPIError = await buscarPerfilPorId(props.client.idPerfil, props.sessionAPIToken);
+                    if (isFetchAPIError(response)) {
+                        console.error("ERROR - lista de usuarios - page.tsx - buscarPerfilPorId: ", response);
+                    } else {
+                        setPerfilCliente(response)
+                    }
+                }
+
+                // Aquí puedes manejar lo que harás con los datos de la institución y el perfilCliente
+                // Por ejemplo, actualizar el estado o realizar otras acciones
+            } catch (error) {
+                console.error("ERROR - lista de usuarios - page.tsx - obtenerDatosCliente: ", error);
+            }
+        };
+
+        obtenerDatosCliente();
+    }, [props.sessionAPIToken]);
+
 
     // Define los términos de búsqueda introducidos por el usuario en tiempo real (searchTerms)
     // y la función para modificarlos (setSearchTerms)
@@ -252,7 +294,7 @@ function TableUsersFC(props: Readonly<TableUsersFCProps>): ReactElement {
     function handleVerClick(user: UsuarioDTO): void {
         if (!props.hasPermissionObtenerUsuarios) return; //Si el cliente no tiene permisos para ver, no hace nada
         createModal({
-            children: <ModalViewUserFC user={user} idAdministrador={props.idAdministrador}
+            children: <ModalViewUserFC user={user} idAdministrador={idAdministrador}
                                        sessionAPIToken={props.sessionAPIToken}/> // Renderiza el componente como JSX
             , buttonsType: ModalButtonsType.CLOSE // Botón de cerrar
         }).show();
@@ -264,9 +306,9 @@ function TableUsersFC(props: Readonly<TableUsersFCProps>): ReactElement {
 
         const modalModificar: ModalInstance = createModal({
             children: <FormModificar editingUser={user}
-                                     perfilCliente={props.perfilCliente}
+                                     perfilCliente={perfilCliente}
                                      sessionAPIToken={props.sessionAPIToken}
-                                     isClientAdministrador={props.idAdministrador === props.clientID}
+                                     isClientAdministrador={idAdministrador === props.clientID}
                                      onCancel={(): void => {
                                          createModal({
                                              children: (
@@ -325,7 +367,7 @@ function TableUsersFC(props: Readonly<TableUsersFCProps>): ReactElement {
 
             // Sí el usuario a dar de baja es el administrador o un usuario con el mismo o mayor nivel de perfil
             // que el cliente, muestra un mensaje de error
-            if (usuario.id === props.idAdministrador || (props.clientID != props.idAdministrador && (perfilUsuario && props.perfilCliente && props.perfilCliente.nivel >= perfilUsuario.nivel))) {
+            if (usuario.id === idAdministrador || (props.clientID != idAdministrador && (perfilUsuario && perfilCliente && perfilCliente.nivel >= perfilUsuario.nivel))) {
                 createModal({
                     children: (
                         <p>No tienes permisos para dar de baja a este usuario</p>
@@ -484,7 +526,7 @@ function TableUsersFC(props: Readonly<TableUsersFCProps>): ReactElement {
                                     <td>{perfil.nombre}</td>
                                 )}
                                 {!perfil && (
-                                    <td>{props.idAdministrador === usuario.id ? "Administrador" : "Sin perfil"}</td>
+                                    <td>{idAdministrador === usuario.id ? "Administrador" : "Sin perfil"}</td>
                                 )}
                                 {usuario.activo ?
                                     (
@@ -504,9 +546,9 @@ function TableUsersFC(props: Readonly<TableUsersFCProps>): ReactElement {
                                     <td></td>
                                 }
                                 <td>
-                                    {props.hasPermissionEdit && usuario.id !== props.clientID && usuario.id !== props.idAdministrador && (
+                                    {props.hasPermissionEdit && usuario.id !== props.clientID && usuario.id !== idAdministrador && (
                                         <>
-                                            {(props.idAdministrador === props.clientID || !perfil || (props.perfilCliente && props.perfilCliente.nivel < perfil.nivel)) && (
+                                            {(idAdministrador === props.clientID || !perfil || (perfilCliente && perfilCliente.nivel < perfil.nivel)) && (
                                                 <button onClick={() => handleEditClick(usuario)}>
                                                     Modificar
                                                 </button>
@@ -801,3 +843,4 @@ function TableUsersFC(props: Readonly<TableUsersFCProps>): ReactElement {
 
 // Exporta el componente (Tabla de usuarios)
 export default TableUsersFC;
+
