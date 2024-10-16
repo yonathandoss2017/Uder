@@ -124,7 +124,7 @@ function EditUserForm(props: Readonly<EditUserFormProps>): ReactElement {
         }
 
         // Obtiene la lista de cambios realizados en el usuario
-        const changes: ChangeEntry[] = await obtenerCambios(userModified, props.editingUser);
+        const changes: ChangeEntry[] = await obtenerCambios(userModified, props.editingUser, props.sessionAPIToken);
 
         // Si no hay cambios, no se realiza la modificación
         if (changes.length === 0) {
@@ -336,7 +336,7 @@ export default EditUserForm;
  * @param editingUser Objeto con los datos del usuario editado
  * @param originalData Datos originales del usuario
  */
-async function obtenerCambios(editingUser: UsuarioDTO, originalData: UsuarioDTO): Promise<ChangeEntry[]> {
+async function obtenerCambios(editingUser: UsuarioDTO, originalData: UsuarioDTO, sessionApiToken: string): Promise<ChangeEntry[]> {
 
     // Lista de cambios en la modificación del usuario
     const changes: ChangeEntry[] = [];
@@ -350,7 +350,7 @@ async function obtenerCambios(editingUser: UsuarioDTO, originalData: UsuarioDTO)
         let newPerfilName: string | undefined = undefined;
 
         if (originalData.idPerfil) {
-            await buscarPerfilPorId(originalData.idPerfil).then(async (response: PerfilDTO | FetchAPIError): Promise<void> => {
+            await buscarPerfilPorId(originalData.idPerfil, sessionApiToken).then(async (response: PerfilDTO | FetchAPIError): Promise<void> => {
                 if (isFetchAPIError(response)) {
                     console.error('Error al obtener el perfil anterior:', response);
                     return;
@@ -360,7 +360,7 @@ async function obtenerCambios(editingUser: UsuarioDTO, originalData: UsuarioDTO)
         }
 
         if (editingUser.idPerfil) {
-            await buscarPerfilPorId(editingUser.idPerfil).then(async (response: PerfilDTO | FetchAPIError): Promise<void> => {
+            await buscarPerfilPorId(editingUser.idPerfil, sessionApiToken).then(async (response: PerfilDTO | FetchAPIError): Promise<void> => {
                 if (isFetchAPIError(response)) {
                     console.error('Error al obtener el nuevo perfil:', response);
                     return;

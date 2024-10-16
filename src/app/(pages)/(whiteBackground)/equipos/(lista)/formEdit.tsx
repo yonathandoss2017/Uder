@@ -134,7 +134,7 @@ function EditEquipoForm(props: Readonly<EditEquipoFormProps>): ReactElement {
         // Procedimiento auto-ejecutable (Para que sea asíncrono)
         (async (): Promise<void> => {
             // Obtiene las imágenes del equipo desde la API
-            await listarImagenes(props.editingEquipo.id as number).then((response: ImagenDTO[] | FetchAPIError): void => {
+            await listarImagenes(props.editingEquipo.id as number, props.sessionAPIToken).then((response: ImagenDTO[] | FetchAPIError): void => {
                 if (isFetchAPIError(response)) {
                     console.error("ERROR - Modificar Equipo - listarImagenes: ", response);
                     setImages([]); // Limpia la lista de imágenes

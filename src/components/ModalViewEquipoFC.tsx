@@ -47,7 +47,7 @@ const ModalViewEquipoFC = ({ equipo, sessionAPIToken }: ModalViewEquipoFC): Reac
 
         (async (): Promise<void> => {
             async function obtenerTipoEquipo() {
-                const response: TipoEquipoDTO | FetchAPIError = await buscarTipoEquipoPorId(equipo.idTipoEquipo); //Buscamos tipos de equipo por id
+                const response: TipoEquipoDTO | FetchAPIError = await buscarTipoEquipoPorId(equipo.idTipoEquipo, sessionAPIToken); //Buscamos tipos de equipo por id
                 if (isFetchAPIError(response)) { //Si ocurre un error en el fetch
                     console.error('Error al obtener el tipo de equipo', response);
                 } else {
@@ -56,7 +56,7 @@ const ModalViewEquipoFC = ({ equipo, sessionAPIToken }: ModalViewEquipoFC): Reac
             }
 
             async function obtenerProveedor() {
-                const response: ProveedorDTO | FetchAPIError = await buscarProveedorPorId(equipo.idProveedor); //Buscamos proveedor por id
+                const response: ProveedorDTO | FetchAPIError = await buscarProveedorPorId(equipo.idProveedor, sessionAPIToken); //Buscamos proveedor por id
                 if (isFetchAPIError(response)) { //Si ocurre un error en el fetch
                     console.error('Error al obtener el proveedor', response);
                 } else {
@@ -65,14 +65,14 @@ const ModalViewEquipoFC = ({ equipo, sessionAPIToken }: ModalViewEquipoFC): Reac
             }
 
             async function obtenerModelo() {
-                const response: ModeloDTO | FetchAPIError = await buscarModeloPorId(equipo.idModelo); //Buscamos modelo por id
+                const response: ModeloDTO | FetchAPIError = await buscarModeloPorId(equipo.idModelo, sessionAPIToken); //Buscamos modelo por id
                 if (isFetchAPIError(response)) { //Si ocurre un error en el fetch
                     console.error('Error al obtener el modelo', response);
                 } else {
                     setModelo(response.nombre); //Se setea el modelo
                     setIdMarca(response.idMarca) //Se setea el id de la marca
                     if (response.idMarca != 0) {
-                        const responseMarca: MarcaDTO | FetchAPIError = await buscarMarcaPorId(response.idMarca); //Buscamos la marca por id
+                        const responseMarca: MarcaDTO | FetchAPIError = await buscarMarcaPorId(response.idMarca, sessionAPIToken); //Buscamos la marca por id
                         if (isFetchAPIError(responseMarca)) { //Si ocurre un error en el fetch
                             console.error('Error al obtener la marca', responseMarca);
                         } else {
@@ -103,7 +103,7 @@ const ModalViewEquipoFC = ({ equipo, sessionAPIToken }: ModalViewEquipoFC): Reac
             }
 
             async function obtenerPais() {
-                const response: PaisDTO | FetchAPIError = await buscarPaisPorId(equipo.idPaisOrigen); //Buscamos pais por id
+                const response: PaisDTO | FetchAPIError = await buscarPaisPorId(equipo.idPaisOrigen, sessionAPIToken); //Buscamos pais por id
                 if (isFetchAPIError(response)) { //Si ocurre un error en el fetch
                     console.error('Error al obtener el pais de origen', response);
                 } else {
@@ -112,7 +112,7 @@ const ModalViewEquipoFC = ({ equipo, sessionAPIToken }: ModalViewEquipoFC): Reac
             }
 
             async function obtenerImagen() {
-                const response: ImagenDTO[] | FetchAPIError = await listarImagenes(equipo.id as number);
+                const response: ImagenDTO[] | FetchAPIError = await listarImagenes(equipo.id as number, sessionAPIToken); //Buscamos imagenes por id de equipo
                 if (isFetchAPIError(response)) {
                     console.error("ERROR - Modificar Equipo - listarImagenes: ", response);
                     setImages([]); // Limpia la lista de imágenes

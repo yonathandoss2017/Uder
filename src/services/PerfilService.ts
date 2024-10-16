@@ -71,14 +71,16 @@ export async function listarPorInstitucion(idInstitucion: number){
 /**
  * Función para buscar un perfil por su ID.
  * @param id - ID del perfil a buscar.
+ * @param token
  * @returns Promise<PerfilDTO> - Perfil encontrado en la API.
  * @returns Promise<FetchAPIError> - Si ocurre un error en la solicitud o en el procesamiento de la respuesta.
  */
-export async function buscarPerfilPorId(id: number): Promise<PerfilDTO | FetchAPIError> {
+export async function buscarPerfilPorId(id: number, token:string): Promise<PerfilDTO | FetchAPIError> {
     const url: string = `${SERVICE_PATH}/buscar/${id}`; // URL de la petición a la API
     const options: RequestInit = { // Opciones de la petición
         method: 'GET',
         headers: {
+            'Authorization': 'Bearer ' + token, // Cabecera de autorización con el token de sesión
             'Content-Type': 'application/json' // Tipo de contenido JSON
         },
     };

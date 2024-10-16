@@ -43,16 +43,18 @@ export async function listarProveedores(token: string, filter: ProveedorFilter =
 /**
  * Función para buscar proveedor por id.
  * @param id - ID del proveedor
+ * @param token
  * @returns Promise<ProveedorDTO> - Proveedor recuperado de la API
  * @returns Promise<FetchAPIError> - Si ocurre un error en la solicitud o en el procesamiento de la respuesta.
  */
-export async function buscarProveedorPorId(id: number): Promise<ProveedorDTO | FetchAPIError> {
+export async function buscarProveedorPorId(id: number, token: string): Promise<ProveedorDTO | FetchAPIError> {
     const url: string = `${SERVICE_PATH}/buscar/${id}`; // URL de la petición a la API
 
     // Opciones de la petición
     const options: RequestInit = {
         method: 'GET',
         headers: {
+            'Authorization': 'Bearer ' + token, // Cabecera de autorización con el token de sesión
             'Content-Type': 'application/json' // Tipo de contenido JSON
         }
     };

@@ -28,7 +28,7 @@ const ModalViewUserFC = ({ user, idAdministrador, sessionAPIToken }: ModalViewUs
     useEffect(() => {
         async function obtenerPerfil() {
             if (user.idPerfil) { //Si el usuario tiene perfil
-                const response: PerfilDTO | FetchAPIError = await buscarPerfilPorId(user.idPerfil); //Lo buscarmos
+                const response: PerfilDTO | FetchAPIError = await buscarPerfilPorId(user.idPerfil, sessionAPIToken); //Lo buscarmos
                 if (isFetchAPIError(response)) { //Si ocurre un error en el fetch
                     console.error('Error al obtener el perfil', response);
                 } else {

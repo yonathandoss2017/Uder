@@ -13,13 +13,15 @@ const SERVICE_PATH: string = `${process.env.NEXT_PUBLIC_BACKEND_API_URL}/interve
 /**
  * Función para buscar intervención por ID.
  * @param id - ID de la intervención
+ * @param token
  * @returns Promise<IntervencionDTO | FetchAPIError> - Intervención que brinda la API o error.
  */
-export async function buscarIntervencionPorId(id: number): Promise<IntervencionDTO | FetchAPIError> {
+export async function buscarIntervencionPorId(id: number, token: string): Promise<IntervencionDTO | FetchAPIError> {
     const url: string = `${SERVICE_PATH}/buscar/${id}`; // URL de la petición a la API
     const options: RequestInit = {
         method: 'GET',
         headers: {
+            'Authorization': 'Bearer ' + token, // Cabecera de autorización con el token de sesión
             'Content-Type': 'application/json' // Tipo de contenido JSON
         }
     };

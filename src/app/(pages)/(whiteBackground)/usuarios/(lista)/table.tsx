@@ -172,7 +172,7 @@ function TableUsersFC(props: Readonly<TableUsersFCProps>): ReactElement {
                 }
 
                 // Obtiene el perfil del usuario
-                const perfil: PerfilDTO | FetchAPIError = await buscarPerfilPorId(usuario.idPerfil);
+                const perfil: PerfilDTO | FetchAPIError = await buscarPerfilPorId(usuario.idPerfil, props.sessionAPIToken);
 
                 // Si ocurre un error en la solicitud, muestra un mensaje de error en la consola y no lo agrega
                 if (isFetchAPIError(perfil)) {

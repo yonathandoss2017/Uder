@@ -44,15 +44,17 @@ export async function listarPaises(token: string, filter: PaisFilter = {}): Prom
 /**
  * Función para buscar pais por ID.
  * @param id - ID del pais
+ * @param token
  * @returns Promise<PaisDTO[]> - País recuperado de la API
  * @returns Promise<FetchAPIError> - Si ocurre un error en la solicitud o en el procesamiento de la respuesta.
  */
-export async function buscarPaisPorId(id: number): Promise<PaisDTO | FetchAPIError> {
+export async function buscarPaisPorId(id: number, token: string): Promise<PaisDTO | FetchAPIError> {
 
     const url: string = `${SERVICE_PATH}/buscar/${id}`; // URL de la petición a la API
     const options: RequestInit = { // Opciones de la petición
         method: 'GET',
         headers: {
+            'Authorization': 'Bearer ' + token, // Cabecera de autorización con el token de sesión
             'Content-Type': 'application/json' // Tipo de contenido JSON
         }
     };

@@ -29,21 +29,11 @@ const UsuariosPage = async (): Promise<ReactElement> => {
     let sessionAPIToken: string | undefined = sessionData?.user?.sessionAPIToken;
     let clientData: UsuarioDTO | undefined = sessionData?.user?.data;
 
-    /*
-    setTimeout(async () => {
-         sessionData = await getServerSession(authOptions);
-         sessionAPIToken = sessionData?.user?.sessionAPIToken;
-         clientData = sessionData?.user?.data;
-    }, 10000);
-
-     */
-
-
     // Si no se obtiene el token de sesión o el usuario, muestra la página de carga hasta obtenerlos
     if (!sessionAPIToken || !clientData?.id) return <LoadingPage/>
 
     // Obtiene la institución del cliente
-    const institucion: InstitucionDTO | FetchAPIError = await buscarInstitucionPorId(clientData.idInstitucion);
+    const institucion: InstitucionDTO | FetchAPIError = await buscarInstitucionPorId(clientData.idInstitucion, sessionAPIToken);
 
     // Si ocurre un error al obtener la institución, muestra un mensaje de error
     if (isFetchAPIError(institucion)) return <ErrorFC message={institucion.errorMessage}/>;
@@ -54,7 +44,7 @@ const UsuariosPage = async (): Promise<ReactElement> => {
     }
 
     // Obtiene el perfil del cliente
-    const perfilCliente: PerfilDTO | undefined = clientData.idPerfil ? await buscarPerfilPorId(clientData.idPerfil)
+    const perfilCliente: PerfilDTO | undefined = clientData.idPerfil ? await buscarPerfilPorId(clientData.idPerfil, sessionAPIToken)
         .then((response: PerfilDTO | FetchAPIError): PerfilDTO | undefined => {
             if (isFetchAPIError(response)) {
                 console.error("ERROR - lista de usuarios - page.tsx - buscarPerfilPorId: ", response);
