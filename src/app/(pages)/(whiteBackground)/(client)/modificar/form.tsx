@@ -17,6 +17,7 @@ import {ModalButtonsType} from "@/components/ModalFC";
 import {useModal} from "@/app/hooks/modals/useModal";
 import ModalChangesFC from "@/components/ModalChangesFC";
 import TableTelefonosFC from "@/components/TableTelefonosFC";
+import {useToken} from "@/app/hooks/TokenProvider";
 
 /**
  * Propiedades del componente
@@ -32,6 +33,9 @@ interface EditUserFormProps {
  * Define el formulario de edición propia del usuario (cliente)
  */
 function FormEditUser(props: Readonly<EditUserFormProps>): ReactElement {
+
+    // Obtenemos el token de sesión del cliente
+    const {sessionAPIToken } = useToken();
 
     // ----------------------- Modales -----------------------
 
@@ -66,6 +70,9 @@ function FormEditUser(props: Readonly<EditUserFormProps>): ReactElement {
 
     // Procedimiento que se ejecuta al hacer clic en el botón 'Guardar'
     const onSubmit: SubmitHandler<UsuarioDTO> = async (formValues: UsuarioDTO): Promise<void> => {
+
+        if(!sessionAPIToken) return;
+
         // Obtiene los cambios realizados en el formulario
         const changes: ChangeEntry[] = await obtenerCambios(formValues, clientDataOriginal, nuevaContrasenia.length > 0);
 
@@ -166,7 +173,7 @@ function FormEditUser(props: Readonly<EditUserFormProps>): ReactElement {
                 }
 
                 // Cambia la contraseña del usuario
-                await cambiarContrasenia(contrasenia, nuevaContrasenia, props.sessionAPIToken).then((response: void | FetchAPIError): void => {
+                await cambiarContrasenia(contrasenia, nuevaContrasenia, sessionAPIToken).then((response: void | FetchAPIError): void => {
                     if (isFetchAPIError(response)) {
                         // Si hay un error al cambiar la contraseña, muestra un mensaje y retorna
                         createModal({
@@ -182,7 +189,7 @@ function FormEditUser(props: Readonly<EditUserFormProps>): ReactElement {
                 });
 
                 // Modifica los datos del usuario
-                await modificarCliente(clientData, props.sessionAPIToken).then((response: void | FetchAPIError): void => {
+                await modificarCliente(clientData, sessionAPIToken).then((response: void | FetchAPIError): void => {
                     if (isFetchAPIError(response)) {
                         console.error("ERROR - Modificación propia del usuario - modificarCliente: ", response);
                         createModal({

@@ -11,6 +11,7 @@ import {ModalButtonsType} from "@/components/ModalFC";
 import {ModalInstance} from "@/app/hooks/modals/ModalProvider";
 import EditFuncionalidadForm from "@/app/(pages)/(whiteBackground)/funcionalidades/(listar)/formEdit";
 import AsignarFuncionalidadesForm from "@/app/(pages)/(whiteBackground)/funcionalidades/(listar)/formAsignar";
+import {useToken} from "@/app/hooks/TokenProvider";
 
 //Props
 interface TableFuncionalidadFCProps {
@@ -33,6 +34,9 @@ interface TableSearchTermsProps {
 }
 
 function TableFuncionalidadFC(props: Readonly<TableFuncionalidadFCProps>): ReactElement {
+
+    // Obtenemos el token de sesión del cliente
+    const {sessionAPIToken } = useToken();
 
     // ----------------------- Modales -----------------------
     const {createModal} = useModal();
@@ -70,8 +74,11 @@ function TableFuncionalidadFC(props: Readonly<TableFuncionalidadFCProps>): React
 
     //Obtiene la lista de funcionalidades
     useEffect((): void => {
+
+        if(!sessionAPIToken) return;
+
         (async (): Promise<void> => {
-            const response: FuncionalidadDTO[] | FetchAPIError = await listarFuncionalidades(props.sessionAPIToken, appliedSearchTerms.size, appliedSearchTerms.page, appliedSearchTerms.fieldSort, appliedSearchTerms.sortDirectionAsc);
+            const response: FuncionalidadDTO[] | FetchAPIError = await listarFuncionalidades(sessionAPIToken, appliedSearchTerms.size, appliedSearchTerms.page, appliedSearchTerms.fieldSort, appliedSearchTerms.sortDirectionAsc);
 
             if (isFetchAPIError(response)) {
                 const errorMessage: string = response.errorMessage;
@@ -91,7 +98,10 @@ function TableFuncionalidadFC(props: Readonly<TableFuncionalidadFCProps>): React
     // ----------------------- Paginacion -----------------------
     //Metodo para calcular paginas disponibles
     function calcularPaginas(): void {
-        contarFuncionalidades(props.idInstitucion, props.sessionAPIToken)
+
+        if(!sessionAPIToken) return;
+
+        contarFuncionalidades(props.idInstitucion, sessionAPIToken)
             .then((response: number | FetchAPIError) => {
                 if (isFetchAPIError(response)) { //Si hay error
                     console.error("ERROR: " + response.errorMessage)
@@ -124,9 +134,12 @@ function TableFuncionalidadFC(props: Readonly<TableFuncionalidadFCProps>): React
 
     // Procedimiento que se ejecuta al hacer click en el boton "Ver"
     function handleVerClick(funcionalidad: FuncionalidadDTO): void {
+
+        if(!sessionAPIToken) return;
+
         if (!props.hasPermissionView) return; //Si el cliente no tiene permisos para ver, no hace nada
         createModal({
-            children: <ModalViewFuncionalidadFC funcionalidad={funcionalidad} sessionAPIToken={props.sessionAPIToken}/>, // Renderiza el componente como JSX
+            children: <ModalViewFuncionalidadFC funcionalidad={funcionalidad} />, // Renderiza el componente como JSX
             buttonsType: ModalButtonsType.CLOSE // Establece el tipo de botones del modal
         }).show();
     }
@@ -188,6 +201,9 @@ function TableFuncionalidadFC(props: Readonly<TableFuncionalidadFCProps>): React
 
     // Procedimiento que se ejecuta al hacer clic en el botón 'Eliminar'
     const handleEliminarClick = (funcionalidadSelected: FuncionalidadDTO): void => {
+
+        if(!sessionAPIToken) return;
+
         if(!props.hasPermissionBaja){
             createModal({
                 children: (
@@ -211,7 +227,7 @@ function TableFuncionalidadFC(props: Readonly<TableFuncionalidadFCProps>): React
             buttonsType: ModalButtonsType.CONFIRM_CANCEL,
             async onConfirm(): Promise<void> { //Acción al confirmar
                 // Realiza la baja de la funcionalidad en la API
-                const response: void | FetchAPIError = await darBajaFuncionalidad(funcionalidadSelected.id as number, props.sessionAPIToken);
+                const response: void | FetchAPIError = await darBajaFuncionalidad(funcionalidadSelected.id as number, sessionAPIToken);
                 if (isFetchAPIError(response)){
                     // Si ocurre un error en la solicitud, muestra un mensaje de error
                     const errorMessage: string = response.errorMessage;

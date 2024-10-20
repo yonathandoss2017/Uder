@@ -13,6 +13,7 @@ import { agregarPerfil, listarPerfiles } from "@/services/PerfilService";
 import { ModalButtonsType } from "@/components/ModalFC";
 import PerfilFilter from "@/types/filters/PerfilFilter";
 import UsuarioDTO from "@/types/dtos/UsuarioDTO";
+import {useToken} from "@/app/hooks/TokenProvider";
 
 interface RegisterPerfilFormProps {
     sessionAPIToken: string;
@@ -22,6 +23,8 @@ interface RegisterPerfilFormProps {
 interface FormValues extends PerfilDTO {}
 
 const RegisterPerfilForm: React.FC<RegisterPerfilFormProps> = (props: RegisterPerfilFormProps) => {
+    const {sessionAPIToken } = useToken();
+
     const { createModal } = useModal();
 
     // ----------------------- Formulario -----------------------
@@ -37,6 +40,9 @@ const RegisterPerfilForm: React.FC<RegisterPerfilFormProps> = (props: RegisterPe
     });
 
     const onSubmit: SubmitHandler<FormValues> = async (formValues: FormValues): Promise<void> => {
+
+        if(sessionAPIToken == null) return;
+
         const nuevoPerfil: PerfilDTO = {
             nombre: formValues.nombre,
             activo: formValues.activo ?? true,
@@ -45,7 +51,7 @@ const RegisterPerfilForm: React.FC<RegisterPerfilFormProps> = (props: RegisterPe
             nivel: formValues.nivel
         };
 
-        const response: PerfilDTO | FetchAPIError = await agregarPerfil(nuevoPerfil, props.sessionAPIToken);
+        const response: PerfilDTO | FetchAPIError = await agregarPerfil(nuevoPerfil, sessionAPIToken);
 
         if (isFetchAPIError(response)) {
             console.error('ERROR - Registro de perfil - agregarPerfil:', response);
@@ -71,7 +77,7 @@ const RegisterPerfilForm: React.FC<RegisterPerfilFormProps> = (props: RegisterPe
         }).show();
 
         // Refrescar la lista de perfiles
-        const perfilesActualizados = await listarPerfiles(props.sessionAPIToken, appliedSearchTerms);
+        const perfilesActualizados = await listarPerfiles(sessionAPIToken, appliedSearchTerms);
         if (!isFetchAPIError(perfilesActualizados)) {
             const perfilesOrdenados = perfilesActualizados.sort((a, b) => (a.nivel ?? 0) - (b.nivel ?? 0));
             setPerfiles(perfilesOrdenados);
@@ -99,8 +105,11 @@ const RegisterPerfilForm: React.FC<RegisterPerfilFormProps> = (props: RegisterPe
     }, [searchTerms]);
 
     useEffect((): void => {
+
+        if(sessionAPIToken==null)return;
+
         (async (): Promise<void> => {
-            const response: PerfilDTO[] | FetchAPIError = await listarPerfiles(props.sessionAPIToken, appliedSearchTerms);
+            const response: PerfilDTO[] | FetchAPIError = await listarPerfiles(sessionAPIToken, appliedSearchTerms);
             if (isFetchAPIError(response)) {
                 console.error("ERROR - listarPerfiles", response.errorMessage);
                 return;

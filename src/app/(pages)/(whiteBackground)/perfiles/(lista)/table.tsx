@@ -10,6 +10,7 @@ import stylesTable from "@public/styles/modules/table/table.tipoequipos.module.c
 import {ModalInstance} from "@/app/hooks/modals/ModalProvider";
 import EditPerfilForm from "@/app/(pages)/(whiteBackground)/perfiles/(lista)/formEdit";
 import {ModalButtonsType} from "@/components/ModalFC";
+import {useToken} from "@/app/hooks/TokenProvider";
 
 /**
  *  Propiedades del componente TablePerfilesFC
@@ -38,6 +39,9 @@ interface TableSearchTermsProps {
 }
 
 function TablePerfilesFC(props: Readonly<TablePerfilesFCProps>): ReactElement {
+
+    // Obtenemos el token de sesión del cliente
+    const {sessionAPIToken } = useToken();
 
     // ----------------------- Modales -----------------------
     const {createModal} = useModal();
@@ -68,8 +72,11 @@ function TablePerfilesFC(props: Readonly<TablePerfilesFCProps>): ReactElement {
     const [perfiles, setPerfiles] = useState<PerfilDTO[]>([]);
 
     useEffect((): void => {
+
+        if(!sessionAPIToken) return;
+
         (async (): Promise<void> => {
-            const response: PerfilDTO[] | FetchAPIError = await listarPerfiles(props.sessionAPIToken, appliedSearchTerms.filter);
+            const response: PerfilDTO[] | FetchAPIError = await listarPerfiles(sessionAPIToken, appliedSearchTerms.filter);
 
             if (isFetchAPIError(response)) {
                 console.error("ERROR - lista de perfiles - table.tsx - listarPerfiles", response.errorMessage);
@@ -123,6 +130,9 @@ function TablePerfilesFC(props: Readonly<TablePerfilesFCProps>): ReactElement {
 
     // Procedimiento que se ejecuta al hacer clic en el botón 'Eliminar'
     const handleEliminarClick = (perfilSelected: PerfilDTO): void => {
+
+        if(!sessionAPIToken) return;
+
         if (!props.hasPermissionBaja) {
             createModal({
                 children: (
@@ -143,7 +153,7 @@ function TablePerfilesFC(props: Readonly<TablePerfilesFCProps>): ReactElement {
             ),
             buttonsType: ModalButtonsType.CONFIRM_CANCEL,
             async onConfirm(): Promise<void> {
-                const response: void | FetchAPIError = await darBajaPerfil(perfilSelected.id as number, props.sessionAPIToken);
+                const response: void | FetchAPIError = await darBajaPerfil(perfilSelected.id as number, sessionAPIToken);
                 if (isFetchAPIError(response)) {
                     createModal({
                         children: (

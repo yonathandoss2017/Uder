@@ -10,6 +10,7 @@ import stylesTable from "@public/styles/modules/table/table.tipoequipos.module.c
 import {ModalInstance} from "@/app/hooks/modals/ModalProvider";
 import EditTipoEquipoForm from "@/app/(pages)/(whiteBackground)/tiposEquipos/(lista)/formEdit";
 import {ModalButtonsType} from "@/components/ModalFC";
+import {useToken} from "@/app/hooks/TokenProvider";
 
 /**
  *  Propiedades del componente TableTiposEquiposFC
@@ -39,6 +40,9 @@ interface TableSearchTermsProps{
 }
 
 function TableTiposEquiposFC(props: Readonly<TableTiposEquipoFCProps>): ReactElement{
+
+    // Obtenemos el token de sesión del cliente
+    const {sessionAPIToken } = useToken();
 
     // ----------------------- Modales -----------------------
 
@@ -86,10 +90,13 @@ function TableTiposEquiposFC(props: Readonly<TableTiposEquipoFCProps>): ReactEle
     // Efecto que se ejecuta al montar el componente y cuando cambian los términos de búsqueda.
     // Actualiza la lista de tipos de equipo según los términos de búsqueda.
     useEffect((): void => {
+
+        if(!sessionAPIToken) return;
+
         // Procedimiento asíncrono auto-ejecutable para ejecutar código asíncrono
         (async (): Promise<void> => {
             // Obtiene la lista de equipos de la API
-            const response: TipoEquipoDTO[] | FetchAPIError = await listarTiposEquipo(props.sessionAPIToken, appliedSearchTerms.filter);
+            const response: TipoEquipoDTO[] | FetchAPIError = await listarTiposEquipo(sessionAPIToken, appliedSearchTerms.filter);
 
             // Si ocurre un error en la solicitud, muestra un mensaje de error en la consola y no hace nada
             if (isFetchAPIError(response)) {
@@ -153,6 +160,9 @@ function TableTiposEquiposFC(props: Readonly<TableTiposEquipoFCProps>): ReactEle
 
     // Procedimiento que se ejecuta al hacer clic en el botón 'Eliminar'
     const handleEliminarClick = (tipoEquipoSelected: TipoEquipoDTO): void => {
+
+        if(!sessionAPIToken) return;
+
         if (!tipoEquipoSelected.activo) { // Si el tipo de equipo está inactivo, entonces se reactiva
             if (!props.hasPermissionReactivar) { // Verifica si el usuario tiene permiso para reactivar
                 createModal({
@@ -176,7 +186,7 @@ function TableTiposEquiposFC(props: Readonly<TableTiposEquipoFCProps>): ReactEle
                 buttonsType: ModalButtonsType.CONFIRM_CANCEL,
                 async onConfirm(): Promise<void> { // Acción al confirmar
                     // Realiza la reactivación del tipo de equipo en la API
-                    const response: void | FetchAPIError = await reactivarTipoEquipo(tipoEquipoSelected.id as number, props.sessionAPIToken);
+                    const response: void | FetchAPIError = await reactivarTipoEquipo(tipoEquipoSelected.id as number, sessionAPIToken);
                     if (isFetchAPIError(response)) {
                         // Si ocurre un error en la solicitud, muestra un mensaje de error
                         const errorMessage: string = response.errorMessage;
@@ -237,7 +247,7 @@ function TableTiposEquiposFC(props: Readonly<TableTiposEquipoFCProps>): ReactEle
                 buttonsType: ModalButtonsType.CONFIRM_CANCEL,
                 async onConfirm(): Promise<void> { // Acción al confirmar
                     // Realiza la baja del tipo de equipo en la API
-                    const response: void | FetchAPIError = await darBajaTipoEquipo(tipoEquipoSelected.id as number, props.sessionAPIToken);
+                    const response: void | FetchAPIError = await darBajaTipoEquipo(tipoEquipoSelected.id as number, sessionAPIToken);
                     if (isFetchAPIError(response)) {
                         // Si ocurre un error en la solicitud, muestra un mensaje de error
                         const errorMessage: string = response.errorMessage;

@@ -3,6 +3,7 @@
 import {SessionProvider} from "next-auth/react"; // Importa el proveedor de sesión de NextAuth.js
 import {ReactNode} from "react";
 import {ModalProvider} from "@/app/hooks/modals/ModalProvider";
+import { TokenProvider } from '@/app/hooks/TokenProvider';
 
 /**
  * Define el componente ProvidersLayout
@@ -14,9 +15,11 @@ function ProvidersLayout({children}: Readonly<{ children: ReactNode }>) {
     return (
         // Envuelve los children en el SessionProvider para proporcionar el contexto de sesión a toda la aplicación
         <SessionProvider>
+            <TokenProvider>
             <ModalProvider>
                 {children}
             </ModalProvider>
+            </TokenProvider>
         </SessionProvider>
     );
 }

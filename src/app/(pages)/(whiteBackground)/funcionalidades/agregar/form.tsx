@@ -11,6 +11,7 @@ import {ModalButtonsType} from "@/components/ModalFC";
 import React from "react";
 import styles from "@public/styles/modules/register.tiposequipo.module.css";
 import {agregarFuncionalidad} from "@/services/FuncionalidadService";
+import {useToken} from "@/app/hooks/TokenProvider";
 
 /**
  * Propiedades del componente
@@ -35,6 +36,8 @@ interface FormValues extends FuncionalidadDTO{
 
 const RegisterFuncionalidadForm : React.FC<RegisterFuncionalidadFormProps> = (props: RegisterFuncionalidadFormProps) => {
 
+    const {sessionAPIToken } = useToken();
+
     // ----------------------- Modales -----------------------
     const {createModal} = useModal();
 
@@ -55,12 +58,14 @@ const RegisterFuncionalidadForm : React.FC<RegisterFuncionalidadFormProps> = (pr
     // Función que se ejecuta al enviar el formulario
     const onSubmit: SubmitHandler<FormValues> = async (formValues: FormValues): Promise<void> => {
 
+        if(sessionAPIToken == null) return;
+
         const nuevaFuncionalidad: FuncionalidadDTO = {
             nombre: formValues.nombre,
             idInstitucion: props.clientData.idInstitucion
         }
 
-        const response: FuncionalidadDTO | FetchAPIError = await agregarFuncionalidad(nuevaFuncionalidad,props.sessionAPIToken);
+        const response: FuncionalidadDTO | FetchAPIError = await agregarFuncionalidad(nuevaFuncionalidad,sessionAPIToken);
 
         //Si ocurre un error al registrar el tipo de equipo se muestra un mensaje de error
         if (isFetchAPIError(response)){

@@ -10,6 +10,7 @@ import ModalChangesFC from "@/components/ModalChangesFC";
 import FetchAPIError, {isFetchAPIError} from "@/types/errors/FetchAPIError";
 import {modificarModelo} from "@/services/ModeloService";
 import styles from "@public/styles/modules/table/table.editformequipo.module.css";
+import {useToken} from "@/app/hooks/TokenProvider";
 
 
 interface EditModeloFormProps {
@@ -21,6 +22,9 @@ interface EditModeloFormProps {
 }
 
 function EditModeloForm(props: Readonly<EditModeloFormProps>): ReactElement {
+
+    // Obtiene el token de sesión del cliente
+    const {sessionAPIToken } = useToken();
 
     // ----------------------- Modales -----------------------
 
@@ -39,6 +43,8 @@ function EditModeloForm(props: Readonly<EditModeloFormProps>): ReactElement {
 
     // Procedimiento que se ejecuta al hacer clic en el botón 'Guardar'
     const onSubmit: SubmitHandler<ModeloDTO> = async (formValues: ModeloDTO): Promise<void> => {
+
+        if(sessionAPIToken == null) return;
 
         const modifiedModelo: ModeloDTO = {
             ...props.editingModelo, // Copia los valores originales del modelo
@@ -68,7 +74,7 @@ function EditModeloForm(props: Readonly<EditModeloFormProps>): ReactElement {
             buttonsType: ModalButtonsType.CONFIRM_CANCEL,
             async onConfirm(): Promise<void> {
                 // Realiza la modificación de modelo en la API
-                const response: void | FetchAPIError = await modificarModelo(modifiedModelo, props.sessionAPIToken);
+                const response: void | FetchAPIError = await modificarModelo(modifiedModelo, sessionAPIToken);
 
                 if (isFetchAPIError(response)) {
                     createModal({

@@ -10,6 +10,7 @@ import {ModalButtonsType} from "@/components/ModalFC";
 import FetchAPIError, {isFetchAPIError} from "@/types/errors/FetchAPIError";
 import ModalChangesFC from "@/components/ModalChangesFC";
 import {modificarPerfil} from "@/services/PerfilService";
+import {useToken} from "@/app/hooks/TokenProvider";
 
 interface EditPerfilFormProps {
     sessionAPIToken: string;
@@ -20,6 +21,8 @@ interface EditPerfilFormProps {
 }
 
 function EditPerfilForm(props: Readonly<EditPerfilFormProps>): ReactElement {
+
+    const {sessionAPIToken } = useToken();
 
     const {createModal} = useModal();
 
@@ -34,6 +37,8 @@ function EditPerfilForm(props: Readonly<EditPerfilFormProps>): ReactElement {
     });
 
     const onSubmit: SubmitHandler<PerfilDTO> = async (formValues: PerfilDTO): Promise<void> => {
+
+        if(sessionAPIToken == null)return;
 
         const modifiedPerfil: PerfilDTO = {
             ...props.editingPerfil,
@@ -59,7 +64,7 @@ function EditPerfilForm(props: Readonly<EditPerfilFormProps>): ReactElement {
             title: `Modificando perfil "${props.editingPerfil.nombre}"`,
             children: ModalChangesFC(changes),
             async onConfirm(): Promise<void> {
-                const response: void | FetchAPIError = await modificarPerfil(modifiedPerfil, props.sessionAPIToken);
+                const response: void | FetchAPIError = await modificarPerfil(modifiedPerfil, sessionAPIToken);
 
                 if (isFetchAPIError(response)) {
                     createModal({

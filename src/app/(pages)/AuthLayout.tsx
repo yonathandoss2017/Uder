@@ -11,6 +11,7 @@ import {renovarToken} from "@/services/SessionService";
 import {useModal} from "@/app/hooks/modals/useModal";
 import {useIdleTimer} from "react-idle-timer";
 import {usePathname} from "next/navigation";
+import {useToken} from "@/app/hooks/TokenProvider";
 
 // Define el componente layout de autenticación
 function AuthLayout({children}: Readonly<{ children: ReactNode }>) {
@@ -20,6 +21,7 @@ function AuthLayout({children}: Readonly<{ children: ReactNode }>) {
     const RENEW_TOKEN = 60000;
     const SESSION_IDLE_TIME = 30000;
     const [hayToken, setHayToken] = useState<boolean>(false);
+    const { setSessionAPIToken } = useToken();
     let expiresTimeTimestampRef = session?.user.expires
 
     const pathname = usePathname();
@@ -84,6 +86,7 @@ function AuthLayout({children}: Readonly<{ children: ReactNode }>) {
                     document.cookie = `sessionToken=${response};path=/;max-age=300;samesite=strict;secure`;
                     session.user.sessionAPIToken = response;
                     setSessionModalActive(false);
+                    setSessionAPIToken(response);
                 }
             }
         },
@@ -127,7 +130,7 @@ function AuthLayout({children}: Readonly<{ children: ReactNode }>) {
                             }
                             document.cookie = `sessionToken=${response};path=/;max-age=300;samesite=strict;secure`;
                             session.user.sessionAPIToken = response;
-
+                            setSessionAPIToken(response);
                         }
                     } else if (isIdle() && timeRemaining < RENEW_TOKEN) {
                         if (!sessionModalActive) {
@@ -136,6 +139,13 @@ function AuthLayout({children}: Readonly<{ children: ReactNode }>) {
                             console.log("modal ", sessionModalActive)
                             console.log("entre a idle")
                             sessionModal.show();
+                        }
+                    }
+
+                    if(timeRemaining<=0){
+                        console.log("entre a time remaining < 0")
+                        if(pathname != "/login" && pathname != "/login/google" && pathname != "/signup" && pathname != "/signup/google") {
+                            signOut({redirect: true, callbackUrl: "/login"})
                         }
                     }
                 }

@@ -14,6 +14,7 @@ import { ModalButtonsType } from "@/components/ModalFC";
 import SchemaModelo from "@/validations/SchemaModelo"; // Validación del formulario
 import styles from "@public/styles/modules/register.tiposequipo.module.css";
 import ComboBoxFC from "@/components/ComboBoxFC";
+import {useToken} from "@/app/hooks/TokenProvider";
 
 interface RegisterModeloFormProps {
     sessionAPIToken: string;
@@ -23,6 +24,9 @@ interface RegisterModeloFormProps {
 interface FormValues extends ModeloDTO {}
 
 const RegisterModeloForm: React.FC<RegisterModeloFormProps> = (props: RegisterModeloFormProps) => {
+
+    const {sessionAPIToken } = useToken();
+
     const { createModal } = useModal();
 
     const {
@@ -45,17 +49,23 @@ const RegisterModeloForm: React.FC<RegisterModeloFormProps> = (props: RegisterMo
 
     // Cargar las marcas al montar el componente
     useEffect(() => {
+
+        if(sessionAPIToken == null) return;
+
         (async (): Promise<void> => {
 
             // ------------------- Cargar marcas -------------------
-            setMarcas(await listarMarcas(props.sessionAPIToken).then((response: MarcaDTO[] | FetchAPIError): MarcaDTO[] => {
+            setMarcas(await listarMarcas(sessionAPIToken).then((response: MarcaDTO[] | FetchAPIError): MarcaDTO[] => {
                 if (isFetchAPIError(response)) return [];
                 return response;
             }));
         })();
-    }, [props.sessionAPIToken]);
+    }, [props.sessionAPIToken, sessionAPIToken]);
 
     const onSubmit: SubmitHandler<FormValues> = async (formValues: FormValues): Promise<void> => {
+
+        if(sessionAPIToken == null) return;
+
         if (!selectedMarcaId) {
             // Mostrar error si no se selecciona una marca
             createModal({
@@ -76,7 +86,7 @@ const RegisterModeloForm: React.FC<RegisterModeloFormProps> = (props: RegisterMo
             idMarca: selectedMarcaId,
         };
 
-        const response: ModeloDTO | FetchAPIError = await agregarModelo(nuevoModel, props.sessionAPIToken);
+        const response: ModeloDTO | FetchAPIError = await agregarModelo(nuevoModel, sessionAPIToken);
 
         if (isFetchAPIError(response)) {
             createModal({

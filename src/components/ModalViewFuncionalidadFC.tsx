@@ -6,19 +6,25 @@ import {obtenerPermisosFuncionalidad} from "@/services/FuncionalidadService";
 import styles from "@public/styles/modules/modal.view.funcionalidad.module.css";
 import LoadingPage from "@/app/(pages)/loading";
 import stylesTable from "@public/styles/modules/table/table.tipoequipos.module.css";
+import {useToken} from "@/app/hooks/TokenProvider";
 
 interface ModalViewFuncionalidadFC{
     funcionalidad: FuncionalidadDTO;
-    sessionAPIToken: string;
 }
 
-const ModalViewFuncionalidadFC = ({funcionalidad, sessionAPIToken}: ModalViewFuncionalidadFC): ReactElement => {
+const ModalViewFuncionalidadFC = ({funcionalidad}: ModalViewFuncionalidadFC): ReactElement => {
+
+    // Obtenemos el token de sesión del cliente
+    const {sessionAPIToken } = useToken();
 
     const [permisos, setPermisos] = useState<string[]>([]);
     //Bandera de cargando
     const [loaded, setLoaded]: [boolean,(value: boolean) => void] = useState<boolean>(false);
 
     useEffect(() => {
+
+        if(!sessionAPIToken) return;
+
         (async (): Promise<void> => {
             const response: string[] | FetchAPIError = await obtenerPermisosFuncionalidad(funcionalidad, sessionAPIToken);
             if (isFetchAPIError(response)) {

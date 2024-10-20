@@ -10,7 +10,7 @@ import stylesTable from "@public/styles/modules/table/table.tipoequipos.module.c
 import { ModalInstance } from "@/app/hooks/modals/ModalProvider";
 import { ModalButtonsType } from "@/components/ModalFC";
 import EditModeloForm from "@/app/(pages)/(whiteBackground)/modelos/(lista)/formEdit";
-
+import {useToken} from "@/app/hooks/TokenProvider";
 
 /**
  *  Propiedades del componente TableModeloFC
@@ -35,6 +35,9 @@ interface TableSearchTermsProps {
 }
 
 function TableModeloFC(props: Readonly<TableModeloFCProps>): ReactElement {
+
+    // Obtenemos el token de sesión del cliente
+    const {sessionAPIToken } = useToken();
 
     // ----------------------- Modales -----------------------
     const { createModal } = useModal();
@@ -64,9 +67,12 @@ function TableModeloFC(props: Readonly<TableModeloFCProps>): ReactElement {
     const [modelos, setModelos] = useState<ModeloDTO[]>([]);
 
     useEffect((): void => {
+
+        if(!sessionAPIToken) return;
+
         (async (): Promise<void> => {
 
-            const response: ModeloDTO[] | FetchAPIError = await listarModelos(props.sessionAPIToken, appliedSearchTerms.filter);
+            const response: ModeloDTO[] | FetchAPIError = await listarModelos(sessionAPIToken, appliedSearchTerms.filter);
 
             if (isFetchAPIError(response)) {
                 const errorMessage: string = response.errorMessage;
@@ -120,6 +126,9 @@ function TableModeloFC(props: Readonly<TableModeloFCProps>): ReactElement {
 
     // Procedimiento que se ejecuta al hacer clic en el botón 'Eliminar'
     const handleEliminarClick = (modeloSelected: ModeloDTO): void => {
+
+        if(!sessionAPIToken) return;
+
         if (!modeloSelected.activo) { // Si el modelo está inactivo, se reactiva
             if (!props.hasPermissionReactivar) { // Verifica si el usuario tiene permiso para reactivar
                 createModal({
@@ -143,7 +152,7 @@ function TableModeloFC(props: Readonly<TableModeloFCProps>): ReactElement {
                 buttonsType: ModalButtonsType.CONFIRM_CANCEL,
                 async onConfirm(): Promise<void> { // Acción al confirmar
                     // Realiza la reactivación del modelo en la API
-                    const response: void | FetchAPIError = await reactivarModelo(modeloSelected.id as number, props.sessionAPIToken);
+                    const response: void | FetchAPIError = await reactivarModelo(modeloSelected.id as number, sessionAPIToken);
                     if (isFetchAPIError(response)) {
                         // Si ocurre un error en la solicitud, muestra un mensaje de error
                         const errorMessage: string = response.errorMessage;
@@ -204,7 +213,7 @@ function TableModeloFC(props: Readonly<TableModeloFCProps>): ReactElement {
                 buttonsType: ModalButtonsType.CONFIRM_CANCEL,
                 async onConfirm(): Promise<void> { // Acción al confirmar
                     // Realiza la baja del modelo en la API
-                    const response: void | FetchAPIError = await darBajaModelo(modeloSelected.id as number, props.sessionAPIToken);
+                    const response: void | FetchAPIError = await darBajaModelo(modeloSelected.id as number, sessionAPIToken);
                     if (isFetchAPIError(response)) {
                         // Si ocurre un error en la solicitud, muestra un mensaje de error
                         const errorMessage: string = response.errorMessage;

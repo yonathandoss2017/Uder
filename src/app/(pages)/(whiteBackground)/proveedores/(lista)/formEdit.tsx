@@ -13,6 +13,7 @@ import {modificarProveedor} from "@/services/ProveedorService";
 import ComboBoxFC from "@/components/ComboBoxFC";
 import PaisDTO from "@/types/dtos/PaisDTO";
 import {listarPaises} from "@/services/PaisService";
+import {useToken} from "@/app/hooks/TokenProvider";
 
 interface EditProveedorFormProps {
     sessionAPIToken: string;
@@ -28,6 +29,9 @@ interface EditProveedorFormProps {
  * @constructor
  */
 function EditProveedorForm(props: Readonly<EditProveedorFormProps>): ReactElement {
+
+    const {sessionAPIToken } = useToken();
+
     const { createModal } = useModal();
     const [paisesOrigen, setPaisesOrigen]: [PaisDTO[], (value: PaisDTO[]) => void] = useState<PaisDTO[]>([]);
     const [loaded, setLoaded]: [boolean, (value: boolean) => void] = useState<boolean>(false);
@@ -47,8 +51,11 @@ function EditProveedorForm(props: Readonly<EditProveedorFormProps>): ReactElemen
 
     // Carga inicial de países de origen
     useEffect(() => {
+
+        if(sessionAPIToken === null) return;
+
         (async (): Promise<void> => {
-            setPaisesOrigen(await listarPaises(props.sessionAPIToken).then((response: PaisDTO[] | FetchAPIError): PaisDTO[] => {
+            setPaisesOrigen(await listarPaises(sessionAPIToken).then((response: PaisDTO[] | FetchAPIError): PaisDTO[] => {
                 if (isFetchAPIError(response)) {
                     console.error("ERROR - Modificar Proveedor - listarPaises: ", response);
                     return [];
@@ -58,9 +65,12 @@ function EditProveedorForm(props: Readonly<EditProveedorFormProps>): ReactElemen
 
             setLoaded(true);
         })();
-    }, [props.editingProveedor]);
+    }, [props.editingProveedor, sessionAPIToken]);
 
     const onSubmit: SubmitHandler<ProveedorDTO> = async (formValues: ProveedorDTO): Promise<void> => {
+
+        if (sessionAPIToken==null) return;
+
         // Actualiza el proveedor con los valores del formulario
         const modifiedProveedor: ProveedorDTO = {
             ...props.editingProveedor,
@@ -87,7 +97,7 @@ function EditProveedorForm(props: Readonly<EditProveedorFormProps>): ReactElemen
             children: ModalChangesFC(changes),
             buttonsType: ModalButtonsType.CONFIRM_CANCEL,
             async onConfirm(): Promise<void> {
-                const response: void | FetchAPIError = await modificarProveedor(modifiedProveedor, props.sessionAPIToken);
+                const response: void | FetchAPIError = await modificarProveedor(modifiedProveedor, sessionAPIToken);
 
                 if (isFetchAPIError(response)) {
                     createModal({

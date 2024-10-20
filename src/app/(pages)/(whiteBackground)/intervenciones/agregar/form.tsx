@@ -10,6 +10,7 @@ import styles from "@public/styles/modules/register.tiposequipo.module.css";
 import LoadingPage from "@/app/(pages)/loading";
 import ComboBoxFC from "@/components/ComboBoxFC";
 import { isFetchAPIError } from "@/types/errors/FetchAPIError";
+import {useToken} from "@/app/hooks/TokenProvider";
 
 interface FormValues {
     fechaHora: string;
@@ -22,7 +23,10 @@ interface RegisterIntervencionFormProps {
     clientData: { id: number };
 }
 
-const RegisterIntervencionForm: React.FC<RegisterIntervencionFormProps> = ({ sessionAPIToken, clientData }) => {
+const RegisterIntervencionForm: React.FC<RegisterIntervencionFormProps> = (props: RegisterIntervencionFormProps) => {
+
+    const {sessionAPIToken } = useToken();
+
     const { createModal } = useModal();
     const { register, handleSubmit, formState: { errors }, reset } = useForm<FormValues>();
 
@@ -38,6 +42,9 @@ const RegisterIntervencionForm: React.FC<RegisterIntervencionFormProps> = ({ ses
     const equiposPorPagina = 5;
 
     useEffect(() => {
+
+        if(sessionAPIToken==null) return;
+
         (async (): Promise<void> => {
             const equiposResponse = await listarEquipos(sessionAPIToken);
             if (isFetchAPIError(equiposResponse)) {
@@ -64,6 +71,9 @@ const RegisterIntervencionForm: React.FC<RegisterIntervencionFormProps> = ({ ses
     }, [sessionAPIToken, createModal]);
 
     const onSubmit: SubmitHandler<FormValues> = async (formValues: FormValues) => {
+
+        if(sessionAPIToken==null)return;
+
         if (!selectedEquipoId || !selectedTipoIntervencionId) {
             createModal({
                 children: (
@@ -83,7 +93,7 @@ const RegisterIntervencionForm: React.FC<RegisterIntervencionFormProps> = ({ ses
             comentarios: formValues.comentarios,
             idEquipo: selectedEquipoId,
             idTipoIntervencion: selectedTipoIntervencionId,
-            idUsuario: clientData.id
+            idUsuario: props.clientData.id
         };
 
         const response = await agregarIntervencion(nuevaIntervencion, sessionAPIToken);
