@@ -35,6 +35,10 @@ import ImagenDTO from "@/types/dtos/ImagenDTO";
 import {agregarImagen} from "@/services/ImagenService";
 import {useModal} from "@/app/hooks/modals/useModal";
 import {ModalButtonsType} from "@/components/ModalFC";
+import MarcaFilter from "@/types/filters/MarcaFilter";
+import ModeloFilter from "@/types/filters/ModeloFilter";
+import TipoEquipoFilter from "@/types/filters/TipoEquipoFilter";
+import ProveedorFilter from "@/types/filters/ProveedorFilter";
 
 /**
  * Propiedades del componente
@@ -110,28 +114,32 @@ const RegisterEquipoForm: React.FC<RegisterEquipoFormProps> = (props: RegisterEq
         (async (): Promise<void> => {
 
             // ------------------- Cargar marcas -------------------
-
+            const filtroMarca:MarcaFilter = {}
+            filtroMarca.activo = true;
             setMarcas(await listarMarcas(props.sessionAPIToken).then((response: MarcaDTO[] | FetchAPIError): MarcaDTO[] => {
                 if (isFetchAPIError(response)) return [];
                 return response;
             }));
 
             // ------------------- Cargar modelos -------------------
-
+            const filtroModelo: ModeloFilter = {};
+            filtroModelo.activo = true;
             setModelos(await listarModelos(props.sessionAPIToken).then((response: ModeloDTO[] | FetchAPIError): ModeloDTO[] => {
                 if (isFetchAPIError(response)) return [];
                 return response;
             }));
 
             // ------------------- Cargar tipos de equipo -------------------
-
+            const filtroTipoEquipo: TipoEquipoFilter = {};
+            filtroTipoEquipo.activo = true;
             setTiposEquipo(await listarTiposEquipo(props.sessionAPIToken).then((response: TipoEquipoDTO[] | FetchAPIError): TipoEquipoDTO[] => {
                 if (isFetchAPIError(response)) return [];
                 return response;
             }));
 
             // ------------------- Cargar proveedores -------------------
-
+            const filtroProveedores: ProveedorFilter = {}
+            filtroProveedores.activo = true;
             setProveedores(await listarProveedores(props.sessionAPIToken).then((response: ProveedorDTO[] | FetchAPIError): ProveedorDTO[] => {
                 if (isFetchAPIError(response)) return [];
                 return response;

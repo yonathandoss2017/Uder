@@ -113,6 +113,7 @@ const authOptions: NextAuthOptions = {
                 }else {
                     console.log("ESTOY EN EL JWT ", cookies().get('sessionToken')?.value)
                     token.user.sessionAPIToken = cookies().get('sessionToken')?.value;
+                    token.user.exp = Date.now() + 300000;
 
                     const response = await buscarClientePorToken(cookies().get('sessionToken')!!.value);
                     if (isFetchAPIError(response)) {
@@ -150,6 +151,7 @@ const authOptions: NextAuthOptions = {
                         {
                             session.user.data = token.user.data;
                             session.user.sessionAPIToken = cookies().get('sessionToken')?.value;
+                            session.user.expires = token.user.exp
                             console.log(session.expires, "Expiracion del session auth")
                         }
                     }

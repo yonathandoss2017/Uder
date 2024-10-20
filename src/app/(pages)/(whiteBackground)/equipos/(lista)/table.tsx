@@ -31,6 +31,7 @@ import {listarUbicaciones} from "@/services/UbicacionService";
 import LoadingPage from "@/app/(pages)/loading";
 import ModeloFilter from "@/types/filters/ModeloFilter";
 import {renovarToken} from "@/services/SessionService";
+import {useSession} from "next-auth/react";
 
 /**
  * Propiedades del componente Table
@@ -66,6 +67,13 @@ interface TableSearchTermsProps {
  */
 function TableEquiposFC(props: Readonly<TableEquiposFCProps>): ReactElement {
 
+    const session = useSession();
+    var sessionApiToken = props.sessionAPIToken;
+
+    useEffect(() => {
+       sessionApiToken = session.data?.user.sessionAPIToken as string;
+    }, [session.data?.user.sessionAPIToken]);
+
     // ----------------------- Modales -----------------------
 
     const {createModal} = useModal();
@@ -99,13 +107,14 @@ function TableEquiposFC(props: Readonly<TableEquiposFCProps>): ReactElement {
     // Define el estado de las ubicaciones existentes para mostrar en la tabla
     const ubicaciones: MutableRefObject<UbicacionDTO[]> = useRef<UbicacionDTO[]>([]);
 
+
     // Efecto que se ejecuta al montar el componente (Carga los combobox de filtros)
     useEffect((): void => {
 
         // Procedimiento asíncrono auto-ejecutable que actualiza la lista de tipos de equipo y la lista de equipos
         (async (): Promise<void> => {
             // Consulta los tipos de equipo y ejecuta un procedimiento con la respuesta
-            await listarTiposEquipo(props.sessionAPIToken).then((response: TipoEquipoDTO[] | FetchAPIError): void => {
+            await listarTiposEquipo(sessionApiToken).then((response: TipoEquipoDTO[] | FetchAPIError): void => {
                 if (isFetchAPIError(response)) {
                     console.error("ERROR - lista de equipos - table.tsx - listarTiposEquipo", response.errorMessage);
                     return;
