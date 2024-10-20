@@ -34,6 +34,10 @@ import ModalChangesFC from "@/components/ModalChangesFC";
 import {modificarEquipo} from "@/services/EquiposService";
 import {imageToBase64} from "@/utils/Utils";
 import styles from "@public/styles/modules/table/table.editformequipo.module.css";
+import MarcaFilter from "@/types/filters/MarcaFilter";
+import ModeloFilter from "@/types/filters/ModeloFilter";
+import TipoEquipoFilter from "@/types/filters/TipoEquipoFilter";
+import ProveedorFilter from "@/types/filters/ProveedorFilter";
 
 /**
  * Propiedades del componente
@@ -154,7 +158,9 @@ function EditEquipoForm(props: Readonly<EditEquipoFormProps>): ReactElement {
 
             // ------------------- Cargar marcas -------------------
 
-            setMarcas(await listarMarcas(props.sessionAPIToken).then((response: MarcaDTO[] | FetchAPIError): MarcaDTO[] => {
+            const filtroMarca:MarcaFilter = {}
+            filtroMarca.activo = true;
+            setMarcas(await listarMarcas(props.sessionAPIToken, filtroMarca).then((response: MarcaDTO[] | FetchAPIError): MarcaDTO[] => {
                 if (isFetchAPIError(response)) {
                     console.error("ERROR - Modificar Equipo - listarMarcas: ", response);
                     return [];
@@ -163,23 +169,28 @@ function EditEquipoForm(props: Readonly<EditEquipoFormProps>): ReactElement {
             }));
 
             // ------------------- Cargar modelos -------------------
-
-            setModelos(await listarModelos(props.sessionAPIToken).then((response: ModeloDTO[] | FetchAPIError): ModeloDTO[] => {
+            const filtroModelo: ModeloFilter = {};
+            filtroModelo.activo = true;
+            setModelos(await listarModelos(props.sessionAPIToken, filtroModelo).then((response: ModeloDTO[] | FetchAPIError): ModeloDTO[] => {
                 if (isFetchAPIError(response)) {
                     console.error("ERROR - Modificar Equipo - listarModelos: ", response);
                     return [];
                 }
 
                 if (props.editingEquipo.idModelo) {
-                    setSelectedMarcaId(response.filter((modelo: ModeloDTO): boolean => modelo.id === props.editingEquipo.idModelo)[0].idMarca);
+                    const modelo = response.find((modelo: ModeloDTO): boolean => modelo.id === Number(props.editingEquipo.idModelo));
+                    if(modelo != undefined) {
+                        setSelectedMarcaId(modelo.idMarca);
+                    }
                 }
 
                 return response;
             }));
 
             // ------------------- Cargar tipos de equipo -------------------
-
-            setTiposEquipo(await listarTiposEquipo(props.sessionAPIToken).then((response: TipoEquipoDTO[] | FetchAPIError): TipoEquipoDTO[] => {
+            const filtroTipoEquipo: TipoEquipoFilter = {};
+            filtroTipoEquipo.activo = true;
+            setTiposEquipo(await listarTiposEquipo(props.sessionAPIToken, filtroTipoEquipo).then((response: TipoEquipoDTO[] | FetchAPIError): TipoEquipoDTO[] => {
                 if (isFetchAPIError(response)) {
                     console.error("ERROR - Modificar Equipo - listarTiposEquipo: ", response);
                     return [];
@@ -188,8 +199,9 @@ function EditEquipoForm(props: Readonly<EditEquipoFormProps>): ReactElement {
             }));
 
             // ------------------- Cargar proveedores -------------------
-
-            setProveedores(await listarProveedores(props.sessionAPIToken).then((response: ProveedorDTO[] | FetchAPIError): ProveedorDTO[] => {
+            const filtroProveedores: ProveedorFilter = {}
+            filtroProveedores.activo = true;
+            setProveedores(await listarProveedores(props.sessionAPIToken, filtroProveedores).then((response: ProveedorDTO[] | FetchAPIError): ProveedorDTO[] => {
                 if (isFetchAPIError(response)) {
                     console.error("ERROR - Modificar Equipo - listarProveedores: ", response);
                     return [];
