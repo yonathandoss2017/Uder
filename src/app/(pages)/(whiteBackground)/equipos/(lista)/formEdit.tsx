@@ -713,24 +713,33 @@ async function obtenerCambios(editingEquipo: EquipoDTO,
     }
     // Verifica si hay cambios en el modelo del equipo
     if (editingEquipo.idModelo != originalData.idModelo) {
-        const previousModelo: ModeloDTO = modelos.filter((modelo: ModeloDTO): boolean => modelo.id === originalData.idModelo)[0];
-        const nextModelo: ModeloDTO = modelos.filter((modelo: ModeloDTO): boolean => modelo.id === editingEquipo.idModelo)[0];
+        console.log("editing equipo", editingEquipo)
+        console.log("id modelo editing equipo", editingEquipo.idModelo)
+        console.log("modelos",modelos)
+        const previousModelo: ModeloDTO | undefined = modelos.find((modelo: ModeloDTO): boolean => modelo.id === Number(originalData.idModelo));
+        const nextModelo: ModeloDTO | undefined = modelos.find((modelo: ModeloDTO): boolean => modelo.id === Number(editingEquipo.idModelo));
 
-        changes.push({
-            field: "Modelo",
-            previousValue: previousModelo.nombre,
-            nextValue: nextModelo.nombre
-        });
+        console.log("previousModelo", previousModelo);
+        console.log("nextModelo", nextModelo);
 
-
-        // Verifica si hay cambios en la marca del equipo
-        if (modelos[editingEquipo.idModelo].idMarca != modelos[originalData.idModelo].idMarca) {
+        if(previousModelo && nextModelo) {
             changes.push({
-                field: "Marca",
-                previousValue: marcas.filter((marca: MarcaDTO): boolean => marca.id === previousModelo.idMarca)[0].nombre,
-                nextValue: marcas.filter((marca: MarcaDTO): boolean => marca.id === nextModelo.idMarca)[0].nombre
+                field: "Modelo",
+                previousValue: previousModelo.nombre,
+                nextValue: nextModelo.nombre
             });
+
+            if (previousModelo.idMarca !== nextModelo.idMarca) {
+                changes.push({
+                    field: "Marca",
+                    previousValue: marcas.find((marca: MarcaDTO) => marca.id === previousModelo.idMarca)?.nombre,
+                    nextValue: marcas.find((marca: MarcaDTO) => marca.id === nextModelo.idMarca)?.nombre
+                });
+            }
+        } else {
+            console.error("No se pudo encontrar el modelo previo o el siguiente.");
         }
+
     }
 
     // Verifica si hay cambios en el número de serie

@@ -50,6 +50,8 @@ export async function listarUsuarios(
         ...(!!filter.perfil && {filter_perfil: filter.perfil})
     });
 
+    console.log("TOKEN", token)
+
     // URL de la petición a la API
     const url: string = `${SERVICE_PATH}/listar?${queryParams}`; // queryParams =  ?size=10&page=1&fieldSort=id&sortDirectionAsc=true&filter_id=1&filter_nombre=nombre
 
@@ -136,6 +138,7 @@ export async function registrarUsuario(usuario: UsuarioDTO, password: string, ph
  * @returns Promise<FetchAPIError> - Si ocurre un error en la solicitud o en el procesamiento de la respuesta.
  */
 export async function modificarUsuario(usuario: UsuarioDTO, token: string): Promise<void | FetchAPIError> {
+
     const url: string = `${SERVICE_PATH}/modificar`; // URL de la petición a la API
 
     // Opciones de la petición
