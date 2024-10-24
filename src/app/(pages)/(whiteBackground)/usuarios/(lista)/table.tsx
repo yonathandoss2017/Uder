@@ -310,8 +310,7 @@ function TableUsersFC(props: Readonly<TableUsersFCProps>): ReactElement {
     function handleVerClick(user: UsuarioDTO): void {
         if (!props.hasPermissionObtenerUsuarios) return; //Si el cliente no tiene permisos para ver, no hace nada
         createModal({
-            children: <ModalViewUserFC user={user} idAdministrador={idAdministrador}
-                                       sessionAPIToken={props.sessionAPIToken}/> // Renderiza el componente como JSX
+            children: <ModalViewUserFC user={user} idAdministrador={idAdministrador}/> // Renderiza el componente como JSX
             , buttonsType: ModalButtonsType.CLOSE // Botón de cerrar
         }).show();
     }
