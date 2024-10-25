@@ -5,8 +5,7 @@ import PerfilDTO from "@/types/dtos/PerfilDTO";
 import { useModal } from "@/app/hooks/modals/useModal";
 import { SubmitHandler, useForm, UseFormReturn } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import styles from "@public/styles/modules/register.tiposequipo.module.css";
-import stylesTable from "@public/styles/modules/table/table.tipoequipos.module.css";
+import styles from "@public/styles/modules/register.perfiles.module.css"
 import SchemaPerfil from "@/validations/SchemaPerfil";
 import FetchAPIError, { isFetchAPIError } from "@/types/errors/FetchAPIError";
 import { agregarPerfil, listarPerfiles } from "@/services/PerfilService";
@@ -157,8 +156,8 @@ const RegisterPerfilForm: React.FC<RegisterPerfilFormProps> = (props: RegisterPe
             </form>
 
             {/* Listado */}
-            <div className={stylesTable.containerTable}>
-                <div className={stylesTable.scroll}>
+            <div className={styles.containerTable}>
+                <div className={styles.scroll}>
                     {perfiles.length > 0 ? (
                         <table style={{ width: "100%" }}>
                             <thead>
