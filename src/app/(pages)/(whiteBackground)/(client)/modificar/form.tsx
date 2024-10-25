@@ -146,48 +146,49 @@ function FormEditUser(props: Readonly<EditUserFormProps>): ReactElement {
                     return;
                 }
 
-                // Verifica que la nueva contraseña cumpla con las validaciones del esquema de Zod (SchemaUserPassword)
-                try {
-                    !schemaUserPassword.parse({contrasenia: nuevaContrasenia});
-                } catch (err) { // Sí hay un error entonces la validación falló
-                    if (err instanceof z.ZodError) { // Si el error es de tipo ZodError (Error de validación de Zod)
-                        // Muestra un mensaje con los errores de validación
-                        createModal({
-                            children: (
-                                <div>
-                                    <h3>Error al modificar los datos</h3>
-                                    <p>La nueva contraseña no cumple con los requisitos mínimos.</p>
-                                    <br/>
-                                    <p>Errores:</p>
-                                    <ul>
-                                        {err.issues.map((issue: z.ZodIssue, index: number) => (
-                                            <li key={index + 1}>{issue.message}</li>
-                                        ))}
-                                    </ul>
-                                </div>
-                            ),
-                            buttonsType: ModalButtonsType.CONFIRM
-                        }).show();
+                if (nuevaContrasenia.length>0) {
+                    // Verifica que la nueva contraseña cumpla con las validaciones del esquema de Zod (SchemaUserPassword)
+                    try {
+                        !schemaUserPassword.parse({contrasenia: nuevaContrasenia});
+                    } catch (err) { // Sí hay un error entonces la validación falló
+                        if (err instanceof z.ZodError) { // Si el error es de tipo ZodError (Error de validación de Zod)
+                            // Muestra un mensaje con los errores de validación
+                            createModal({
+                                children: (
+                                    <div>
+                                        <h3>Error al modificar los datos</h3>
+                                        <p>La nueva contraseña no cumple con los requisitos mínimos.</p>
+                                        <br/>
+                                        <p>Errores:</p>
+                                        <ul>
+                                            {err.issues.map((issue: z.ZodIssue, index: number) => (
+                                                <li key={index + 1}>{issue.message}</li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                ),
+                                buttonsType: ModalButtonsType.CONFIRM
+                            }).show();
+                        }
+                        return; // Retorna sin hacer nada
                     }
-                    return; // Retorna sin hacer nada
+
+                    // Cambia la contraseña del usuario
+                    await cambiarContrasenia(contrasenia, nuevaContrasenia, sessionAPIToken).then((response: void | FetchAPIError): void => {
+                        if (isFetchAPIError(response)) {
+                            // Si hay un error al cambiar la contraseña, muestra un mensaje y retorna
+                            createModal({
+                                children: (
+                                    <div>
+                                        <h3>Error al cambiar la contraseña</h3>
+                                        <p>{response.errorMessage}</p>
+                                    </div>
+                                ),
+                                buttonsType: ModalButtonsType.CONFIRM
+                            }).show();
+                        }
+                    });
                 }
-
-                // Cambia la contraseña del usuario
-                await cambiarContrasenia(contrasenia, nuevaContrasenia, sessionAPIToken).then((response: void | FetchAPIError): void => {
-                    if (isFetchAPIError(response)) {
-                        // Si hay un error al cambiar la contraseña, muestra un mensaje y retorna
-                        createModal({
-                            children: (
-                                <div>
-                                    <h3>Error al cambiar la contraseña</h3>
-                                    <p>{response.errorMessage}</p>
-                                </div>
-                            ),
-                            buttonsType: ModalButtonsType.CONFIRM
-                        }).show();
-                    }
-                });
-
                 // Modifica los datos del usuario
                 await modificarCliente(clientData, sessionAPIToken).then((response: void | FetchAPIError): void => {
                     if (isFetchAPIError(response)) {
@@ -337,7 +338,7 @@ function FormEditUser(props: Readonly<EditUserFormProps>): ReactElement {
                     />
                 </div>
                 <div className="input-box-mp">
-                    <label className="details">Nueva Contraseña <span className="required-field">*</span></label>
+                    <label className="details">Nueva Contraseña <span className="required-field"></span></label>
                     <input id={"nuevaContrasenia"} type="password" placeholder="Contraseña"
                            className="contrasenia"
                            onChange={(event: ChangeEvent<HTMLInputElement>) => setNuevaContrasenia(event.target.value)}
@@ -404,11 +405,11 @@ async function obtenerCambios(editingUser: UsuarioDTO, originalData: UsuarioDTO,
         });
     }
 
-    if (editingUser.segundoNombre != originalData.segundoNombre) {
+    if (originalData.segundoNombre !== editingUser.segundoNombre && (originalData.segundoNombre || editingUser.segundoNombre)) {
         changes.push({
             field: "Segundo nombre",
-            previousValue: originalData.segundoNombre,
-            nextValue: editingUser.segundoNombre
+            previousValue: originalData.segundoNombre || "",
+            nextValue: editingUser.segundoNombre || ""
         });
     }
 
@@ -420,11 +421,11 @@ async function obtenerCambios(editingUser: UsuarioDTO, originalData: UsuarioDTO,
         });
     }
 
-    if (originalData.segundoApellido != editingUser.segundoApellido) {
+    if (originalData.segundoApellido !== editingUser.segundoApellido && (originalData.segundoApellido || editingUser.segundoApellido)) {
         changes.push({
             field: "Segundo apellido",
-            previousValue: originalData.segundoApellido,
-            nextValue: editingUser.segundoApellido
+            previousValue: originalData.segundoApellido || "",
+            nextValue: editingUser.segundoApellido || ""
         });
     }
 
