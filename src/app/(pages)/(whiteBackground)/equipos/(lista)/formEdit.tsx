@@ -165,9 +165,7 @@ function EditEquipoForm(props: Readonly<EditEquipoFormProps>): ReactElement {
             if (sessionAPIToken != null) {
                 // ------------------- Cargar marcas -------------------
 
-                const filtroMarca: MarcaFilter = {}
-                filtroMarca.activo = true;
-                setMarcas(await listarMarcas(sessionAPIToken, filtroMarca).then((response: MarcaDTO[] | FetchAPIError): MarcaDTO[] => {
+                setMarcas(await listarMarcas(sessionAPIToken, {activo: true}).then((response: MarcaDTO[] | FetchAPIError): MarcaDTO[] => {
                     if (isFetchAPIError(response)) {
                         console.error("ERROR - Modificar Equipo - listarMarcas: ", response);
                         return [];
@@ -176,9 +174,7 @@ function EditEquipoForm(props: Readonly<EditEquipoFormProps>): ReactElement {
                 }));
 
                 // ------------------- Cargar modelos -------------------
-                const filtroModelo: ModeloFilter = {};
-                filtroModelo.activo = true;
-                setModelos(await listarModelos(sessionAPIToken, filtroModelo).then((response: ModeloDTO[] | FetchAPIError): ModeloDTO[] => {
+                setModelos(await listarModelos(sessionAPIToken, {activo: true}).then((response: ModeloDTO[] | FetchAPIError): ModeloDTO[] => {
                     if (isFetchAPIError(response)) {
                         console.error("ERROR - Modificar Equipo - listarModelos: ", response);
                         return [];
@@ -195,9 +191,7 @@ function EditEquipoForm(props: Readonly<EditEquipoFormProps>): ReactElement {
                 }));
 
                 // ------------------- Cargar tipos de equipo -------------------
-                const filtroTipoEquipo: TipoEquipoFilter = {};
-                filtroTipoEquipo.activo = true;
-                setTiposEquipo(await listarTiposEquipo(sessionAPIToken, filtroTipoEquipo).then((response: TipoEquipoDTO[] | FetchAPIError): TipoEquipoDTO[] => {
+                setTiposEquipo(await listarTiposEquipo(sessionAPIToken, {activo: true}).then((response: TipoEquipoDTO[] | FetchAPIError): TipoEquipoDTO[] => {
                     if (isFetchAPIError(response)) {
                         console.error("ERROR - Modificar Equipo - listarTiposEquipo: ", response);
                         return [];
@@ -207,9 +201,7 @@ function EditEquipoForm(props: Readonly<EditEquipoFormProps>): ReactElement {
                 console.log("listado de equipos token", tiposEquipo)
 
                 // ------------------- Cargar proveedores -------------------
-                const filtroProveedores: ProveedorFilter = {}
-                filtroProveedores.activo = true;
-                setProveedores(await listarProveedores(sessionAPIToken, filtroProveedores).then((response: ProveedorDTO[] | FetchAPIError): ProveedorDTO[] => {
+                setProveedores(await listarProveedores(sessionAPIToken, {activo: true}).then((response: ProveedorDTO[] | FetchAPIError): ProveedorDTO[] => {
                     if (isFetchAPIError(response)) {
                         console.error("ERROR - Modificar Equipo - listarProveedores: ", response);
                         return [];
@@ -230,7 +222,7 @@ function EditEquipoForm(props: Readonly<EditEquipoFormProps>): ReactElement {
 
                 // ------------------- Cargar países de origen -------------------
 
-                setPaisesOrigen(await listarPaises(sessionAPIToken).then((response: PaisDTO[] | FetchAPIError): PaisDTO[] => {
+                setPaisesOrigen(await listarPaises(sessionAPIToken, {activo: true}).then((response: PaisDTO[] | FetchAPIError): PaisDTO[] => {
                     if (isFetchAPIError(response)) {
                         console.error("ERROR - Modificar Equipo - listarPaises: ", response);
                         return [];

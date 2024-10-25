@@ -1,16 +1,17 @@
 'use client'
-import React, { useEffect, useState } from "react";
-import { useForm, SubmitHandler } from "react-hook-form";
-import { agregarIntervencion } from "@/services/IntervencionService";
-import { listarEquipos } from "@/services/EquiposService";
-import { listarTiposIntervencion } from "@/services/TipoIntervencionService";
-import { useModal } from "@/app/hooks/modals/useModal";
-import { ModalButtonsType } from "@/components/ModalFC";
+import React, {useEffect, useState} from "react";
+import {SubmitHandler, useForm} from "react-hook-form";
+import {agregarIntervencion} from "@/services/IntervencionService";
+import {listarEquipos} from "@/services/EquiposService";
+import {listarTiposIntervencion} from "@/services/TipoIntervencionService";
+import {useModal} from "@/app/hooks/modals/useModal";
+import {ModalButtonsType} from "@/components/ModalFC";
 import styles from "@public/styles/modules/register.tiposequipo.module.css";
 import LoadingPage from "@/app/(pages)/loading";
 import ComboBoxFC from "@/components/ComboBoxFC";
-import { isFetchAPIError } from "@/types/errors/FetchAPIError";
+import {isFetchAPIError} from "@/types/errors/FetchAPIError";
 import {useToken} from "@/app/hooks/TokenProvider";
+import EquipoFieldSortEnum from "@/types/enums/EquipoFieldSortEnum";
 
 interface FormValues {
     fechaHora: string;
@@ -46,7 +47,7 @@ const RegisterIntervencionForm: React.FC<RegisterIntervencionFormProps> = (props
         if(sessionAPIToken==null) return;
 
         (async (): Promise<void> => {
-            const equiposResponse = await listarEquipos(sessionAPIToken);
+            const equiposResponse = await listarEquipos(sessionAPIToken, equiposPorPagina, 1,EquipoFieldSortEnum.NOMBRE, true, {activo: true});
             if (isFetchAPIError(equiposResponse)) {
                 createModal({
                     children: <div>Error al cargar los equipos: {equiposResponse.errorMessage}</div>,

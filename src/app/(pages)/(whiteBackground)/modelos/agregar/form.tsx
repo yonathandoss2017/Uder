@@ -55,7 +55,7 @@ const RegisterModeloForm: React.FC<RegisterModeloFormProps> = (props: RegisterMo
         (async (): Promise<void> => {
 
             // ------------------- Cargar marcas -------------------
-            setMarcas(await listarMarcas(sessionAPIToken).then((response: MarcaDTO[] | FetchAPIError): MarcaDTO[] => {
+            setMarcas(await listarMarcas(sessionAPIToken, {activo: true}).then((response: MarcaDTO[] | FetchAPIError): MarcaDTO[] => {
                 if (isFetchAPIError(response)) return [];
                 return response;
             }));

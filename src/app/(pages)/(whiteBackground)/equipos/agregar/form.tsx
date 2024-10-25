@@ -121,33 +121,25 @@ const RegisterEquipoForm: React.FC<RegisterEquipoFormProps> = (props: RegisterEq
             }
 
             // ------------------- Cargar marcas -------------------
-            const filtroMarca:MarcaFilter = {}
-            filtroMarca.activo = true;
-            setMarcas(await listarMarcas(sessionAPIToken).then((response: MarcaDTO[] | FetchAPIError): MarcaDTO[] => {
+            setMarcas(await listarMarcas(sessionAPIToken, {activo: true}).then((response: MarcaDTO[] | FetchAPIError): MarcaDTO[] => {
                 if (isFetchAPIError(response)) return [];
                 return response;
             }));
 
             // ------------------- Cargar modelos -------------------
-            const filtroModelo: ModeloFilter = {};
-            filtroModelo.activo = true;
-            setModelos(await listarModelos(sessionAPIToken).then((response: ModeloDTO[] | FetchAPIError): ModeloDTO[] => {
+            setModelos(await listarModelos(sessionAPIToken, {activo: true}).then((response: ModeloDTO[] | FetchAPIError): ModeloDTO[] => {
                 if (isFetchAPIError(response)) return [];
                 return response;
             }));
 
             // ------------------- Cargar tipos de equipo -------------------
-            const filtroTipoEquipo: TipoEquipoFilter = {};
-            filtroTipoEquipo.activo = true;
-            setTiposEquipo(await listarTiposEquipo(sessionAPIToken).then((response: TipoEquipoDTO[] | FetchAPIError): TipoEquipoDTO[] => {
+            setTiposEquipo(await listarTiposEquipo(sessionAPIToken, {activo: true}).then((response: TipoEquipoDTO[] | FetchAPIError): TipoEquipoDTO[] => {
                 if (isFetchAPIError(response)) return [];
                 return response;
             }));
 
             // ------------------- Cargar proveedores -------------------
-            const filtroProveedores: ProveedorFilter = {}
-            filtroProveedores.activo = true;
-            setProveedores(await listarProveedores(sessionAPIToken).then((response: ProveedorDTO[] | FetchAPIError): ProveedorDTO[] => {
+            setProveedores(await listarProveedores(sessionAPIToken, {activo: true}).then((response: ProveedorDTO[] | FetchAPIError): ProveedorDTO[] => {
                 if (isFetchAPIError(response)) return [];
                 return response;
             }));
@@ -166,8 +158,7 @@ const RegisterEquipoForm: React.FC<RegisterEquipoFormProps> = (props: RegisterEq
                 }));
 
             // ------------------- Cargar países de origen -------------------
-
-            setPaisesOrigen(await listarPaises(sessionAPIToken).then((response: PaisDTO[] | FetchAPIError): PaisDTO[] => {
+            setPaisesOrigen(await listarPaises(sessionAPIToken, {activo: true}).then((response: PaisDTO[] | FetchAPIError): PaisDTO[] => {
                 if (isFetchAPIError(response)) return [];
                 return response;
             }));

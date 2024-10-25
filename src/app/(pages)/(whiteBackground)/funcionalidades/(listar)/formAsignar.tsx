@@ -47,7 +47,7 @@ function AsignarFuncionalidadesForm(props: Readonly<AsignarFuncionalidadesFormPr
         if(sessionAPIToken === null) return;
 
         (async (): Promise<void> => {
-            const response: PerfilDTO[] | FetchAPIError = await listarPerfiles(sessionAPIToken);
+            const response: PerfilDTO[] | FetchAPIError = await listarPerfiles(sessionAPIToken, {activo: true});
             if (isFetchAPIError(response)) {
                 console.error("ERROR - obtenerPerfiles: ", response);
                 setPerfiles([]);
@@ -147,10 +147,6 @@ function AsignarFuncionalidadesForm(props: Readonly<AsignarFuncionalidadesFormPr
             </button>
         </form>
     );
-
-
-
-
 }
 
 export default AsignarFuncionalidadesForm;
