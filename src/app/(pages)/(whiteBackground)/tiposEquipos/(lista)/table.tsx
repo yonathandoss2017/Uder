@@ -104,11 +104,12 @@ function TableTiposEquiposFC(props: Readonly<TableTiposEquipoFCProps>): ReactEle
                 console.error("ERROR - lista de equipos - table.tsx - listarEquipos", errorMessage);
                 return;
             }
+            console.log("TIPOS EQUIPO ", response);
             // Guarda la lista de equipos
             setTiposEquipos(response);
         })();
 
-    }, [appliedSearchTerms]);
+    }, [appliedSearchTerms, sessionAPIToken]);
 
     // Procedimiento que se ejecuta al hacer clic en el botón 'Modificar'
     async function handleEditClick (tipoEquipo: TipoEquipoDTO): Promise<void> {

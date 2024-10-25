@@ -153,7 +153,7 @@ function EditEquipoForm(props: Readonly<EditEquipoFormProps>): ReactElement {
                 setImages(response); // Almacena las imágenes en el estado
             });
         })();
-    }, [props.editingEquipo]); // Se ejecuta al montar el componente y cuando cambia el equipo a editar
+    }, [props.editingEquipo, sessionAPIToken]); // Se ejecuta al montar el componente y cuando cambia el equipo a editar
 
 
     // Efecto que se ejecuta al montar el componente (Carga los datos de las listas de los ComboBox)

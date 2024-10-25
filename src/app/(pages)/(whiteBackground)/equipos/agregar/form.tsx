@@ -174,7 +174,7 @@ const RegisterEquipoForm: React.FC<RegisterEquipoFormProps> = (props: RegisterEq
 
         })();
 
-    }, [props.sessionAPIToken]); // Se ejecuta solo al montar el componente o si cambia el sessionAPIToken
+    }, [props.sessionAPIToken, sessionAPIToken]); // Se ejecuta solo al montar el componente o si cambia el sessionAPIToken
 
 
     // Efecto que se ejecuta al cambiar la marca seleccionada (Carga los modelos de la marca seleccionada)

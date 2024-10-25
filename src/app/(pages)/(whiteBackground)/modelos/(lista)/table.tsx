@@ -82,7 +82,7 @@ function TableModeloFC(props: Readonly<TableModeloFCProps>): ReactElement {
             console.log(response);
             setModelos(response);
         })();
-    }, [appliedSearchTerms]);
+    }, [appliedSearchTerms, sessionAPIToken]);
 
     // Procedimiento que se ejecuta al hacer clic en el botón 'Modificar'
     async function handleEditClick(modelo: ModeloDTO): Promise<void> {

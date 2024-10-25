@@ -110,7 +110,7 @@ function EditUserForm(props: Readonly<EditUserFormProps>): ReactElement {
 
         })();
 
-    }, []);
+    }, [sessionAPIToken, props.perfilCliente, props.isClientAdministrador]);
 
     // ----------------------- Eventos del formulario de edición de usuario ----------------------------
 

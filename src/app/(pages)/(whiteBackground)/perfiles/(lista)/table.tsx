@@ -88,45 +88,7 @@ function TablePerfilesFC(props: Readonly<TablePerfilesFCProps>): ReactElement {
             setPerfiles(sortedPerfiles);
         })();
 
-    }, [appliedSearchTerms]);
-
-    // Procedimiento que se ejecuta al hacer clic en el botón 'Modificar'
-    async function handleEditClick(perfil: PerfilDTO): Promise<void> {
-        if (!props.hasPermissionEdit) { return; }
-
-        const modalModificar: ModalInstance = createModal({
-            children: (
-                <EditPerfilForm
-                    sessionAPIToken={props.sessionAPIToken}
-                    idInstitucion={props.idInstitucion}
-                    editingPerfil={perfil}
-                    onSave={(perfilModified: PerfilDTO): void => {
-                        setPerfiles(perfiles.map((p: PerfilDTO): PerfilDTO => {
-                            return p.id === perfilModified.id ? perfilModified : p;
-                        }));
-                        modalModificar.close();
-                        refSearchTermsTimer.current = setTimeout((): void => {
-                            setAppliedSearchTerms({ ...appliedSearchTerms });
-                        }, 1000);
-                    }}
-                    onCancel={(): void => {
-                        createModal({
-                            children: (
-                                <p>¿Estás seguro de que deseas cancelar la modificación del perfil?</p>
-                            ),
-                            buttonsType: ModalButtonsType.CONFIRM_CANCEL,
-                            onConfirm: (): void => {
-                                modalModificar.close();
-                            }
-                        }).show();
-                    }}
-                />
-            ),
-            buttonsType: ModalButtonsType.NONE
-        });
-
-        modalModificar.show();
-    }
+    }, [appliedSearchTerms, sessionAPIToken]);
 
     // Procedimiento que se ejecuta al hacer clic en el botón 'Eliminar'
     const handleEliminarClick = (perfilSelected: PerfilDTO): void => {

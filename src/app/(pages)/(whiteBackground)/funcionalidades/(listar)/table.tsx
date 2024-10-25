@@ -92,7 +92,7 @@ function TableFuncionalidadFC(props: Readonly<TableFuncionalidadFCProps>): React
             });
             calcularPaginas();
         })();
-    }, [appliedSearchTerms]); // Cuando cambian los términos de búsqueda
+    }, [appliedSearchTerms, sessionAPIToken]); // Cuando cambian los términos de búsqueda
 
 
     // ----------------------- Paginacion -----------------------

@@ -170,7 +170,7 @@ function TableEquiposFC(props: Readonly<TableEquiposFCProps>): ReactElement {
 
             setLoading(true);
         })();
-    }, [props]);
+    }, [props, sessionAPIToken]);
 
 
     // Define los términos de búsqueda introducidos por el usuario en tiempo real (searchTerms)
@@ -236,7 +236,7 @@ function TableEquiposFC(props: Readonly<TableEquiposFCProps>): ReactElement {
             calcularPaginas();
         })();
 
-    }, [appliedSearchTerms]);
+    }, [appliedSearchTerms, sessionAPIToken]);
 
     //Metodo para calcular paginas disponibles
     function calcularPaginas(): void {

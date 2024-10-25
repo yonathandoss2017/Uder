@@ -82,7 +82,7 @@ function TableMarcaFC(props: Readonly<TableMarcaFCProps>): ReactElement {
 
             setMarca(response);
         })();
-    }, [appliedSearchTerms]);
+    }, [appliedSearchTerms, sessionAPIToken]);
 
     // Procedimiento que se ejecuta al hacer clic en el botón 'Modificar'
     async function handleEditClick(marca: MarcaDTO): Promise<void> {

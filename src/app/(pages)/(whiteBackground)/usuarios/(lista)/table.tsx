@@ -132,7 +132,7 @@ function TableUsersFC(props: Readonly<TableUsersFCProps>): ReactElement {
         };
 
         obtenerDatosCliente();
-    }, [props.sessionAPIToken]);
+    }, [sessionAPIToken, props.client.idInstitucion, props.client.idPerfil]);
 
 
     // Define los términos de búsqueda introducidos por el usuario en tiempo real (searchTerms)
@@ -245,7 +245,7 @@ function TableUsersFC(props: Readonly<TableUsersFCProps>): ReactElement {
             calcularPaginas();
         })();
 
-    }, [users, sessionAPIToken]);
+    }, [users, sessionAPIToken, perfilCliente, idAdministrador, appliedSearchTerms, currentPage]);
 
     // ----------------------- Lista de perfiles -----------------------
 

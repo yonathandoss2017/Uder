@@ -119,7 +119,7 @@ const RegisterPerfilForm: React.FC<RegisterPerfilFormProps> = (props: RegisterPe
 
             setPerfiles(perfilesOrdenados);
         })();
-    }, [appliedSearchTerms]);
+    }, [appliedSearchTerms, sessionAPIToken]);
 
     return (
         <div className={styles.container}>

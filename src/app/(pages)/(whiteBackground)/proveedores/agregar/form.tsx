@@ -59,7 +59,7 @@ const RegisterProveedorForm: React.FC<RegisterProveedorFormProps> = (props: Regi
                 return response;
             }));
         })();
-    }, [props.sessionAPIToken]);
+    }, [sessionAPIToken]);
 
     const onSubmit: SubmitHandler<FormValues> = async (formValues: FormValues): Promise<void> => {
 
