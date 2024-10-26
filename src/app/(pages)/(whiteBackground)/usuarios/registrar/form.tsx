@@ -81,7 +81,7 @@ const RegisterUserForm = (props: RegisterUserFormProps) => {
             setPerfiles(response);
         })();
 
-    }, []);
+    }, [props.clientData.idInstitucion]);
 
     // Función que se ejecuta al enviar el formulario
     const onSubmit: SubmitHandler<FormValues> = async (formValues: FormValues): Promise<void> => {

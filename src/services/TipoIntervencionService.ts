@@ -93,20 +93,4 @@ export async function listarTiposIntervencion(token: string): Promise<TipoInterv
     return await fetchBodyWithErrorHandling<TipoIntervencionDTO[]>(url, options);
 }
 
-/**
- * Función para buscar un tipo de intervención por ID.
- * @param id - ID del tipo de intervención
- * @returns Promise<TipoIntervencionDTO | FetchAPIError> - Tipo de intervención encontrado o error
- */
-export async function buscarTipoIntervencionPorId(id: number): Promise<TipoIntervencionDTO | FetchAPIError> {
-    const url: string = `${SERVICE_PATH}/buscar/${id}`;
 
-    const options: RequestInit = {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-    };
-
-    return await fetchBodyWithErrorHandling<TipoIntervencionDTO>(url, options);
-}

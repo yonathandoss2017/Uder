@@ -14,6 +14,7 @@ import {ModalButtonsType} from "@/components/ModalFC";
 import {listarPaises} from "@/services/PaisService";
 import ComboBoxFC from "@/components/ComboBoxFC";
 import PaisDTO from "@/types/dtos/PaisDTO";
+import {useToken} from "@/app/hooks/TokenProvider";
 
 
 interface RegisterProveedorFormProps {
@@ -24,6 +25,9 @@ interface RegisterProveedorFormProps {
 interface FormValues extends ProveedorDTO {}
 
 const RegisterProveedorForm: React.FC<RegisterProveedorFormProps> = (props: RegisterProveedorFormProps) => {
+
+    const {sessionAPIToken } = useToken();
+
     const { createModal } = useModal();
 
     const {
@@ -45,16 +49,22 @@ const RegisterProveedorForm: React.FC<RegisterProveedorFormProps> = (props: Regi
 
     // Cargar los países al montar el componente
     useEffect(() => {
+
+        if(sessionAPIToken==null) return;
+
         (async (): Promise<void> => {
             // ------------------- Cargar países -------------------
-            setPaises(await listarPaises(props.sessionAPIToken).then((response: PaisDTO[] | FetchAPIError): PaisDTO[] => {
+            setPaises(await listarPaises(sessionAPIToken).then((response: PaisDTO[] | FetchAPIError): PaisDTO[] => {
                 if (isFetchAPIError(response)) return [];
                 return response;
             }));
         })();
-    }, [props.sessionAPIToken]);
+    }, [sessionAPIToken]);
 
     const onSubmit: SubmitHandler<FormValues> = async (formValues: FormValues): Promise<void> => {
+
+        if(sessionAPIToken==null) return;
+
         if (!selectedPaisId) {
             // Mostrar error si no se selecciona un país
             createModal({
@@ -76,7 +86,7 @@ const RegisterProveedorForm: React.FC<RegisterProveedorFormProps> = (props: Regi
             idPaisOrigen: selectedPaisId
         };
 
-        const response: ProveedorDTO | FetchAPIError = await agregarProveedor(nuevoProveedor, props.sessionAPIToken);
+        const response: ProveedorDTO | FetchAPIError = await agregarProveedor(nuevoProveedor, sessionAPIToken);
 
         if (isFetchAPIError(response)) {
             console.error('ERROR - Registro de proveedor - agregarProveedor:', response);

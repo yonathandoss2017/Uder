@@ -10,6 +10,7 @@ import stylesTable from "@public/styles/modules/table/table.tipoequipos.module.c
 import {ModalInstance} from "@/app/hooks/modals/ModalProvider";
 import EditProveedorForm from "@/app/(pages)/(whiteBackground)/proveedores/(lista)/formEdit";
 import {ModalButtonsType} from "@/components/ModalFC";
+import {useToken} from "@/app/hooks/TokenProvider";
 
 /**
  *  Propiedades del componente TableProveedoresFC
@@ -40,6 +41,9 @@ interface TableSearchTermsProps {
 
 function TableProveedoresFC(props: Readonly<TableProveedoresFCProps>): ReactElement {
 
+    // Obtenemos el token de sesión del cliente
+    const {sessionAPIToken } = useToken();
+
     // ----------------------- Modales -----------------------
     const {createModal} = useModal();
 
@@ -69,8 +73,11 @@ function TableProveedoresFC(props: Readonly<TableProveedoresFCProps>): ReactElem
     const [proveedores, setProveedores] = useState<ProveedorDTO[]>([]);
 
     useEffect((): void => {
+
+        if(!sessionAPIToken) return;
+
         (async (): Promise<void> => {
-            const response: ProveedorDTO[] | FetchAPIError = await listarProveedores(props.sessionAPIToken, appliedSearchTerms.filter);
+            const response: ProveedorDTO[] | FetchAPIError = await listarProveedores(sessionAPIToken, appliedSearchTerms.filter);
 
             if (isFetchAPIError(response)) {
                 console.error("ERROR - lista de proveedores - table.tsx - listarProveedores", response.errorMessage);
@@ -80,7 +87,7 @@ function TableProveedoresFC(props: Readonly<TableProveedoresFCProps>): ReactElem
             setProveedores(response);
         })();
 
-    }, [appliedSearchTerms]);
+    }, [appliedSearchTerms, sessionAPIToken]);
 
     // Procedimiento que se ejecuta al hacer clic en el botón 'Modificar'
     async function handleEditClick(proveedor: ProveedorDTO): Promise<void> {
@@ -115,6 +122,9 @@ function TableProveedoresFC(props: Readonly<TableProveedoresFCProps>): ReactElem
 
     // Procedimiento que se ejecuta al hacer clic en el botón 'Eliminar'
     const handleEliminarClick = (proveedorSelected: ProveedorDTO): void => {
+
+        if(!sessionAPIToken) return;
+
         if (!proveedorSelected.activo) { // Si el proveedor está inactivo, entonces se reactiva
             if (!props.hasPermissionReactivar) { // Verifica si el usuario tiene permiso para reactivar
                 createModal({
@@ -138,7 +148,7 @@ function TableProveedoresFC(props: Readonly<TableProveedoresFCProps>): ReactElem
                 buttonsType: ModalButtonsType.CONFIRM_CANCEL,
                 async onConfirm(): Promise<void> { // Acción al confirmar
                     // Realiza la reactivación del proveedor en la API
-                    const response: void | FetchAPIError = await reactivarProveedor(proveedorSelected.id as number, props.sessionAPIToken);
+                    const response: void | FetchAPIError = await reactivarProveedor(proveedorSelected.id as number, sessionAPIToken);
                     if (isFetchAPIError(response)) {
                         // Si ocurre un error en la solicitud, muestra un mensaje de error
                         createModal({
@@ -198,7 +208,7 @@ function TableProveedoresFC(props: Readonly<TableProveedoresFCProps>): ReactElem
                 buttonsType: ModalButtonsType.CONFIRM_CANCEL,
                 async onConfirm(): Promise<void> { // Acción al confirmar
                     // Realiza la baja del proveedor en la API
-                    const response: void | FetchAPIError = await darBajaProveedor(proveedorSelected.id as number, props.sessionAPIToken);
+                    const response: void | FetchAPIError = await darBajaProveedor(proveedorSelected.id as number, sessionAPIToken);
                     if (isFetchAPIError(response)) {
                         // Si ocurre un error en la solicitud, muestra un mensaje de error
                         createModal({

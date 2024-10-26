@@ -109,16 +109,18 @@ export async function listarTiposEquipo(token: string, filter: TipoEquipoFilter 
 /**
  * Función para buscar tipo de equipo por id.
  * @param id - ID del tipo de equipo
+ * @param token
  * @returns Promise<TipoEquipoDTO> - Tipo de equipo
  * @returns Promise<FetchAPIError> - Si ocurre un error en la solicitud o en el procesamiento de la respuesta.
  */
-export async function buscarTipoEquipoPorId(id: number): Promise<TipoEquipoDTO | FetchAPIError> {
+export async function buscarTipoEquipoPorId(id: number, token: string): Promise<TipoEquipoDTO | FetchAPIError> {
     const url: string = `${SERVICE_PATH}/buscar/${id}`; // URL de la petición a la API
 
     // Opciones de la petición
     const options: RequestInit = {
         method: 'GET',
         headers: {
+            'Authorization': 'Bearer ' + token, // Cabecera de autorización con el token de sesión
             'Content-Type': 'application/json' // Tipo de contenido JSON
         }
     };

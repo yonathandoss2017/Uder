@@ -9,13 +9,22 @@ import {z, ZodObject} from "zod";
 const SchemaUser: ZodObject<any> = z.object({
     // Validación del campo de cédula
     cedula: z
-        .preprocess(((val): string => val ? String(val) : ''), // Convierte el valor a string
+        .preprocess((val) => val ? String(val) : '', // Convierte el valor a string
             z.string()
-                .length(8, "CI debe ser de 8 caracteres")
                 .regex(/^\d+$/, 'La CI debe contener solo números')
                 .refine((value: string) => !value.includes(" "), {
                     message: "No debe contener espacios en blanco",
-                })),
+                })
+                .refine((cedula: string) => {
+                    const length = cedula.length;
+                    return length === 7 || length === 8;
+                }, {
+                    message: "La CI debe tener 7 o 8 caracteres",
+                })
+                .refine((cedula: string) => validarCedula(cedula), {
+                    message: "El dígito verificador de la cédula es incorrecto",
+                })
+        ),
 
     // Validación del campo de primer nombre
     primerNombre: z
@@ -113,6 +122,33 @@ const SchemaUser: ZodObject<any> = z.object({
         z.string().optional()),
 
 });
+
+function validarCedula(cedula: string): boolean {
+    if (cedula.length === 8) {
+        const multiplicadores = [2, 9, 8, 7, 6, 3, 4]; // Para cédulas de 8 dígitos
+        const cuerpo = cedula.substring(0, 7);
+        const digitoVerificador = parseInt(cedula.substring(7), 10);
+        let suma = 0;
+        for (let i = 0; i < cuerpo.length; i++) {
+            suma += parseInt(cuerpo[i], 10) * multiplicadores[i];
+        }
+        const resto = suma % 10;
+        const verificadorCalculado = (10 - resto) % 10;
+        return verificadorCalculado === digitoVerificador;
+    } else if (cedula.length === 7) {
+        const multiplicadores = [1, 2, 3, 4, 7, 6]; // Para cédulas de 7 dígitos
+        const cuerpo = cedula.substring(0, 6);
+        const digitoVerificador = parseInt(cedula.substring(6), 10);
+        let suma = 0;
+        for (let i = 0; i < cuerpo.length; i++) {
+            suma += parseInt(cuerpo[i], 10) * multiplicadores[i];
+        }
+        const verificadorCalculado = suma % 10;
+        return verificadorCalculado === digitoVerificador;
+    }
+    return false; // Longitud inválida
+}
+
 
 // Exporta el esquema de validación
 export default SchemaUser;

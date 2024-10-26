@@ -15,6 +15,7 @@ import EditIntervencionForm from "@/app/(pages)/(whiteBackground)/intervenciones
 import EquipoDTO from "@/types/dtos/EquipoDTO";
 import TipoIntervencionDTO from "@/types/dtos/TipoIntervencionDTO";
 import styles from "@public/styles/modules/table/table.tipoequipos.module.css";
+import {useToken} from "@/app/hooks/TokenProvider";
 
 interface TableIntervencionFCProps {
     sessionAPIToken: string;
@@ -28,6 +29,10 @@ interface TableSearchTermsProps {
 
 
 function TableIntervencionFC(props: Readonly<TableIntervencionFCProps>): ReactElement {
+
+    // Obtenemos el token de sesión del cliente
+    const {sessionAPIToken } = useToken();
+
     const { createModal } = useModal();
 
     const [searchTerms, setSearchTerms] = useState<TableSearchTermsProps>({ filter: {} });
@@ -68,20 +73,23 @@ function TableIntervencionFC(props: Readonly<TableIntervencionFCProps>): ReactEl
     };
 
     useEffect(() => {
+
+        if(!sessionAPIToken) return;
+
         (async () => {
-            const intervResponse = await listarIntervenciones(props.sessionAPIToken, appliedSearchTerms.filter);
+            const intervResponse = await listarIntervenciones(sessionAPIToken, appliedSearchTerms.filter);
             if (isFetchAPIError(intervResponse)) {
                 console.error("ERROR - lista de intervenciones", intervResponse.errorMessage);
                 return;
             }
 
-            const equiposResponse = await listarEquipos(props.sessionAPIToken);
+            const equiposResponse = await listarEquipos(sessionAPIToken);
             if (isFetchAPIError(equiposResponse)) {
                 console.error("ERROR - lista de equipos", equiposResponse.errorMessage);
                 return;
             }
 
-            const tiposResponse = await listarTiposIntervencion(props.sessionAPIToken);
+            const tiposResponse = await listarTiposIntervencion(sessionAPIToken);
             if (isFetchAPIError(tiposResponse)) {
                 console.error("ERROR - lista de tipos de intervención", tiposResponse.errorMessage);
                 return;
@@ -91,7 +99,7 @@ function TableIntervencionFC(props: Readonly<TableIntervencionFCProps>): ReactEl
             setEquipos(equiposResponse);
             setTiposIntervencion(tiposResponse);
         })();
-    }, [appliedSearchTerms, props.sessionAPIToken]);
+    }, [appliedSearchTerms, props.sessionAPIToken, sessionAPIToken]);
 
     async function handleEditClick(intervencion: IntervencionDTO): Promise<void> {
         if (!props.hasPermissionEdit) { return; }

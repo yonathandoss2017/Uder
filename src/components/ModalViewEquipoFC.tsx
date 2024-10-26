@@ -15,14 +15,16 @@ import {buscarModeloPorId} from "@/services/ModeloService";
 import {Carousel} from "react-responsive-carousel";
 import ImagenDTO from "@/types/dtos/ImagenDTO";
 import {listarImagenes} from "@/services/ImagenService";
+import {useToken} from "@/app/hooks/TokenProvider";
 
 
 interface ModalViewEquipoFC {
     equipo: EquipoDTO;
-    sessionAPIToken: string;
 }
 
-const ModalViewEquipoFC = ({ equipo, sessionAPIToken }: ModalViewEquipoFC): ReactElement => {
+const ModalViewEquipoFC = ({ equipo }: ModalViewEquipoFC): ReactElement => {
+
+    const {sessionAPIToken } = useToken();
 
     const [pais, setPais] = useState<string>("");
     const [tipoEquipo, setTipoEquipo] = useState<string>("");
@@ -39,6 +41,7 @@ const ModalViewEquipoFC = ({ equipo, sessionAPIToken }: ModalViewEquipoFC): Reac
 
     //Bandera de cargando
     const [loaded, setLoaded]: [boolean,(value: boolean) => void] = useState<boolean>(false);
+    const [error, setError] = useState<string | null>(null);
 
 
     //----------------- Obtenemos datos con ids -----------------
@@ -46,94 +49,108 @@ const ModalViewEquipoFC = ({ equipo, sessionAPIToken }: ModalViewEquipoFC): Reac
     useEffect(() => {
 
         (async (): Promise<void> => {
-            async function obtenerTipoEquipo() {
-                const response: TipoEquipoDTO | FetchAPIError = await buscarTipoEquipoPorId(equipo.idTipoEquipo); //Buscamos tipos de equipo por id
-                if (isFetchAPIError(response)) { //Si ocurre un error en el fetch
-                    console.error('Error al obtener el tipo de equipo', response);
-                } else {
-                    setTipoEquipo(response.nombre); //Se setea el tipo de equipo
-                }
+
+            if (!sessionAPIToken) {
+                console.error("El token de sesión es nulo");
+                setError("No se ha encontrado el token de sesión. Por favor, inicie sesión nuevamente.");
+                return;
             }
 
-            async function obtenerProveedor() {
-                const response: ProveedorDTO | FetchAPIError = await buscarProveedorPorId(equipo.idProveedor); //Buscamos proveedor por id
-                if (isFetchAPIError(response)) { //Si ocurre un error en el fetch
-                    console.error('Error al obtener el proveedor', response);
-                } else {
-                    setProveedor(response.nombre); //Se setea el proveedor
-                }
-            }
 
-            async function obtenerModelo() {
-                const response: ModeloDTO | FetchAPIError = await buscarModeloPorId(equipo.idModelo); //Buscamos modelo por id
-                if (isFetchAPIError(response)) { //Si ocurre un error en el fetch
-                    console.error('Error al obtener el modelo', response);
-                } else {
-                    setModelo(response.nombre); //Se setea el modelo
-                    setIdMarca(response.idMarca) //Se setea el id de la marca
-                    if (response.idMarca != 0) {
-                        const responseMarca: MarcaDTO | FetchAPIError = await buscarMarcaPorId(response.idMarca); //Buscamos la marca por id
-                        if (isFetchAPIError(responseMarca)) { //Si ocurre un error en el fetch
-                            console.error('Error al obtener la marca', responseMarca);
-                        } else {
-                            setMarca(responseMarca.nombre); //Se setea la marca
-                        }
+            const obtenerTipoEquipo = async() => {
+                    const response: TipoEquipoDTO | FetchAPIError = await buscarTipoEquipoPorId(equipo.idTipoEquipo, sessionAPIToken); //Buscamos tipos de equipo por id
+                    if (isFetchAPIError(response)) { //Si ocurre un error en el fetch
+                        console.error('Error al obtener el tipo de equipo', response);
                     } else {
-                        console.error("Ha ocurrido un error al obtener la marca")
+                        setTipoEquipo(response.nombre); //Se setea el tipo de equipo
                     }
                 }
-            }
 
-            if (equipo.garantia.dePorVida) {
-                setMsjGarantia("De por Vida")
-            } else if (equipo.fechaExpiracionGarantia != null) {
-                const fecha = new Date(equipo.fechaExpiracionGarantia);
-                let fechaString = fecha.toLocaleDateString('es-ES', {
-                    day: '2-digit',
-                    month: '2-digit',
-                    year: 'numeric'
-                })
-                if(fecha.getTime() > new Date().getTime()) {
-                    setMsjGarantia("Expira el " + fechaString);
-                } else {
-                    setMsjGarantia("Expirado ("+fechaString+")");
+                const obtenerProveedor = async() => {
+                    const response: ProveedorDTO | FetchAPIError = await buscarProveedorPorId(equipo.idProveedor, sessionAPIToken); //Buscamos proveedor por id
+                    if (isFetchAPIError(response)) { //Si ocurre un error en el fetch
+                        console.error('Error al obtener el proveedor', response);
+                    } else {
+                        setProveedor(response.nombre); //Se setea el proveedor
+                    }
                 }
-            } else {
-                setMsjGarantia("Sin garantía")
-            }
 
-            async function obtenerPais() {
-                const response: PaisDTO | FetchAPIError = await buscarPaisPorId(equipo.idPaisOrigen); //Buscamos pais por id
-                if (isFetchAPIError(response)) { //Si ocurre un error en el fetch
-                    console.error('Error al obtener el pais de origen', response);
-                } else {
-                    setPais(response.nombre); //Se setea el pais
+                const obtenerModelo = async() => {
+                    const response: ModeloDTO | FetchAPIError = await buscarModeloPorId(equipo.idModelo, sessionAPIToken); //Buscamos modelo por id
+                    if (isFetchAPIError(response)) { //Si ocurre un error en el fetch
+                        console.error('Error al obtener el modelo', response);
+                    } else {
+                        setModelo(response.nombre); //Se setea el modelo
+                        setIdMarca(response.idMarca) //Se setea el id de la marca
+                        if (response.idMarca != 0) {
+                            const responseMarca: MarcaDTO | FetchAPIError = await buscarMarcaPorId(response.idMarca, sessionAPIToken); //Buscamos la marca por id
+                            if (isFetchAPIError(responseMarca)) { //Si ocurre un error en el fetch
+                                console.error('Error al obtener la marca', responseMarca);
+                            } else {
+                                setMarca(responseMarca.nombre); //Se setea la marca
+                            }
+                        } else {
+                            console.error("Ha ocurrido un error al obtener la marca")
+                        }
+                    }
                 }
-            }
 
-            async function obtenerImagen() {
-                const response: ImagenDTO[] | FetchAPIError = await listarImagenes(equipo.id as number);
-                if (isFetchAPIError(response)) {
-                    console.error("ERROR - Modificar Equipo - listarImagenes: ", response);
-                    setImages([]); // Limpia la lista de imágenes
-                    return;
+                if (equipo.garantia.dePorVida) {
+                    setMsjGarantia("De por Vida")
+                } else if (equipo.fechaExpiracionGarantia != null) {
+                    const fecha = new Date(equipo.fechaExpiracionGarantia);
+                    let fechaString = fecha.toLocaleDateString('es-ES', {
+                        day: '2-digit',
+                        month: '2-digit',
+                        year: 'numeric'
+                    })
+                    if (fecha.getTime() > new Date().getTime()) {
+                        setMsjGarantia("Expira el " + fechaString);
+                    } else {
+                        setMsjGarantia("Expirado (" + fechaString + ")");
+                    }
                 } else {
-                    setImages(response); // Almacena las imágenes en el estado
+                    setMsjGarantia("Sin garantía")
                 }
-            }
 
+                const obtenerPais = async() =>{
+                    const response: PaisDTO | FetchAPIError = await buscarPaisPorId(equipo.idPaisOrigen, sessionAPIToken); //Buscamos pais por id
+                    if (isFetchAPIError(response)) { //Si ocurre un error en el fetch
+                        console.error('Error al obtener el pais de origen', response);
+                    } else {
+                        setPais(response.nombre); //Se setea el pais
+                    }
+                }
 
-            await obtenerPais();
-            await obtenerProveedor();
-            await obtenerTipoEquipo();
-            await obtenerModelo();
-            await obtenerImagen();
+                const obtenerImagen= async ()=> {
+                    const response: ImagenDTO[] | FetchAPIError = await listarImagenes(equipo.id as number, sessionAPIToken); //Buscamos imagenes por id de equipo
+                    if (isFetchAPIError(response)) {
+                        console.error("ERROR - Modificar Equipo - listarImagenes: ", response);
+                        setImages([]); // Limpia la lista de imágenes
+                        return;
+                    } else {
+                        setImages(response); // Almacena las imágenes en el estado
+                    }
+                }
+
+            await Promise.all([
+                obtenerPais(),
+                obtenerProveedor(),
+                obtenerTipoEquipo(),
+                obtenerModelo(),
+                obtenerImagen(),
+            ]);
+
             setLoaded(true);
+
         })();
 
 
-    }, [equipo]); //Cada vez que cambia el equipo
+    }, [equipo, sessionAPIToken]); //Cada vez que cambia el equipo
 
+    if (error) {
+        return <div>Error: {error}</div>;
+    }
 
     // Retorna el JSX del mensaje de vista
     if(!loaded){ //Si no han cargado los datos

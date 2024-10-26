@@ -4,18 +4,23 @@ import FetchAPIError, {isFetchAPIError} from "@/types/errors/FetchAPIError";
 import TelefonoDTO, {formatTelefono} from "@/types/dtos/TelefonoDTO";
 import {obtenerTelefonosPorUsuario} from "@/services/TelefonoService";
 import styles from "@public/styles/modules/modal.view.data.module.css"
+import {useToken} from "@/app/hooks/TokenProvider";
 
 interface ModalTelefonoProps{
     user: UsuarioDTO;
-    sessionAPIToken: string;
 }
 
-const ModalViewTelefonoFC = ({user, sessionAPIToken}: ModalTelefonoProps): ReactElement => {
+const ModalViewTelefonoFC = ({user}: ModalTelefonoProps): ReactElement => {
+
+    // Obtenemos el token de sesión del cliente
+    const {sessionAPIToken } = useToken();
 
     //Telefonos del usuario
     const [telefonos, setTelefonos]: [TelefonoDTO[], (value: TelefonoDTO[]) => void] = useState<TelefonoDTO[]>([]);
 
     useEffect((): void => {
+
+        if(!sessionAPIToken) return;
 
         // Procedimiento asíncrono auto-ejecutable que actualiza la lista de  teléfonos
         (async (): Promise<void> => {

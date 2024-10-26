@@ -171,7 +171,7 @@ const Sidebar = (): ReactElement | null => {
                 setPermissions(response);
             }
         })();
-    }, [sessionData]); // Agrego sessionData como dependencia
+    }, [clientData.id]);
 
     useEffect(() => {
         // Encuentra la sección cuyo submenú está siendo visualizado actualmente
@@ -191,7 +191,7 @@ const Sidebar = (): ReactElement | null => {
         }
         return openMenu === sectionKey ? styles.subMenuTitleOpen : "";
     };
-if (!clientData) return <LoadingPage/>
+if (!clientData || !clientData.id) return <LoadingPage/>
     return (
         <nav className={styles.sidebarContainer}>
             {/* Título de la barra lateral */}

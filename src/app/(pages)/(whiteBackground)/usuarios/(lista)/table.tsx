@@ -24,6 +24,10 @@ import {buscarPerfilPorId, listarPerfiles} from "@/services/PerfilService";
 import LoadingPage from "@/app/(pages)/loading";
 import {ModalInstance} from "@/app/hooks/modals/ModalProvider";
 import ComboBoxFC from "@/components/ComboBoxFC";
+import InstitucionDTO from "@/types/dtos/InstitucionDTO";
+import {buscarInstitucionPorId} from "@/services/InstitucionService";
+import ErrorFC from "@/components/ErrorFC";
+import {useToken} from "@/app/hooks/TokenProvider";
 
 /**
  * Propiedades del componente Table
@@ -37,8 +41,6 @@ interface TableUsersFCProps {
     sessionAPIToken: string;
     clientID: number;
     client: UsuarioDTO;
-    perfilCliente?: PerfilDTO;
-    idAdministrador?: number;
     hasPermissionEdit: boolean;
     hasPermissionBaja: boolean;
     hasPermissionReactivar: boolean;
@@ -74,6 +76,9 @@ interface TableRowProps {
  */
 function TableUsersFC(props: Readonly<TableUsersFCProps>): ReactElement {
 
+    // Obtenemos el token de sesión del cliente
+    const {sessionAPIToken } = useToken();
+
     // ----------------------- Modales -----------------------
 
     const {createModal} = useModal();
@@ -83,7 +88,52 @@ function TableUsersFC(props: Readonly<TableUsersFCProps>): ReactElement {
 
     const [currentPage, setCurrentPage] = useState<number>(1);
     const [npage, setNpage] = useState<number>(1);
+
+    const [idAdministrador, setIdAdministrador] = useState<number>(0);
+    const [perfilCliente, setPerfilCliente] = useState<PerfilDTO | undefined>(undefined);
+
     const recordsPerPage: number = 5;
+
+    useEffect(() => {
+
+        if(sessionAPIToken == null) return;
+
+        const obtenerDatosCliente = async () => {
+            try {
+                // Obtiene la institución del cliente
+                const institucion: InstitucionDTO | FetchAPIError = await buscarInstitucionPorId(props.client.idInstitucion, sessionAPIToken);
+
+                if (institucion && !isFetchAPIError(institucion)){
+                    setIdAdministrador(institucion.idAdministrador as number);
+                }
+
+
+                // Si ocurre un error al obtener la institución, muestra un mensaje de error
+                if (isFetchAPIError(institucion)) {
+                    console.error("ERROR - lista de usuarios - page.tsx - buscarInstitucionPorId: ", institucion);
+                    return <ErrorFC message={institucion.errorMessage} />;
+                }
+
+                if (props.client.idPerfil) {
+                    console.log("iddelperfil", props.client.idPerfil)
+                    const response: PerfilDTO | FetchAPIError = await buscarPerfilPorId(props.client.idPerfil, sessionAPIToken);
+                    if (isFetchAPIError(response)) {
+                        console.error("ERROR - lista de usuarios - page.tsx - buscarPerfilPorId: ", response);
+                    } else {
+                        setPerfilCliente(response)
+                    }
+                }
+
+                // Aquí puedes manejar lo que harás con los datos de la institución y el perfilCliente
+                // Por ejemplo, actualizar el estado o realizar otras acciones
+            } catch (error) {
+                console.error("ERROR - lista de usuarios - page.tsx - obtenerDatosCliente: ", error);
+            }
+        };
+
+        obtenerDatosCliente();
+    }, [sessionAPIToken, props.client.idInstitucion, props.client.idPerfil]);
+
 
     // Define los términos de búsqueda introducidos por el usuario en tiempo real (searchTerms)
     // y la función para modificarlos (setSearchTerms)
@@ -110,6 +160,7 @@ function TableUsersFC(props: Readonly<TableUsersFCProps>): ReactElement {
     // Reinicia el temporizador para actualizar los términos de búsqueda aplicados con los introducidos por el usuario
     // (Esto evita que se realicen múltiples actualizaciones en un corto período de tiempo, ósea por cada letra que se escribe o borra)
     useEffect((): void => {
+
         // Si hay un temporizador en ejecución, lo cancela para evitar múltiples ejecuciones
         if (refSearchTermsTimer.current !== null) {
             clearTimeout(refSearchTermsTimer.current);
@@ -133,9 +184,12 @@ function TableUsersFC(props: Readonly<TableUsersFCProps>): ReactElement {
     // Efecto que se ejecuta al montar el componente y cuando cambian los términos de búsqueda.
     // Actualiza la lista de usuarios según los términos de búsqueda.
     useEffect((): void => {
+
+        if(sessionAPIToken==null) return;
+
         (async (): Promise<void> => {
             const response: UsuarioDTO[] | FetchAPIError = await listarUsuarios(
-                props.sessionAPIToken,
+                sessionAPIToken,
                 appliedSearchTerms.size,
                 appliedSearchTerms.page,
                 appliedSearchTerms.fieldSort,
@@ -150,14 +204,14 @@ function TableUsersFC(props: Readonly<TableUsersFCProps>): ReactElement {
             }
             setUsers(response);
         })();
-    }, [appliedSearchTerms]);
+    }, [appliedSearchTerms, sessionAPIToken]);
 
 
     // Efecto que se ejecuta cuando cambia la lista de usuarios.
     // Actualiza la lista de elementos de la tabla de usuarios
     useEffect((): void => {
+        if(sessionAPIToken == null) return;
         if (!users) return; // Si no hay usuarios, no hace nada
-
 
         // Procedimiento asíncrono auto-ejecutable para ejecutar código asíncrono
         (async (): Promise<void> => {
@@ -171,9 +225,10 @@ function TableUsersFC(props: Readonly<TableUsersFCProps>): ReactElement {
                     continue;
                 }
 
+                console.log("antes de romperse")
                 // Obtiene el perfil del usuario
-                const perfil: PerfilDTO | FetchAPIError = await buscarPerfilPorId(usuario.idPerfil);
-
+                const perfil: PerfilDTO | FetchAPIError = await buscarPerfilPorId(usuario.idPerfil, sessionAPIToken);
+                console.log("despues de romperse")
                 // Si ocurre un error en la solicitud, muestra un mensaje de error en la consola y no lo agrega
                 if (isFetchAPIError(perfil)) {
                     const errorMessage: string = perfil.errorMessage;
@@ -185,14 +240,12 @@ function TableUsersFC(props: Readonly<TableUsersFCProps>): ReactElement {
                 newTableRows.push({usuario, perfil});
             }
 
-
-
             // Actualiza la lista de elementos de la tabla de usuarios
             setTableRows(newTableRows);
             calcularPaginas();
         })();
 
-    }, [users]);
+    }, [users, sessionAPIToken, perfilCliente, idAdministrador, appliedSearchTerms, currentPage]);
 
     // ----------------------- Lista de perfiles -----------------------
 
@@ -201,9 +254,11 @@ function TableUsersFC(props: Readonly<TableUsersFCProps>): ReactElement {
 
     useEffect(() => {
 
+        if(sessionAPIToken==null) return;
+
         (async (): Promise<void> => {
             //Obtener perfiles
-            await listarPerfiles(props.sessionAPIToken).then((response: PerfilDTO[] | FetchAPIError): void => {
+            await listarPerfiles(sessionAPIToken).then((response: PerfilDTO[] | FetchAPIError): void => {
                 if (isFetchAPIError(response)) {
                     console.error("ERROR - lista de usuarios - table.tsx - listarPerfiles", response.errorMessage);
                     return;
@@ -212,11 +267,14 @@ function TableUsersFC(props: Readonly<TableUsersFCProps>): ReactElement {
                 perfiles.current = response;
             });
         })();
-    }, [props]);
+    }, [props, sessionAPIToken]);
 
     //Metodo para calcular páginas disponibles
     function calcularPaginas(): void {
-        contarUsuariosPorInstitucion(props.sessionAPIToken, appliedSearchTerms.filter)
+
+        if(sessionAPIToken==null) return;
+
+        contarUsuariosPorInstitucion(sessionAPIToken, appliedSearchTerms.filter)
             .then((response: number | FetchAPIError) => {
                 if (isFetchAPIError(response)) { //Si hay error
                     console.error("ERROR: " + response.errorMessage)
@@ -242,7 +300,7 @@ function TableUsersFC(props: Readonly<TableUsersFCProps>): ReactElement {
             page: currentPage //Sea actualizan los parametros de búsqueda
         });
 
-    }, [currentPage]); //Cuando cambia la página
+    }, [currentPage, sessionAPIToken]); //Cuando cambia la página
 
 
     // ----------------------- Eventos de la tabla de usuarios -----------------------
@@ -252,8 +310,7 @@ function TableUsersFC(props: Readonly<TableUsersFCProps>): ReactElement {
     function handleVerClick(user: UsuarioDTO): void {
         if (!props.hasPermissionObtenerUsuarios) return; //Si el cliente no tiene permisos para ver, no hace nada
         createModal({
-            children: <ModalViewUserFC user={user} idAdministrador={props.idAdministrador}
-                                       sessionAPIToken={props.sessionAPIToken}/> // Renderiza el componente como JSX
+            children: <ModalViewUserFC user={user} idAdministrador={idAdministrador}/> // Renderiza el componente como JSX
             , buttonsType: ModalButtonsType.CLOSE // Botón de cerrar
         }).show();
     }
@@ -264,9 +321,9 @@ function TableUsersFC(props: Readonly<TableUsersFCProps>): ReactElement {
 
         const modalModificar: ModalInstance = createModal({
             children: <FormModificar editingUser={user}
-                                     perfilCliente={props.perfilCliente}
+                                     perfilCliente={perfilCliente}
                                      sessionAPIToken={props.sessionAPIToken}
-                                     isClientAdministrador={props.idAdministrador === props.clientID}
+                                     isClientAdministrador={idAdministrador === props.clientID}
                                      onCancel={(): void => {
                                          createModal({
                                              children: (
@@ -305,6 +362,7 @@ function TableUsersFC(props: Readonly<TableUsersFCProps>): ReactElement {
 
     // Procedimiento que se ejecuta al hacer clic en el checkbox de 'Activo' / 'Dado de baja' de un usuario
     async function handleAltaClick(usuario: UsuarioDTO, perfilUsuario?: PerfilDTO): Promise<void> {
+        if(sessionAPIToken==null) return;
         if (!usuario.id) return; // Si el usuario no tiene un ID, no hace nada (No debería pasar)
 
         if (usuario.id === props.clientID) return; // Si el usuario es el cliente, no hace nada (No puede darse de baja a sí mismo)
@@ -325,7 +383,7 @@ function TableUsersFC(props: Readonly<TableUsersFCProps>): ReactElement {
 
             // Sí el usuario a dar de baja es el administrador o un usuario con el mismo o mayor nivel de perfil
             // que el cliente, muestra un mensaje de error
-            if (usuario.id === props.idAdministrador || (props.clientID != props.idAdministrador && (perfilUsuario && props.perfilCliente && props.perfilCliente.nivel >= perfilUsuario.nivel))) {
+            if (usuario.id === idAdministrador || (props.clientID != idAdministrador && (perfilUsuario && perfilCliente && perfilCliente.nivel >= perfilUsuario.nivel))) {
                 createModal({
                     children: (
                         <p>No tienes permisos para dar de baja a este usuario</p>
@@ -348,7 +406,7 @@ function TableUsersFC(props: Readonly<TableUsersFCProps>): ReactElement {
                 buttonsType: ModalButtonsType.CONFIRM_CANCEL,
                 async onConfirm(): Promise<void> { // Acción al confirmar
                     // Da de baja al usuario en la API
-                    const response: void | FetchAPIError = await darBajaUsuario(usuario.id as number, props.sessionAPIToken);
+                    const response: void | FetchAPIError = await darBajaUsuario(usuario.id as number, sessionAPIToken);
                     if (isFetchAPIError(response)) {
                         const errorMessage: string = response.errorMessage;
                         // Muestra un mensaje de error al dar de baja al usuario
@@ -403,7 +461,7 @@ function TableUsersFC(props: Readonly<TableUsersFCProps>): ReactElement {
                 buttonsType: ModalButtonsType.CONFIRM_CANCEL,
                 async onConfirm(): Promise<void> { // Acción al confirmar
                     // Reactiva al usuario en la API
-                    const response: void | FetchAPIError = await reactivarUsuario(usuario.id as number, props.sessionAPIToken);
+                    const response: void | FetchAPIError = await reactivarUsuario(usuario.id as number, sessionAPIToken);
 
                     if (isFetchAPIError(response)) {
                         const errorMessage: string = response.errorMessage;
@@ -484,7 +542,7 @@ function TableUsersFC(props: Readonly<TableUsersFCProps>): ReactElement {
                                     <td>{perfil.nombre}</td>
                                 )}
                                 {!perfil && (
-                                    <td>{props.idAdministrador === usuario.id ? "Administrador" : "Sin perfil"}</td>
+                                    <td>{idAdministrador === usuario.id ? "Administrador" : "Sin perfil"}</td>
                                 )}
                                 {usuario.activo ?
                                     (
@@ -504,9 +562,9 @@ function TableUsersFC(props: Readonly<TableUsersFCProps>): ReactElement {
                                     <td></td>
                                 }
                                 <td>
-                                    {props.hasPermissionEdit && usuario.id !== props.clientID && usuario.id !== props.idAdministrador && (
+                                    {props.hasPermissionEdit && usuario.id !== props.clientID && usuario.id !== idAdministrador && (
                                         <>
-                                            {(props.idAdministrador === props.clientID || !perfil || (props.perfilCliente && props.perfilCliente.nivel < perfil.nivel)) && (
+                                            {(idAdministrador === props.clientID || !perfil || (perfilCliente && perfilCliente.nivel < perfil.nivel)) && (
                                                 <button onClick={() => handleEditClick(usuario)}>
                                                     Modificar
                                                 </button>
@@ -801,3 +859,4 @@ function TableUsersFC(props: Readonly<TableUsersFCProps>): ReactElement {
 
 // Exporta el componente (Tabla de usuarios)
 export default TableUsersFC;
+

@@ -11,6 +11,7 @@ import SchemaTipoEquipo from "@/validations/SchemaTipoEquipo";
 import FetchAPIError, {isFetchAPIError} from "@/types/errors/FetchAPIError";
 import {agregarTipoEquipo} from "@/services/TipoEquipoService";
 import {ModalButtonsType} from "@/components/ModalFC";
+import {useToken} from "@/app/hooks/TokenProvider";
 
 /**
  * Propiedades del componente
@@ -34,6 +35,9 @@ interface FormValues extends TipoEquipoDTO{
  */
 const RegisterTipoEquipoForm : React.FC<RegisterTipoEquipoFormProps> = (props: RegisterTipoEquipoFormProps) => {
 
+    // Obtenemos el token de sesión del cliente
+    const {sessionAPIToken } = useToken();
+
     // ----------------------- Modales -----------------------
 
     const {createModal} = useModal();
@@ -55,6 +59,8 @@ const RegisterTipoEquipoForm : React.FC<RegisterTipoEquipoFormProps> = (props: R
     // Función que se ejecuta al enviar el formulario
     const onSubmit: SubmitHandler<FormValues> = async (formValues: FormValues): Promise<void> => {
 
+        if (sessionAPIToken == null) return;
+
         const nuevoTipoEquipo: TipoEquipoDTO = {
             nombre: formValues.nombre,
             activo: true,
@@ -62,7 +68,7 @@ const RegisterTipoEquipoForm : React.FC<RegisterTipoEquipoFormProps> = (props: R
         };
 
         // Se registra el equipo en la API
-        const response: TipoEquipoDTO | FetchAPIError = await agregarTipoEquipo(nuevoTipoEquipo, props.sessionAPIToken);
+        const response: TipoEquipoDTO | FetchAPIError = await agregarTipoEquipo(nuevoTipoEquipo, sessionAPIToken);
 
         //Si ocurre un error al registrar el tipo de equipo se muestra un mensaje de error
         if (isFetchAPIError(response)){

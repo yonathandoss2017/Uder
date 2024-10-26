@@ -10,6 +10,7 @@ import stylesTable from "@public/styles/modules/table/table.tipoequipos.module.c
 import {ModalInstance} from "@/app/hooks/modals/ModalProvider";
 import {ModalButtonsType} from "@/components/ModalFC";
 import EditMarcaForm from "@/app/(pages)/(whiteBackground)/marcas/(lista)/formEdit";
+import {useToken} from "@/app/hooks/TokenProvider";
 
 
 /**
@@ -35,6 +36,9 @@ interface TableSearchTermsProps {
 }
 
 function TableMarcaFC(props: Readonly<TableMarcaFCProps>): ReactElement {
+
+    // Obtenemos el token de sesión del cliente
+    const {sessionAPIToken } = useToken();
 
     // ----------------------- Modales -----------------------
     const {createModal} = useModal();
@@ -64,8 +68,11 @@ function TableMarcaFC(props: Readonly<TableMarcaFCProps>): ReactElement {
     const [marcas, setMarca] = useState<MarcaDTO[]>([]);
 
     useEffect((): void => {
+
+        if(!sessionAPIToken) return;
+
         (async (): Promise<void> => {
-            const response: MarcaDTO[] | FetchAPIError = await listarMarcas(props.sessionAPIToken, appliedSearchTerms.filter);
+            const response: MarcaDTO[] | FetchAPIError = await listarMarcas(sessionAPIToken, appliedSearchTerms.filter);
 
             if (isFetchAPIError(response)) {
                 const errorMessage: string = response.errorMessage;
@@ -75,7 +82,7 @@ function TableMarcaFC(props: Readonly<TableMarcaFCProps>): ReactElement {
 
             setMarca(response);
         })();
-    }, [appliedSearchTerms]);
+    }, [appliedSearchTerms, sessionAPIToken]);
 
     // Procedimiento que se ejecuta al hacer clic en el botón 'Modificar'
     async function handleEditClick(marca: MarcaDTO): Promise<void> {
@@ -129,6 +136,9 @@ function TableMarcaFC(props: Readonly<TableMarcaFCProps>): ReactElement {
 
         // Procedimiento que se ejecuta al hacer clic en el botón 'Eliminar'
     const handleEliminarClick = (marcaSelected: MarcaDTO): void => {
+
+        if(!sessionAPIToken) return;
+
         if (!marcaSelected.activo) { // Si la marca está inactiva, entonces se reactiva
             if (!props.hasPermissionReactivar) { // Verifica si el usuario tiene permiso para reactivar
                 createModal({
@@ -152,7 +162,7 @@ function TableMarcaFC(props: Readonly<TableMarcaFCProps>): ReactElement {
                 buttonsType: ModalButtonsType.CONFIRM_CANCEL,
                 async onConfirm(): Promise<void> { // Acción al confirmar
                     // Realiza la reactivación de la marca en la API
-                    const response: void | FetchAPIError = await reactivarMarca(marcaSelected.id as number, props.sessionAPIToken);
+                    const response: void | FetchAPIError = await reactivarMarca(marcaSelected.id as number, sessionAPIToken);
                     if (isFetchAPIError(response)) {
                         // Si ocurre un error en la solicitud, muestra un mensaje de error
                         const errorMessage: string = response.errorMessage;
@@ -213,7 +223,7 @@ function TableMarcaFC(props: Readonly<TableMarcaFCProps>): ReactElement {
                 buttonsType: ModalButtonsType.CONFIRM_CANCEL,
                 async onConfirm(): Promise<void> { // Acción al confirmar
                     // Realiza la baja de marca en la API
-                    const response: void | FetchAPIError = await darBajaMarca(marcaSelected.id as number, props.sessionAPIToken);
+                    const response: void | FetchAPIError = await darBajaMarca(marcaSelected.id as number, sessionAPIToken);
                     if (isFetchAPIError(response)) {
                         // Si ocurre un error en la solicitud, muestra un mensaje de error
                         const errorMessage: string = response.errorMessage;

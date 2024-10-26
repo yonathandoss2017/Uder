@@ -35,6 +35,11 @@ import ImagenDTO from "@/types/dtos/ImagenDTO";
 import {agregarImagen} from "@/services/ImagenService";
 import {useModal} from "@/app/hooks/modals/useModal";
 import {ModalButtonsType} from "@/components/ModalFC";
+import MarcaFilter from "@/types/filters/MarcaFilter";
+import ModeloFilter from "@/types/filters/ModeloFilter";
+import TipoEquipoFilter from "@/types/filters/TipoEquipoFilter";
+import ProveedorFilter from "@/types/filters/ProveedorFilter";
+import {useToken} from "@/app/hooks/TokenProvider";
 
 /**
  * Propiedades del componente
@@ -68,6 +73,8 @@ interface FormValues extends EquipoDTO {
  * @param {RegisterEquipoFormProps} props - Propiedades del componente
  */
 const RegisterEquipoForm: React.FC<RegisterEquipoFormProps> = (props: RegisterEquipoFormProps) => {
+
+    const { sessionAPIToken } = useToken();
 
     // ----------------------- Modales -----------------------
 
@@ -109,30 +116,30 @@ const RegisterEquipoForm: React.FC<RegisterEquipoFormProps> = (props: RegisterEq
         // Procedimiento auto-ejecutable (Para que sea asíncrono)
         (async (): Promise<void> => {
 
-            // ------------------- Cargar marcas -------------------
+            if (sessionAPIToken == null){
+                return;
+            }
 
-            setMarcas(await listarMarcas(props.sessionAPIToken).then((response: MarcaDTO[] | FetchAPIError): MarcaDTO[] => {
+            // ------------------- Cargar marcas -------------------
+            setMarcas(await listarMarcas(sessionAPIToken, {activo: true}).then((response: MarcaDTO[] | FetchAPIError): MarcaDTO[] => {
                 if (isFetchAPIError(response)) return [];
                 return response;
             }));
 
             // ------------------- Cargar modelos -------------------
-
-            setModelos(await listarModelos(props.sessionAPIToken).then((response: ModeloDTO[] | FetchAPIError): ModeloDTO[] => {
+            setModelos(await listarModelos(sessionAPIToken, {activo: true}).then((response: ModeloDTO[] | FetchAPIError): ModeloDTO[] => {
                 if (isFetchAPIError(response)) return [];
                 return response;
             }));
 
             // ------------------- Cargar tipos de equipo -------------------
-
-            setTiposEquipo(await listarTiposEquipo(props.sessionAPIToken).then((response: TipoEquipoDTO[] | FetchAPIError): TipoEquipoDTO[] => {
+            setTiposEquipo(await listarTiposEquipo(sessionAPIToken, {activo: true}).then((response: TipoEquipoDTO[] | FetchAPIError): TipoEquipoDTO[] => {
                 if (isFetchAPIError(response)) return [];
                 return response;
             }));
 
             // ------------------- Cargar proveedores -------------------
-
-            setProveedores(await listarProveedores(props.sessionAPIToken).then((response: ProveedorDTO[] | FetchAPIError): ProveedorDTO[] => {
+            setProveedores(await listarProveedores(sessionAPIToken, {activo: true}).then((response: ProveedorDTO[] | FetchAPIError): ProveedorDTO[] => {
                 if (isFetchAPIError(response)) return [];
                 return response;
             }));
@@ -141,7 +148,7 @@ const RegisterEquipoForm: React.FC<RegisterEquipoFormProps> = (props: RegisterEq
 
             setUbicaciones(
                 await listarUbicaciones(
-                    props.sessionAPIToken, 0, 1, "id", true, {activo: true}
+                    sessionAPIToken, 0, 1, "id", true, {activo: true}
                 ).then((response: UbicacionDTO[] | FetchAPIError): UbicacionDTO[] => {
                     if (isFetchAPIError(response)) {
                         console.error("Error al obtener las ubicaciones: ", response);
@@ -151,15 +158,14 @@ const RegisterEquipoForm: React.FC<RegisterEquipoFormProps> = (props: RegisterEq
                 }));
 
             // ------------------- Cargar países de origen -------------------
-
-            setPaisesOrigen(await listarPaises(props.sessionAPIToken).then((response: PaisDTO[] | FetchAPIError): PaisDTO[] => {
+            setPaisesOrigen(await listarPaises(sessionAPIToken, {activo: true}).then((response: PaisDTO[] | FetchAPIError): PaisDTO[] => {
                 if (isFetchAPIError(response)) return [];
                 return response;
             }));
 
         })();
 
-    }, [props.sessionAPIToken]); // Se ejecuta solo al montar el componente o si cambia el sessionAPIToken
+    }, [props.sessionAPIToken, sessionAPIToken]); // Se ejecuta solo al montar el componente o si cambia el sessionAPIToken
 
 
     // Efecto que se ejecuta al cambiar la marca seleccionada (Carga los modelos de la marca seleccionada)
@@ -184,6 +190,11 @@ const RegisterEquipoForm: React.FC<RegisterEquipoFormProps> = (props: RegisterEq
 
     // Función que se ejecuta al enviar el formulario
     const onSubmit: SubmitHandler<FormValues> = async (formValues: FormValues): Promise<void> => {
+
+        if (sessionAPIToken == null){
+            return;
+        }
+
         // Se crea un nuevo objeto GarantiaDTO con los valores de garantía del formulario
         const nuevoGarantiaDTO: GarantiaDTO = {
             anios: formValues.garantiaAnios,
@@ -210,7 +221,7 @@ const RegisterEquipoForm: React.FC<RegisterEquipoFormProps> = (props: RegisterEq
         const imagenFile: File = formValues.imagen.item(0) as File;
 
         // Se registra el equipo en la API
-        const response: EquipoDTO | FetchAPIError = await agregarEquipo(nuevoEquipoDTO, props.sessionAPIToken);
+        const response: EquipoDTO | FetchAPIError = await agregarEquipo(nuevoEquipoDTO, sessionAPIToken);
 
         // Se verifica si hay un error en la respuesta
         if (isFetchAPIError(response)) {
@@ -241,7 +252,7 @@ const RegisterEquipoForm: React.FC<RegisterEquipoFormProps> = (props: RegisterEq
         };
 
         // Se registra la imagen en la API
-        await agregarImagen(imagenDTO, props.sessionAPIToken).then((response: void | FetchAPIError): void => {
+        await agregarImagen(imagenDTO, sessionAPIToken).then((response: void | FetchAPIError): void => {
             if (isFetchAPIError(response)) {
                 // Si ocurre un error al registrar la imagen se muestra un mensaje de error
                 createModal({
