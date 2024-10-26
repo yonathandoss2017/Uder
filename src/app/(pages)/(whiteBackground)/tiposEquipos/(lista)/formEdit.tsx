@@ -10,6 +10,7 @@ import {ModalButtonsType} from "@/components/ModalFC";
 import FetchAPIError, {isFetchAPIError} from "@/types/errors/FetchAPIError";
 import ModalChangesFC from "@/components/ModalChangesFC";
 import {modificarTipoEquipo} from "@/services/TipoEquipoService";
+import {useToken} from "@/app/hooks/TokenProvider";
 
 interface EditTipoEquipoFormProps {
     sessionAPIToken: string;
@@ -22,6 +23,9 @@ interface EditTipoEquipoFormProps {
 
 
 function EditTipoEquipoForm(props: Readonly<EditTipoEquipoFormProps>): ReactElement {
+
+    // Obtiene el token de la sesión
+    const {sessionAPIToken } = useToken();
 
     // ----------------------- Modales -----------------------
 
@@ -41,6 +45,8 @@ function EditTipoEquipoForm(props: Readonly<EditTipoEquipoFormProps>): ReactElem
 
     // Procedimiento que se ejecuta al hacer clic en el botón 'Guardar'
     const onSubmit: SubmitHandler<TipoEquipoDTO> = async (formValues: TipoEquipoDTO): Promise<void> => {
+
+        if(sessionAPIToken == null) return;
 
         const modifiedTipoEquipo: TipoEquipoDTO = {
             ...props.editingTipoEquipo, // Copia los valores originales del equipo
@@ -70,7 +76,7 @@ function EditTipoEquipoForm(props: Readonly<EditTipoEquipoFormProps>): ReactElem
             buttonsType: ModalButtonsType.CONFIRM_CANCEL,
             async onConfirm(): Promise<void> {
                 // Realiza la modificación del tipo de equipo en la API
-                const response: void | FetchAPIError = await modificarTipoEquipo(modifiedTipoEquipo, props.sessionAPIToken);
+                const response: void | FetchAPIError = await modificarTipoEquipo(modifiedTipoEquipo, sessionAPIToken);
 
                 if (isFetchAPIError(response)) {
                     createModal({

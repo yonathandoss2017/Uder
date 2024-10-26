@@ -11,6 +11,7 @@ import FetchAPIError, { isFetchAPIError } from "@/types/errors/FetchAPIError";
 import { ModalButtonsType } from "@/components/ModalFC";
 import SchemaMarca from "@/validations/SchemaMarca";
 import styles from "@public/styles/modules/register.tiposequipo.module.css";
+import {useToken} from "@/app/hooks/TokenProvider";
 
 // Definición del tipo FormValues para el formulario
 interface FormValues {
@@ -35,6 +36,10 @@ interface RegisterMarcaFormProps {
  * @param {RegisterMarcaFormProps} props
  */
 const RegisterMarcaForm: React.FC<RegisterMarcaFormProps> = (props: RegisterMarcaFormProps) => {
+
+    // Obtenemos el token de sesión del cliente
+    const {sessionAPIToken } = useToken();
+
     // ----------------------- Modales -----------------------
     const { createModal } = useModal();
 
@@ -54,6 +59,9 @@ const RegisterMarcaForm: React.FC<RegisterMarcaFormProps> = (props: RegisterMarc
 
     // Función que se ejecuta al enviar el formulario
     const onSubmit: SubmitHandler<FormValues> = async (formValues: FormValues): Promise<void> => {
+
+        if (sessionAPIToken == null) return;
+
         const nuevoMarcaDTO: MarcaDTO = {
             nombre: formValues.nombre,
             activo: true,
@@ -61,7 +69,7 @@ const RegisterMarcaForm: React.FC<RegisterMarcaFormProps> = (props: RegisterMarc
         };
 
         // Se registra la marca en la API
-        const response: MarcaDTO | FetchAPIError = await agregarMarca(nuevoMarcaDTO, props.sessionAPIToken);
+        const response: MarcaDTO | FetchAPIError = await agregarMarca(nuevoMarcaDTO, sessionAPIToken);
 
         // Se verifica si hay un error en la respuesta
         if (isFetchAPIError(response)) {

@@ -37,6 +37,7 @@ declare module "next-auth" {
              * (Por ejemplo, tokén de sesión inválida del lado de la API)
              */
             error?: string
+            expires?: number
 
         };
     }
@@ -45,6 +46,7 @@ declare module "next-auth" {
     interface User {
         sessionAPIToken?: string
         exp: number
+
     }
 
     interface Account {
@@ -74,7 +76,15 @@ declare module "next-auth/jwt" {
             /**
              * Fecha de expiración del token
              */
-            exp: number
+            exp?: number
+
+            lastFetched?:number
+
+            /**
+             * Datos del usuario
+             */
+            data?: UsuarioDTO
+
 
             /**
              * Indica un error al iniciar sesión

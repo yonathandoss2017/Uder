@@ -16,7 +16,7 @@
     box-shadow: 0 5px 10px rgba(0, 0, 0, 0.23);
 }
 
-.perfilForm {
+.form {
     position: relative;
     display: flex;
     flex-direction: column;

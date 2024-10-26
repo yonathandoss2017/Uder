@@ -10,6 +10,7 @@ import ModalChangesFC from "@/components/ModalChangesFC";
 import FetchAPIError, {isFetchAPIError} from "@/types/errors/FetchAPIError";
 import styles from "@public/styles/modules/table/table.editformequipo.module.css";
 import {modificarFuncionalidad} from "@/services/FuncionalidadService";
+import {useToken} from "@/app/hooks/TokenProvider";
 
 interface EditFuncionalidadFormProps {
     sessionAPIToken: string;
@@ -20,6 +21,8 @@ interface EditFuncionalidadFormProps {
 }
 
 function EditFuncionalidadForm(props: Readonly<EditFuncionalidadFormProps>): ReactElement {
+
+    const { sessionAPIToken } = useToken();
 
     // ----------------------- Modales -----------------------
 
@@ -39,6 +42,8 @@ function EditFuncionalidadForm(props: Readonly<EditFuncionalidadFormProps>): Rea
 
     // Procedimiento que se ejecuta al hacer clic en el botón 'Guardar'
     const onSubmit: SubmitHandler<FuncionalidadDTO> = async (formValues: FuncionalidadDTO): Promise<void> => {
+
+        if(sessionAPIToken == null) return;
 
         const modifiedFuncionalidad: FuncionalidadDTO = {
             ...props.editingFuncionalidad, // Copia los valores originales del equipo
@@ -69,7 +74,7 @@ function EditFuncionalidadForm(props: Readonly<EditFuncionalidadFormProps>): Rea
             async onConfirm(): Promise<void> {
                 console.log("ID INSTITUCION", modifiedFuncionalidad.idInstitucion);
                 // Realiza la modificación del tipo de equipo en la API
-                const response: void | FetchAPIError = await modificarFuncionalidad(modifiedFuncionalidad, props.sessionAPIToken);
+                const response: void | FetchAPIError = await modificarFuncionalidad(modifiedFuncionalidad,sessionAPIToken);
 
                 if (isFetchAPIError(response)) {
                     createModal({

@@ -9,6 +9,7 @@ import {asignarFuncionalidad, listarPerfilesFuncionalidad} from "@/services/Func
 import LoadingPage from "@/app/(pages)/loading";
 import {useForm, UseFormReturn} from "react-hook-form";
 import {ModalButtonsType} from "@/components/ModalFC";
+import {useToken} from "@/app/hooks/TokenProvider";
 
 interface AsignarFuncionalidadesFormProps {
     sessionAPIToken: string;
@@ -23,6 +24,8 @@ interface FormValues extends FuncionalidadDTO{
 }
 
 function AsignarFuncionalidadesForm(props: Readonly<AsignarFuncionalidadesFormProps>): ReactElement {
+
+    const { sessionAPIToken } = useToken();
 
     // ----------------------- Modales -----------------------
 
@@ -40,8 +43,11 @@ function AsignarFuncionalidadesForm(props: Readonly<AsignarFuncionalidadesFormPr
     const [loaded, setLoaded] = useState<boolean>(false);
 
     useEffect(() => {
+
+        if(sessionAPIToken === null) return;
+
         (async (): Promise<void> => {
-            const response: PerfilDTO[] | FetchAPIError = await listarPerfiles(props.sessionAPIToken);
+            const response: PerfilDTO[] | FetchAPIError = await listarPerfiles(sessionAPIToken, {activo: true});
             if (isFetchAPIError(response)) {
                 console.error("ERROR - obtenerPerfiles: ", response);
                 setPerfiles([]);
@@ -50,7 +56,7 @@ function AsignarFuncionalidadesForm(props: Readonly<AsignarFuncionalidadesFormPr
             setPerfiles(response);
 
             if(props.funcionalidad.id) {
-                const response: PerfilDTO[] | FetchAPIError = await listarPerfilesFuncionalidad(props.funcionalidad.id, props.sessionAPIToken);
+                const response: PerfilDTO[] | FetchAPIError = await listarPerfilesFuncionalidad(props.funcionalidad.id, sessionAPIToken);
                 if (isFetchAPIError(response)) {
                     console.error("ERROR - obtenerPerfilesFuncionalidad: ", response);
                     setPerfilesFuncionalidad([]);
@@ -64,7 +70,7 @@ function AsignarFuncionalidadesForm(props: Readonly<AsignarFuncionalidadesFormPr
         })();
 
 
-    }, [props.funcionalidad, props.sessionAPIToken]);
+    }, [props.funcionalidad, props.sessionAPIToken, sessionAPIToken]);
 
     useEffect(() => {
         console.log("perfiles", perfiles)
@@ -76,8 +82,11 @@ function AsignarFuncionalidadesForm(props: Readonly<AsignarFuncionalidadesFormPr
     }, [perfilesSeleccionados]);
 
     const onSubmit = async (formValues: FormValues): Promise<void> => {
+
+        if (sessionAPIToken == null) return;
+
         if(!props.funcionalidad.id) return;
-        const response: void | FetchAPIError = await asignarFuncionalidad(props.funcionalidad.id, perfilesSeleccionados, props.sessionAPIToken);
+        const response: void | FetchAPIError = await asignarFuncionalidad(props.funcionalidad.id, perfilesSeleccionados, sessionAPIToken);
         if (isFetchAPIError(response)) {
             createModal({
                 children: (
@@ -138,10 +147,6 @@ function AsignarFuncionalidadesForm(props: Readonly<AsignarFuncionalidadesFormPr
             </button>
         </form>
     );
-
-
-
-
 }
 
 export default AsignarFuncionalidadesForm;

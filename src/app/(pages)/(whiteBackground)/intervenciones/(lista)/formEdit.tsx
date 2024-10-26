@@ -12,6 +12,7 @@ import { modificarIntervencion } from "@/services/IntervencionService";
 import { listarTiposIntervencion } from "@/services/TipoIntervencionService";
 import ComboBoxFC from "@/components/ComboBoxFC";
 import styles from "@public/styles/modules/table/table.editformequipo.module.css";
+import {useToken} from "@/app/hooks/TokenProvider";
 
 interface EditIntervencionFormProps {
     sessionAPIToken: string;
@@ -21,6 +22,9 @@ interface EditIntervencionFormProps {
 }
 
 function TrabajarIntervencionForm(props: Readonly<EditIntervencionFormProps>): ReactElement {
+
+    const {sessionAPIToken } = useToken();
+
     const { createModal } = useModal();
     const [tiposIntervencion, setTiposIntervencion] = useState<any[]>([]);
 
@@ -47,7 +51,11 @@ function TrabajarIntervencionForm(props: Readonly<EditIntervencionFormProps>): R
     }, [props.editingIntervencion, setValue]);
 
     useEffect(() => {
-        listarTiposIntervencion(props.sessionAPIToken).then((response) => {
+
+        if(sessionAPIToken == null) return;
+
+        (async (): Promise<void> => {
+        listarTiposIntervencion(sessionAPIToken).then((response) => {
             if (isFetchAPIError(response)) {
                 createModal({
                     children: <div>Error al cargar los tipos de intervención: {response.errorMessage}</div>,
@@ -57,9 +65,13 @@ function TrabajarIntervencionForm(props: Readonly<EditIntervencionFormProps>): R
             }
             setTiposIntervencion(response);
         });
-    }, [props.sessionAPIToken, createModal]);
+        })();
+    }, [props.sessionAPIToken, createModal, sessionAPIToken]);
 
     const onSubmit: SubmitHandler<IntervencionDTO> = async (formValues: IntervencionDTO): Promise<void> => {
+
+        if(sessionAPIToken == null) return;
+
         const modifiedIntervencion: IntervencionDTO = {
             ...props.editingIntervencion,
             ...formValues
@@ -87,7 +99,7 @@ function TrabajarIntervencionForm(props: Readonly<EditIntervencionFormProps>): R
             title: `Trabajando intervención`,
             children: ModalChangesFC(changes),
             async onConfirm(): Promise<void> {
-                const response: void | FetchAPIError = await modificarIntervencion(modifiedIntervencion, props.sessionAPIToken);
+                const response: void | FetchAPIError = await modificarIntervencion(modifiedIntervencion,sessionAPIToken);
 
                 if (isFetchAPIError(response)) {
                     createModal({

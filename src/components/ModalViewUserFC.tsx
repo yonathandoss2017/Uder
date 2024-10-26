@@ -7,15 +7,18 @@ import UsuarioDTO from "@/types/dtos/UsuarioDTO";
 import ModalViewTelefonoFC from "@/components/ModalViewTelefonoFC"
 import {useModal} from "@/app/hooks/modals/useModal";
 import {ModalButtonsType} from "@/components/ModalFC";
+import {useToken} from "@/app/hooks/TokenProvider";
 
 
 interface ModalViewUserProps {
     user: UsuarioDTO;
-    sessionAPIToken: string;
     idAdministrador ?: number;
 }
 
-const ModalViewUserFC = ({ user, idAdministrador, sessionAPIToken }: ModalViewUserProps): ReactElement => {
+const ModalViewUserFC = ({ user, idAdministrador }: ModalViewUserProps): ReactElement => {
+
+    // Obtenemos el token de sesión del cliente
+    const {sessionAPIToken } = useToken();
 
     const {createModal} = useModal();
 
@@ -26,7 +29,11 @@ const ModalViewUserFC = ({ user, idAdministrador, sessionAPIToken }: ModalViewUs
     const [loaded, setLoaded]: [boolean,(value: boolean) => void] = useState<boolean>(false);
 
     useEffect(() => {
+
         async function obtenerPerfil() {
+
+            if(!sessionAPIToken) return;
+
             if (user.idPerfil) { //Si el usuario tiene perfil
                 const response: PerfilDTO | FetchAPIError = await buscarPerfilPorId(user.idPerfil, sessionAPIToken); //Lo buscarmos
                 if (isFetchAPIError(response)) { //Si ocurre un error en el fetch
@@ -100,7 +107,7 @@ const ModalViewUserFC = ({ user, idAdministrador, sessionAPIToken }: ModalViewUs
                 <div className={styles.inputBox}>
                     <button className={styles.btnTelefonos} onClick={() => createModal({
                         children: (
-                            <ModalViewTelefonoFC user={user} sessionAPIToken={sessionAPIToken}/>
+                            <ModalViewTelefonoFC user={user}/>
                             ),buttonsType: ModalButtonsType.CLOSE
                         }).show()}
                     > Teléfonos

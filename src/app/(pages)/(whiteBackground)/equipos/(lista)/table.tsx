@@ -29,8 +29,8 @@ import {listarProveedores} from "@/services/ProveedorService";
 import UbicacionDTO from "@/types/dtos/UbicacionDTO";
 import {listarUbicaciones} from "@/services/UbicacionService";
 import LoadingPage from "@/app/(pages)/loading";
-import ModeloFilter from "@/types/filters/ModeloFilter";
-import {renovarToken} from "@/services/SessionService";
+import {useToken} from "@/app/hooks/TokenProvider";
+
 
 /**
  * Propiedades del componente Table
@@ -66,6 +66,9 @@ interface TableSearchTermsProps {
  */
 function TableEquiposFC(props: Readonly<TableEquiposFCProps>): ReactElement {
 
+    // Obtenemos el token de sesión del cliente
+    const {sessionAPIToken } = useToken();
+
     // ----------------------- Modales -----------------------
 
     const {createModal} = useModal();
@@ -99,22 +102,27 @@ function TableEquiposFC(props: Readonly<TableEquiposFCProps>): ReactElement {
     // Define el estado de las ubicaciones existentes para mostrar en la tabla
     const ubicaciones: MutableRefObject<UbicacionDTO[]> = useRef<UbicacionDTO[]>([]);
 
+
     // Efecto que se ejecuta al montar el componente (Carga los combobox de filtros)
     useEffect((): void => {
 
+        if(!sessionAPIToken) return;
+
         // Procedimiento asíncrono auto-ejecutable que actualiza la lista de tipos de equipo y la lista de equipos
         (async (): Promise<void> => {
-            // Consulta los tipos de equipo y ejecuta un procedimiento con la respuesta
-            await listarTiposEquipo(props.sessionAPIToken).then((response: TipoEquipoDTO[] | FetchAPIError): void => {
-                if (isFetchAPIError(response)) {
-                    console.error("ERROR - lista de equipos - table.tsx - listarTiposEquipo", response.errorMessage);
-                    return;
-                }
-                // Actualiza la lista de tipos de equipo
-                tiposEquipo.current = response;
-            });
 
-            await listarMarcas(props.sessionAPIToken).then((response: MarcaDTO[] | FetchAPIError): void => {
+                // Consulta los tipos de equipo y ejecuta un procedimiento con la respuesta
+                await listarTiposEquipo(sessionAPIToken).then((response: TipoEquipoDTO[] | FetchAPIError): void => {
+                    if (isFetchAPIError(response)) {
+                        console.error("ERROR - lista de equipos - table.tsx - listarTiposEquipo", response.errorMessage);
+                        return;
+                    }
+                    console.log("tipos de equipos", response)
+                    // Actualiza la lista de tipos de equipo
+                    tiposEquipo.current = response;
+                });
+
+            await listarMarcas(sessionAPIToken).then((response: MarcaDTO[] | FetchAPIError): void => {
                 if (isFetchAPIError(response)) {
                     console.error("ERROR - marcas - table.tsx - listarMarcas", response.errorMessage);
                     return;
@@ -123,7 +131,7 @@ function TableEquiposFC(props: Readonly<TableEquiposFCProps>): ReactElement {
                 marcas.current = response;
             });
 
-            await listarModelos(props.sessionAPIToken).then((response: ModeloDTO[] | FetchAPIError): void => {
+            await listarModelos(sessionAPIToken).then((response: ModeloDTO[] | FetchAPIError): void => {
                 if (isFetchAPIError(response)) {
                     console.error("ERROR - lista de equipos - table.tsx - listarModelos", response.errorMessage);
                     return;
@@ -132,7 +140,7 @@ function TableEquiposFC(props: Readonly<TableEquiposFCProps>): ReactElement {
                 modelos.current = response;
             });
 
-            await listarPaises(props.sessionAPIToken).then((response: PaisDTO[] | FetchAPIError): void => {
+            await listarPaises(sessionAPIToken).then((response: PaisDTO[] | FetchAPIError): void => {
                 if (isFetchAPIError(response)) {
                     console.error("ERROR - lista de equipos - table.tsx - listarPaises", response.errorMessage);
                     return;
@@ -141,7 +149,7 @@ function TableEquiposFC(props: Readonly<TableEquiposFCProps>): ReactElement {
                 paisOrigen.current = response;
             });
 
-            await listarProveedores(props.sessionAPIToken).then((response: ProveedorDTO[] | FetchAPIError): void => {
+            await listarProveedores(sessionAPIToken).then((response: ProveedorDTO[] | FetchAPIError): void => {
                 if (isFetchAPIError(response)) {
                     console.error("ERROR - lista de equipos - table.tsx - listarProveedores", response.errorMessage);
                     return;
@@ -150,7 +158,7 @@ function TableEquiposFC(props: Readonly<TableEquiposFCProps>): ReactElement {
                 proveedores.current = response;
             });
 
-            await listarUbicaciones(props.sessionAPIToken).then((response: UbicacionDTO[] | FetchAPIError): void => {
+            await listarUbicaciones(sessionAPIToken).then((response: UbicacionDTO[] | FetchAPIError): void => {
                 if (isFetchAPIError(response)) {
                     console.error("ERROR - lista de equipos - table.tsx - listarUbicaciones", response.errorMessage);
                     return;
@@ -162,7 +170,7 @@ function TableEquiposFC(props: Readonly<TableEquiposFCProps>): ReactElement {
 
             setLoading(true);
         })();
-    }, [props]);
+    }, [props, sessionAPIToken]);
 
 
     // Define los términos de búsqueda introducidos por el usuario en tiempo real (searchTerms)
@@ -209,10 +217,13 @@ function TableEquiposFC(props: Readonly<TableEquiposFCProps>): ReactElement {
     // Efecto que se ejecuta al montar el componente y cuando cambian los términos de búsqueda.
     // Actualiza la lista de equipos según los términos de búsqueda.
     useEffect((): void => {
+
+        if(!sessionAPIToken) return;
+
         // Procedimiento asíncrono auto-ejecutable para ejecutar código asíncrono
         (async (): Promise<void> => {
             // Obtiene la lista de equipos de la API
-            const response: EquipoDTO[] | FetchAPIError = await listarEquipos(props.sessionAPIToken, appliedSearchTerms.size, appliedSearchTerms.page, appliedSearchTerms.fieldSort, appliedSearchTerms.sortDirectionAsc, appliedSearchTerms.filter);
+            const response: EquipoDTO[] | FetchAPIError = await listarEquipos(sessionAPIToken, appliedSearchTerms.size, appliedSearchTerms.page, appliedSearchTerms.fieldSort, appliedSearchTerms.sortDirectionAsc, appliedSearchTerms.filter);
 
             // Si ocurre un error en la solicitud, muestra un mensaje de error en la consola y no hace nada
             if (isFetchAPIError(response)) {
@@ -225,11 +236,14 @@ function TableEquiposFC(props: Readonly<TableEquiposFCProps>): ReactElement {
             calcularPaginas();
         })();
 
-    }, [appliedSearchTerms]);
+    }, [appliedSearchTerms, sessionAPIToken]);
 
     //Metodo para calcular paginas disponibles
     function calcularPaginas(): void {
-        contarEquipos(props.sessionAPIToken, appliedSearchTerms.filter)
+
+        if(!sessionAPIToken) return;
+
+        contarEquipos(sessionAPIToken, appliedSearchTerms.filter)
             .then((response: number | FetchAPIError) => {
                 if (isFetchAPIError(response)) { //Si hay error
                     console.error("ERROR: " + response.errorMessage)
@@ -258,7 +272,7 @@ function TableEquiposFC(props: Readonly<TableEquiposFCProps>): ReactElement {
     function handleVerClick(equipo: EquipoDTO): void {
         if (!props.hasPermissionView) return; //Si el cliente no tiene permisos para ver, no hace nada
         createModal({
-            children: <ModalViewEquipoFC equipo={equipo} sessionAPIToken={props.sessionAPIToken}/>, // Renderiza el componente como JSX
+            children: <ModalViewEquipoFC equipo={equipo}/>, // Renderiza el componente como JSX
             buttonsType: ModalButtonsType.CLOSE // Establece el tipo de botones del modal
         }).show();
     }
