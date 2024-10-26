@@ -83,7 +83,7 @@ function AuthLayout({children}: Readonly<{ children: ReactNode }>) {
                         console.error("ERROR - EquiposPage_renovarToken: ", response);
                         throw new Error(response.errorMessage);
                     }
-                    document.cookie = `sessionToken=${response};path=/;max-age=300;samesite=strict;secure`;
+                    document.cookie = `sessionToken=${response};path=/;max-age=300;samesite=strict;`;
                     session.user.sessionAPIToken = response;
                     setSessionModalActive(false);
                     setSessionAPIToken(response);
@@ -92,7 +92,7 @@ function AuthLayout({children}: Readonly<{ children: ReactNode }>) {
         },
         onCancel: (): void => {
             setSessionModalActive(false);
-            document.cookie = `sessionToken=;max-age=0;path=/;samesite=lax;secure`;
+            document.cookie = `sessionToken=;max-age=0;path=/;samesite=lax;`;
             signOut({redirect: true, callbackUrl: "/login"})
 
         }
@@ -128,7 +128,7 @@ function AuthLayout({children}: Readonly<{ children: ReactNode }>) {
                                 sessionModal.close();
                                 return;
                             }
-                            document.cookie = `sessionToken=${response};path=/;max-age=300;samesite=strict;secure`;
+                            document.cookie = `sessionToken=${response};path=/;max-age=300;samesite=strict;`;
                             session.user.sessionAPIToken = response;
                             setSessionAPIToken(response);
                         }
