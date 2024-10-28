@@ -52,7 +52,7 @@ const authOptions: NextAuthOptions = {
                         httpOnly: false,
                         secure: true,
                         sameSite: 'strict',
-                        maxAge: 30,
+                        maxAge: 300,
                         path: '/',
                     })
                 }

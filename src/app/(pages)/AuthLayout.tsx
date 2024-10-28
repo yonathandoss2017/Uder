@@ -16,11 +16,11 @@ import {usePathname} from "next/navigation";
 function AuthLayout({children}: Readonly<{ children: ReactNode }>) {
 
     const {data: session, status, update} = useSession();
-    const CHECK_SESSION_EXP_TIME = 5000;
-    const RENEW_TOKEN = 15000;
-    const SESSION_IDLE_TIME = 5000;
+    const CHECK_SESSION_EXP_TIME = 15000;
+    const RENEW_TOKEN = 60000;
+    const SESSION_IDLE_TIME = 30000;
     const [hayToken, setHayToken] = useState<boolean>(false);
-    const expiresTimeTimestampRef = useRef<number>(Date.now() + 30000);
+    const expiresTimeTimestampRef = useRef<number>(Date.now() + 300000);
 
     const pathname = usePathname();
 
@@ -72,7 +72,7 @@ function AuthLayout({children}: Readonly<{ children: ReactNode }>) {
         ),
         buttonsType: ModalButtonsType.CONFIRM_CANCEL,
         onConfirm: async (): Promise<void> => {
-            expiresTimeTimestampRef.current = Date.now() + 30000;
+            expiresTimeTimestampRef.current = Date.now() + 300000;
             console.log("Renovando token en page");
             if (session?.user.sessionAPIToken) {
                 const response: string | FetchAPIError = await renovarToken(session?.user.sessionAPIToken);
@@ -80,7 +80,7 @@ function AuthLayout({children}: Readonly<{ children: ReactNode }>) {
                     console.error("ERROR - EquiposPage_renovarToken: ", response);
                     throw new Error(response.errorMessage);
                 }
-                document.cookie = `sessionToken=${response};path=/;max-age=30;samesite=strict;secure`;
+                document.cookie = `sessionToken=${response};path=/;max-age=300;samesite=strict;secure`;
                 session.user.sessionAPIToken = response;
                 setSessionModalActive(false);
             }
@@ -113,14 +113,14 @@ function AuthLayout({children}: Readonly<{ children: ReactNode }>) {
                     console.log("entre a no idle")
                     if (session?.user?.sessionAPIToken && !session.user.error) {
                         console.log("no idle con token renovando")
-                        expiresTimeTimestampRef.current = Date.now() + 30000;
+                        expiresTimeTimestampRef.current = Date.now() + 300000;
                         const response: string | FetchAPIError = await renovarToken(session?.user.sessionAPIToken);
                         if (isFetchAPIError(response)) {
                             console.error("ERROR - EquiposPage_renovarToken: ", response);
                             sessionModal.close();
                             return;
                         }
-                        document.cookie = `sessionToken=${response};path=/;max-age=30;samesite=strict;secure`;
+                        document.cookie = `sessionToken=${response};path=/;max-age=300;samesite=strict;secure`;
                         session.user.sessionAPIToken = response;
 
                     }
