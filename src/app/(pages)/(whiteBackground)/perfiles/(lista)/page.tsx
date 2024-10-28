@@ -41,7 +41,6 @@ const PerfilesPage = async (): Promise<ReactElement> => {
     // Retorna el JSX de la página de lista de perfiles
     return (
         <main>
-
             <TablePerfilesFC
                 sessionAPIToken={sessionAPIToken}
                 hasPermissionBaja={hasPermissionBaja}
