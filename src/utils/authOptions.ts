@@ -52,13 +52,14 @@ const authOptions: NextAuthOptions = {
                         httpOnly: false,
                         secure: true,
                         sameSite: 'strict',
-                        maxAge: 300,
+                        maxAge: 30,
                         path: '/',
                     })
                 }
                 // Retornamos un objeto con el token de sesión en la API para persistirlo en el JWT (JSON Web Token)
                 return {
                     sessionAPIToken: response,
+                    //exp: (Date.now() + 30000)
                 } as User;
 
             }
@@ -102,25 +103,9 @@ const authOptions: NextAuthOptions = {
                 token.user = session.user;
             }
 
-            const cacheDuration = 5 * 60 * 1000;
-
             if(cookies().get('sessionToken')?.value !== undefined) {
-                // Si el token ya tiene un timestamp y está dentro del tiempo de caché, no hacer la llamada
-                if (token.user.lastFetched && (Date.now() - token.user.lastFetched < cacheDuration)) {
-                    console.log("estoy dentro del if no hago la llamada")
-                    return token;
-                }else {
-                    console.log("ESTOY EN EL JWT ", cookies().get('sessionToken')?.value)
-                    token.user.sessionAPIToken = cookies().get('sessionToken')?.value;
-                    token.user.exp = Date.now() + 300000;
-
-                    const response = await buscarClientePorToken(cookies().get('sessionToken')!!.value);
-                    if (isFetchAPIError(response)) {
-                        throw new Error(response.errorMessage);
-                    }
-                    token.user.data = response;
-                    token.user.lastFetched = Date.now();
-                }
+                console.log("ESTOY EN EL JWT ", cookies().get('sessionToken')?.value)
+                token.user.sessionAPIToken = cookies().get('sessionToken')?.value;
             }
 
             return token;
@@ -148,9 +133,13 @@ const authOptions: NextAuthOptions = {
                 try {
                     if(cookies().get('sessionToken')?.value !== undefined) {
                         {
-                            session.user.data = token.user.data;
+                            console.log("POR OBTENER EL RESPONSE", cookies().get('sessionToken')?.value)
+                            const response = await buscarClientePorToken(cookies().get('sessionToken')!!.value);
+                            if (isFetchAPIError(response)) {
+                                throw new Error(response.errorMessage);
+                            }
+                            session.user.data = response;
                             session.user.sessionAPIToken = cookies().get('sessionToken')?.value;
-                            session.user.expires = token.user.exp
                             console.log(session.expires, "Expiracion del session auth")
                         }
                     }
