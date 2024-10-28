@@ -32,8 +32,7 @@ const IntervencionPage = async (): Promise<ReactElement> => {
             <TableIntervencionFC
                 sessionAPIToken={sessionAPIToken}
                 hasPermissionEdit={hasPermissionEdit}
-                hasPermissionView={hasPermissionView}
-            />
+                hasPermissionView={hasPermissionView}/>
         </main>
     );
 };

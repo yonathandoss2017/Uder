@@ -116,8 +116,7 @@ function TableIntervencionFC(props: Readonly<TableIntervencionFCProps>): ReactEl
                         modalModificar.close();
                         refSearchTermsTimer.current = setTimeout(() => {
                             setAppliedSearchTerms({ ...appliedSearchTerms });
-                        }, 1000);
-                    }}
+                        }, 1000);}}
                     onCancel={() => {
                         createModal({
                             children: (
@@ -128,9 +127,7 @@ function TableIntervencionFC(props: Readonly<TableIntervencionFCProps>): ReactEl
                                 modalModificar.close();
                             }
                         }).show();
-                    }}
-                />
-            ),
+                    }}/>),
             buttonsType: ModalButtonsType.NONE
         });
 
@@ -188,9 +185,7 @@ function TableIntervencionFC(props: Readonly<TableIntervencionFCProps>): ReactEl
                                     <td>{formatDate(intervencion.fechaHora)}</td>
                                     <td>{getTipoIntervencionNombre(intervencion.idTipoIntervencion)}</td>
                                     <td>{getEquipoNombre(intervencion.idEquipo)}</td>
-                                    <td>
-                                        <button onClick={() => handleViewDataClick(intervencion)}>Ver Datos</button> {/* Cambiado el texto del botón */}
-                                    </td>
+                                    <td><button onClick={() => handleViewDataClick(intervencion)}>Ver Datos</button> {/* Cambiado el texto del botón */}</td>
                                     <td>
                                         {props.hasPermissionEdit && !ID_TIPOS_INTERVENCION_RESOLUCION.includes(intervencion.idTipoIntervencion) ? (
                                             <button style={{ marginLeft: '10px' }} onClick={() => handleEditClick(intervencion)}>Trabajar</button>
@@ -209,26 +204,21 @@ function TableIntervencionFC(props: Readonly<TableIntervencionFCProps>): ReactEl
                         <button
                             className={styles.paginationButton}
                             onClick={handlePreviousPage}
-                            disabled={currentPage === 1}
-                        >
+                            disabled={currentPage === 1}>
                             Anterior
                         </button>
-
                         {Array.from({ length: totalPages }, (_, index) => (
                             <button
                                 key={index + 1}
                                 className={`${styles.paginationButton} ${currentPage === index + 1 ? styles.activePage : ''}`}
-                                onClick={() => setCurrentPage(index + 1)}
-                            >
+                                onClick={() => setCurrentPage(index + 1)}>
                                 {index + 1}
                             </button>
                         ))}
-
                         <button
                             className={styles.paginationButton}
                             onClick={handleNextPage}
-                            disabled={currentPage === totalPages}
-                        >
+                            disabled={currentPage === totalPages}>
                             Siguiente
                         </button>
                     </div>
@@ -248,8 +238,7 @@ function TableIntervencionFC(props: Readonly<TableIntervencionFCProps>): ReactEl
                                         fechaDesde: event.target.value ? new Date(event.target.value) : undefined
                                     }
                                 });
-                            }}
-                        />
+                            }}/>
                         <label htmlFor="fechaHasta">Fecha Hasta:</label>
                         <input
                             type="date"
@@ -276,8 +265,7 @@ function TableIntervencionFC(props: Readonly<TableIntervencionFCProps>): ReactEl
                                         idTipoIntervencion: event.target.value ? parseInt(event.target.value) : undefined
                                     }
                                 });
-                            }}
-                        >
+                            }}>
                             <option value="">Tipo de Intervencion</option>
                             {tiposIntervencion.map((tipo) => (
                                 <option key={tipo.id} value={tipo.id}>{tipo.nombre}</option>
