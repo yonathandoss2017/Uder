@@ -59,7 +59,6 @@ const authOptions: NextAuthOptions = {
                 // Retornamos un objeto con el token de sesión en la API para persistirlo en el JWT (JSON Web Token)
                 return {
                     sessionAPIToken: response,
-                    //exp: (Date.now() + 30000)
                 } as User;
 
             }
