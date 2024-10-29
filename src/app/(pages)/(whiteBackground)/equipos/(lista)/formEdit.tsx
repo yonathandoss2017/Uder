@@ -34,10 +34,6 @@ import ModalChangesFC from "@/components/ModalChangesFC";
 import {modificarEquipo} from "@/services/EquiposService";
 import {imageToBase64} from "@/utils/Utils";
 import styles from "@public/styles/modules/table/table.editformequipo.module.css";
-import MarcaFilter from "@/types/filters/MarcaFilter";
-import ModeloFilter from "@/types/filters/ModeloFilter";
-import TipoEquipoFilter from "@/types/filters/TipoEquipoFilter";
-import ProveedorFilter from "@/types/filters/ProveedorFilter";
 import {useToken} from "@/app/hooks/TokenProvider";
 
 /**
@@ -88,7 +84,8 @@ function EditEquipoForm(props: Readonly<EditEquipoFormProps>): ReactElement {
     const {
         register,               // Método para registrar los inputs del formulario
         handleSubmit,           // Método para manejar el envío del formulario
-        formState: {errors}     // Propiedad que contiene los errores del formulario
+        formState: {errors},     // Propiedad que contiene los errores del formulario
+        setValue
     }: UseFormReturn<FormValues> = useForm<FormValues>({ // Inicializamos useForm con el tipo EquipoFormData
         resolver: zodResolver(SchemaEquipo.merge(
             z.object({
@@ -240,22 +237,24 @@ function EditEquipoForm(props: Readonly<EditEquipoFormProps>): ReactElement {
 
     // Efecto que se ejecuta al cambiar la marca seleccionada (Carga los modelos de la marca seleccionada)
     useEffect((): void => {
+        if (selectedMarcaId) {
+            const nuevosModelosPorMarca = modelos.filter((modelo: ModeloDTO) => modelo.idMarca === selectedMarcaId);
+            setModelosPorMarca(nuevosModelosPorMarca);
 
-        // Procedimiento auto-ejecutable (Para que sea asíncrono)
-        (async (): Promise<void> => {
-
-            // Si se ha seleccionado una marca se cargan los modelos de la marca seleccionada
-            if (selectedMarcaId) {
-
-                // Filtra por idMarca
-                setModelosPorMarca(modelos.filter((modelo: ModeloDTO): boolean => modelo.idMarca === selectedMarcaId));
-
-            } else { // Si no, se limpia la lista de modelos
-                setModelosPorMarca([]);
+            // Actualizar el idModelo solo si existen modelos para la marca seleccionada
+            if (nuevosModelosPorMarca.length > 0 && nuevosModelosPorMarca[0].id) {
+                // Establecemos el valor explícitamente en el formulario para que lo detecte como cambio
+                setValue("idModelo", nuevosModelosPorMarca[0].id, { shouldDirty: true });
+            } else {
+                // Si no hay modelos, se resetea el valor del modelo
+                setValue("idModelo", 0, { shouldDirty: true });
             }
-        })();
+        } else {
+            setModelosPorMarca([]);
+            setValue("idModelo", 0, { shouldDirty: true });
+        }
+    }, [selectedMarcaId, modelos, setValue]);
 
-    }, [modelos, selectedMarcaId]); // Se ejecuta al montar el componente y cuando cambia selectedMarcaId o la lista de modelos
 
 
     // ----------------------- Eventos del formulario de edición de equipo -----------------------
@@ -499,7 +498,18 @@ function EditEquipoForm(props: Readonly<EditEquipoFormProps>): ReactElement {
                             value: marca.nombre
                         }))}
                         selectedKey={selectedMarcaId}
-                        onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setSelectedMarcaId(parseInt(e.target.value))}
+                        onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {setSelectedMarcaId(parseInt(e.target.value))
+                            // Filtra los modelos para la nueva marca seleccionada y selecciona el primero
+                            const nuevosModelosPorMarca = modelos.filter((modelo: ModeloDTO) => modelo.idMarca === selectedMarcaId);
+                            setModelosPorMarca(nuevosModelosPorMarca);
+
+                            // Actualiza `idModelo` en el formulario si hay modelos disponibles
+                            if (nuevosModelosPorMarca.length > 0 && nuevosModelosPorMarca[0].id) {
+                            setValue("idModelo", nuevosModelosPorMarca[0].id);
+                        } else {
+                            setValue("idModelo", 0);
+                        }
+                    }}
                     />
                 </div>
                 <div className={styles.inputBox}>
