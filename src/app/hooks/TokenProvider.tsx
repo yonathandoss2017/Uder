@@ -22,7 +22,7 @@ export const TokenProvider = ({ children }: { children: ReactNode }) => {
             setSessionAPIToken(session.user.sessionAPIToken); // Si hay un token en la sesión, lo establecemos
         }
         console.log("DESPUES TOKEN PROVIDER", sessionAPIToken)
-    }, [session]); // Se ejecuta cada vez que la sesión cambie
+    }, [session, session?.user.sessionAPIToken]); // Se ejecuta cada vez que la sesión cambie
 
     return (
         <TokenContext.Provider value={{ sessionAPIToken, setSessionAPIToken }}>

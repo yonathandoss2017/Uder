@@ -11,9 +11,12 @@ import {renovarToken} from "@/services/SessionService";
 import {useModal} from "@/app/hooks/modals/useModal";
 import {useIdleTimer} from "react-idle-timer";
 import {usePathname} from "next/navigation";
+import {TokenProvider, useToken} from "@/app/hooks/TokenProvider";
 
 // Define el componente layout de autenticación
 function AuthLayout({children}: Readonly<{ children: ReactNode }>) {
+
+    const { sessionAPIToken, setSessionAPIToken } = useToken();
 
     const {data: session, status, update} = useSession();
     const CHECK_SESSION_EXP_TIME = 15000;
@@ -23,6 +26,7 @@ function AuthLayout({children}: Readonly<{ children: ReactNode }>) {
     const expiresTimeTimestampRef = useRef<number>(Date.now() + 300000);
 
     const pathname = usePathname();
+
 
     const onUserIdle = () => {
         console.log('IDLE');
@@ -82,6 +86,7 @@ function AuthLayout({children}: Readonly<{ children: ReactNode }>) {
                 }
                 document.cookie = `sessionToken=${response};path=/;max-age=300;samesite=strict;secure`;
                 session.user.sessionAPIToken = response;
+                setSessionAPIToken(response);
                 setSessionModalActive(false);
             }
         },
@@ -122,7 +127,7 @@ function AuthLayout({children}: Readonly<{ children: ReactNode }>) {
                         }
                         document.cookie = `sessionToken=${response};path=/;max-age=300;samesite=strict;secure`;
                         session.user.sessionAPIToken = response;
-
+                        setSessionAPIToken(response);
                     }
                 } else if (isIdle() && timeRemaining < RENEW_TOKEN) {
                     if (!sessionModalActive) {
