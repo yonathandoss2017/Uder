@@ -50,26 +50,6 @@ function AuthLayout({children}: Readonly<{ children: ReactNode }>) {
     const [showSessionExpiredError, setShowSessionExpiredError] = useState<boolean>(false);
     const [sessionModalActive, setSessionModalActive] = useState<boolean>(false);
 
-    const renderSessionExpiredError = (): ReactElement => {
-        return (<ErrorFC customContent={(
-                <>
-                    <h1>Error</h1>
-                    <h2>La sesión expiro por inactividad</h2>
-                    <h3>Por favor inicie sesión nuevamente.</h3>
-                    <br/>
-                    <button onClick={async (): Promise<void> => {
-                        await signOut({
-                            callbackUrl: "/login", // URL de redirección después del cierre de sesión
-                            redirect: true    // Redirige al usuario después de cerrar la sesión
-                        });
-                    }}>
-                        Volver a iniciar sesión
-                    </button>
-                </>
-            )}></ErrorFC>
-        );
-    };
-
     const sessionModal = createModal({
         children: (
             <p>Su sesión está por expirar, quiere renovarla?</p>
@@ -94,7 +74,6 @@ function AuthLayout({children}: Readonly<{ children: ReactNode }>) {
             setSessionModalActive(false);
             document.cookie = `sessionToken=;max-age=0;path=/;samesite=lax;secure`;
             signOut({redirect: true, callbackUrl: "/login"})
-
         }
     });
 
