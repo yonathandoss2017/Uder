@@ -50,6 +50,7 @@ const authOptions: NextAuthOptions = {
                         name: 'sessionToken',
                         value: response,
                         httpOnly: false,
+                        secure: true,
                         sameSite: 'strict',
                         maxAge: 300,
                         path: '/',
