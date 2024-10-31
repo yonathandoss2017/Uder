@@ -20,7 +20,7 @@ const SignOut = () => {
     if(sessionData) sessionData.user.sessionAPIToken = undefined;
 
     if (document.cookie.includes('sessionToken')) {
-        document.cookie = `sessionToken=;max-age=0;path=/;samesite=lax;secure`;
+        document.cookie = `sessionToken=;max-age=0;path=/;samesite=lax;`;
     }
 
     // Define el efecto secundario del componente (Cerrar sesión)
