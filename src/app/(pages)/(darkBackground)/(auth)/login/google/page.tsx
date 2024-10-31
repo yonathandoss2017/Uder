@@ -91,7 +91,7 @@ const GoogleAuthPage = () => {
 
                         }).show();
                     } else {
-                        document.cookie = `sessionToken=${response};path=/;max-age=300;samesite=strict;secure`;
+                        document.cookie = `sessionToken=${response};path=/;max-age=300;samesite=strict`;
                         if (document.cookie.includes('sessionToken')) {
                             window.location.href = "/";
                             sessionData.user.sessionAPIToken = response; // Asigna el token de sesión al usuario
