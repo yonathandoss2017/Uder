@@ -130,6 +130,47 @@ export async function registrarUsuario(usuario: UsuarioDTO, password: string, ph
     return await fetchBodyWithErrorHandling<UsuarioDTO>(url, options);
 }
 
+export async function registrarConAD(usuario: UsuarioDTO, phone: number): Promise<UsuarioDTO | FetchAPIError>{
+
+    const url: string = `${SERVICE_PATH}/registrar-ad?phone=${phone}`; // URL de la petición a la API
+
+    // Opciones de la petición
+    const options: RequestInit = {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json' // Tipo de contenido JSON
+        },
+        body: JSON.stringify(usuario) // Cuerpo de la petición con los datos del usuario en formato JSON
+    };
+
+    // Realiza la petición a la API y retorna el resultado
+    return await fetchBodyWithErrorHandling<UsuarioDTO>(url, options);
+}
+
+export async function generarNombreUsuario(primerNombre: string, segundoNombre: string,  primerApellido: string, segundoApellido: string): Promise<string | FetchAPIError> {
+
+    const queryParams: URLSearchParams = new URLSearchParams({
+        ...(!!primerNombre && {primerNombre: primerNombre}),
+        ...(!!segundoNombre && {segundoNombre: segundoNombre}),
+        ...(!!primerApellido && {primerApellido: primerApellido}),
+        ...(!!segundoApellido && {segundoApellido: segundoApellido})
+    })
+
+    const url: string = `${SERVICE_PATH}/generar-nombre-usuario?${queryParams}`; // URL de la petición a la API
+
+    // Opciones de la petición
+    const options: RequestInit = {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json' // Tipo de contenido JSON
+        }
+    };
+
+    // Realiza la petición a la API y retorna el resultado
+    return await fetchBodyWithErrorHandling<string>(url, options);
+
+}
+
 /**
  * Función para modificar un usuario existente.
  * @param usuario - Datos del usuario a modificar
