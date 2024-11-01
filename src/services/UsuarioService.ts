@@ -10,6 +10,11 @@ import UsuarioFieldSortEnum from "@/types/enums/UsuarioFieldSortEnum";
 // URL base de la API REST de la API para los usuarios
 const SERVICE_PATH: string = process.env.NEXT_PUBLIC_BACKEND_API_URL + "/usuarios";
 
+interface UsernameAPIResponse {
+    username: string;
+}
+
+
 /**
  * Función para listar todos los usuarios.
  * @param token - Token de autenticación del usuario
@@ -166,8 +171,9 @@ export async function generarNombreUsuario(primerNombre: string, segundoNombre: 
         }
     };
 
-    // Realiza la petición a la API y retorna el resultado
-    return await fetchBodyWithErrorHandling<string>(url, options);
+    const response: UsernameAPIResponse | FetchAPIError = await fetchBodyWithErrorHandling<UsernameAPIResponse>(url, options);
+    if (isFetchAPIError(response)) return response;
+    return response.username;
 
 }
 
