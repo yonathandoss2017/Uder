@@ -11,6 +11,10 @@ const SchemaUserRegisterAd = SchemaUser.merge(SchemaUserPhone).extend({
         })
         .refine((value: string) => value.trim().length != 0, {
             message: "El dominio no puede estar vacío",
+        }),
+    contrasenia: z
+        .string({
+            required_error: "La contraseña no puede estar vacía"
         })
 });
 
