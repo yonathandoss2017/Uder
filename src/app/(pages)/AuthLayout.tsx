@@ -80,7 +80,7 @@ function AuthLayout({children}: Readonly<{ children: ReactNode }>) {
 
     useEffect(() => {
 
-        if (pathname === "/login" || pathname === "/login/google" || pathname.includes('/signup')) {
+        if (pathname === "/login" || pathname === "/login/google" || pathname === "/signup/google" || pathname === "/signup/ad") {
             return;
         }
         console.log("HAY TOKEN BOOLEAN", document.cookie.includes('sessionToken'));
@@ -130,7 +130,7 @@ function AuthLayout({children}: Readonly<{ children: ReactNode }>) {
     useEffect(() => {
         const intervalId = setInterval(async () => {
             console.log("ESTOY DENTRO DEL SEGUNDO USE EFEFECT")
-            if (!document.cookie.includes('sessionToken') && pathname !== "/login" && pathname !== "/login/google" && !pathname.includes('/signup')) {
+            if (!document.cookie.includes('sessionToken') && pathname !== "/login" && pathname !== "/login/google" && pathname != "/signup/google" && pathname != "/signup/ad") {
                 console.log("EN EL PRIMER IF DEL SEGUNDO USE EFFECT")
                 console.log("pase el if IF")
                 sessionModal.close();
@@ -150,7 +150,7 @@ function AuthLayout({children}: Readonly<{ children: ReactNode }>) {
 // Muestra un mensaje de error si se produce un error de sesión
     // Muestra un mensaje de error si se produce un error de sesión
     if (showSessionExpiredError || session?.user?.error) {
-        if(pathname != "/login" && pathname != "/login/google" && !pathname.includes('/signup')) {
+        if(pathname != "/login" && pathname != "/login/google" && pathname != "/signup/google" && pathname != "/signup/ad") {
             signOut({redirect: true, callbackUrl: "/login"})
         }
     }
