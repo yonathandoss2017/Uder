@@ -147,7 +147,7 @@ export async function registrarConAD(usuario: UsuarioDTO, phone: number): Promis
     return await fetchBodyWithErrorHandling<UsuarioDTO>(url, options);
 }
 
-export async function generarNombreUsuario(primerNombre: string, segundoNombre: string,  primerApellido: string, segundoApellido: string): Promise<string | FetchAPIError> {
+export async function generarNombreUsuario(primerNombre: string, segundoNombre: string | undefined,  primerApellido: string, segundoApellido: string |undefined): Promise<string | FetchAPIError> {
 
     const queryParams: URLSearchParams = new URLSearchParams({
         ...(!!primerNombre && {primerNombre: primerNombre}),
@@ -168,6 +168,27 @@ export async function generarNombreUsuario(primerNombre: string, segundoNombre: 
 
     // Realiza la petición a la API y retorna el resultado
     return await fetchBodyWithErrorHandling<string>(url, options);
+
+}
+
+export async function verificarAD(nombreUsuario: string, password: string, dominio: string): Promise<boolean | FetchAPIError> {
+    const queryParams: URLSearchParams = new URLSearchParams({
+        ...(!!nombreUsuario && {nombreUsuario: nombreUsuario}),
+        ...(!!password && {password: password}),
+        ...(!!dominio && {dominio: dominio})
+    })
+
+    const url: string = `${SERVICE_PATH}/verificar-ad?${queryParams}`; // URL de la petición a la API
+
+    // Opciones de la petición
+    const options: RequestInit = {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json' // Tipo de contenido JSON
+        }
+    };
+
+    return await fetchBodyWithErrorHandling<boolean>(url, options);
 
 }
 
@@ -255,6 +276,8 @@ export async function existeCorreo(correo: string): Promise<boolean> {
     };
 
     return await fetchBodyWithErrorHandling<boolean>(url, options).then((response: boolean | FetchAPIError): boolean => {
+
+        console.log("RESPONSE existe correo", response)
         if (isFetchAPIError(response)) {
             // Sí ocurre un error en la solicitud o en el procesamiento de la respuesta
             // imprime el error en la consola y retorna false indicando que no existe el correo
