@@ -138,6 +138,7 @@ const RegisterFormClientAd = () => {
             return;
         }
 
+        console.log("Valores pasados a verificarAD ", nombreUsuario, formValues.contrasenia, formValues.dominio)
        const existeAd: boolean | FetchAPIError = await verificarAD(nombreUsuario, formValues.contrasenia, formValues.dominio);
 
         if (isFetchAPIError(existeAd)) {
@@ -300,7 +301,7 @@ const RegisterFormClientAd = () => {
                     <div className={styles.inputBox}>
                         <label className={styles.details}>
                             <span>Contraseña <span className={styles.requiredField}>*</span></span>
-                            <input type="password" placeholder="Contraseña"/>
+                            <input {...register("contrasenia")} type="password" placeholder="Contraseña"/>
                         </label>
                         {errors.contrasenia &&
                             <label className={styles.error}>{errors.contrasenia.message}</label>}
