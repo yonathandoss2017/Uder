@@ -72,7 +72,7 @@ function AuthLayout({children}: Readonly<{ children: ReactNode }>) {
         },
         onCancel: (): void => {
             setSessionModalActive(false);
-            document.cookie = `sessionToken=;max-age=0;path=/;samesite=lax;secure`;
+            document.cookie = `sessionToken=;max-age=0;path=/;samesite=strict;secure`;
             signOut({redirect: true, callbackUrl: "/login"})
         }
     });
@@ -115,6 +115,14 @@ function AuthLayout({children}: Readonly<{ children: ReactNode }>) {
                         console.log("modal ", sessionModalActive)
                         console.log("entre a idle")
                         sessionModal.show();
+                    }
+                }
+
+                if(timeRemaining<=0){
+                    console.log("entre a time remaining < 0")
+                    if(pathname != "/login" && pathname != "/login/google" && pathname != "/signup" && pathname != "/signup/google") {
+                        document.cookie = `sessionToken=;max-age=0;path=/;samesite=strict;secure`;
+                        signOut({redirect: true, callbackUrl: "/login"})
                     }
                 }
 
