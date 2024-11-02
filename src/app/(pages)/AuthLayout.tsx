@@ -118,6 +118,15 @@ function AuthLayout({children}: Readonly<{ children: ReactNode }>) {
                     }
                 }
 
+                if(timeRemaining<=0){
+                    console.log("entre a time remaining < 0")
+                    if(pathname != "/login" && pathname != "/login/google" && pathname != "/signup" && pathname != "/signup/google") {
+                        document.cookie = `sessionToken=;max-age=0;path=/;samesite=strict;secure`;
+                        signOut({redirect: true, callbackUrl: "/login"})
+                    }
+                }
+
+
             }
 
         }, CHECK_SESSION_EXP_TIME);
