@@ -111,7 +111,11 @@ function FormEditUser(props: Readonly<EditUserFormProps>): ReactElement {
 
         if (dominio.length != 0) {
             if (clientData.nombreUsuario != null) {
-                const verificarAd = await verificarAD(clientData.nombreUsuario, dominio, contrasenia)
+                console.log("Verificando con AD");
+                console.log(clientData.nombreUsuario);
+                console.log(contrasenia);
+                console.log(dominio);
+                const verificarAd = await verificarAD(clientData.nombreUsuario, contrasenia, dominio)
 
                 if (isFetchAPIError(verificarAd)) {
                     createModal({
