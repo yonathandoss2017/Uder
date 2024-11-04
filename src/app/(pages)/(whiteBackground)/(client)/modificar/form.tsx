@@ -18,6 +18,9 @@ import {useModal} from "@/app/hooks/modals/useModal";
 import ModalChangesFC from "@/components/ModalChangesFC";
 import TableTelefonosFC from "@/components/TableTelefonosFC";
 import {useToken} from "@/app/hooks/TokenProvider";
+import styles from "@public/styles/modules/auth/signupForm.module.css";
+import {dom} from "@fortawesome/fontawesome-svg-core";
+import {verificarAD} from "@/services/UsuarioService";
 
 /**
  * Propiedades del componente
@@ -47,9 +50,7 @@ function FormEditUser(props: Readonly<EditUserFormProps>): ReactElement {
         handleSubmit,           // Método para manejar el envío del formulario
         formState: {errors}     // Propiedad que contiene los errores del formulario
     }: UseFormReturn<UsuarioDTO> = useForm<UsuarioDTO>({ // Inicializamos useForm con el tipo EquipoFormData
-        resolver: zodResolver(schemaUser.merge(z.object({
-            contrasenia: z.string().optional()
-        }))),                                     // Usamos zodResolver para la validación del formulario con el esquema de Zod SchemaUserEstado
+        resolver: zodResolver(schemaUser),                                     // Usamos zodResolver para la validación del formulario con el esquema de Zod SchemaUserEstado
         mode: 'all',                              // Configuramos el modo de validación a "all", lo que válida en cada cambio de valor y al salir del campo
         defaultValues: props.clientData,          // Valores por defecto del formulario
     });
@@ -65,6 +66,9 @@ function FormEditUser(props: Readonly<EditUserFormProps>): ReactElement {
     let [contrasenia, setContrasenia]: [string, (value: string) => void] = useState<string>("");
     // Define el estado de la nueva contraseña y la función para modificarla (setNuevaContrasenia)
     let [nuevaContrasenia, setNuevaContrasenia]: [string, (value: string) => void] = useState<string>("");
+
+    // Define el estado del dominio actual y la función para modificarlo (setDominio)
+    let [dominio, setDominio]: [string, (value: string) => void] = useState<string>("");
 
     // ----------------------- Eventos del formulario de edición propia del usuario -----------------------
 
@@ -107,10 +111,32 @@ function FormEditUser(props: Readonly<EditUserFormProps>): ReactElement {
         // Define una bandera para verificar si la contraseña actual es correcta
         let resultActualPassword: boolean = true;
 
-        // Verifica si la contraseña actual es correcta intentando hacer login con las credenciales del usuario
-        await loginCredentials(clientData.nombreUsuario as string, contrasenia).catch((): void => {
-            resultActualPassword = false; // Si hay un error, establece la bandera en falso (Contraseña incorrecta)
-        });
+        if (dominio.length != 0) {
+            if (clientData.nombreUsuario != null) {
+                const verificarAd = await verificarAD(clientData.nombreUsuario, dominio, contrasenia)
+
+                if (isFetchAPIError(verificarAd)) {
+                    createModal({
+                        children: (
+                            <div>
+                                <h3>Error al verificar con el Active Directory</h3>
+                            </div>
+                        ),
+                        buttonsType: ModalButtonsType.CONFIRM
+                    }).show();
+                }
+
+                if (!verificarAd) {
+                    resultActualPassword = false;
+                }
+
+            }
+        } else {
+            // Verifica si la contraseña actual es correcta intentando hacer login con las credenciales del usuario
+            await loginCredentials(clientData.nombreUsuario as string, contrasenia).catch((): void => {
+                resultActualPassword = false; // Si hay un error, establece la bandera en falso (Contraseña incorrecta)
+            });
+        }
 
         // Si la contraseña actual no es correcta, muestra un mensaje y retorna
         if (!resultActualPassword) {
@@ -343,6 +369,13 @@ function FormEditUser(props: Readonly<EditUserFormProps>): ReactElement {
                            className="contrasenia"
                            onChange={(event: ChangeEvent<HTMLInputElement>) => setNuevaContrasenia(event.target.value)}
                     />
+                </div>
+                <div className="input-box-mp">
+                    <label className="details">
+                        <span>Dominio <span className="required-field"></span></span>  </label>
+                        <input id={"dominio"} type="text" placeholder="Dominio"
+                        onChange={(event: ChangeEvent<HTMLInputElement>) => setDominio(event.target.value)}
+                        />
                 </div>
                 <div className="input-box-mp">
                     <label className="details">Fecha de nacimiento <span className="required-field">*</span></label>
