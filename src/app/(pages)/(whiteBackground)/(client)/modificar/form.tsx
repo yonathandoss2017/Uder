@@ -18,8 +18,6 @@ import {useModal} from "@/app/hooks/modals/useModal";
 import ModalChangesFC from "@/components/ModalChangesFC";
 import TableTelefonosFC from "@/components/TableTelefonosFC";
 import {useToken} from "@/app/hooks/TokenProvider";
-import styles from "@public/styles/modules/auth/signupForm.module.css";
-import {dom} from "@fortawesome/fontawesome-svg-core";
 import {verificarAD} from "@/services/UsuarioService";
 
 /**
@@ -124,6 +122,7 @@ function FormEditUser(props: Readonly<EditUserFormProps>): ReactElement {
                         ),
                         buttonsType: ModalButtonsType.CONFIRM
                     }).show();
+                    return;
                 }
 
                 if (!verificarAd) {
