@@ -113,7 +113,7 @@ function EditFuncionalidadForm(props: Readonly<EditFuncionalidadFormProps>): Rea
 
     return (
         <form onSubmit={handleSubmit(onSubmit)} className={`${styles.formContainer} ${styles.aparecer}`}>
-            <h2>Modificacion de Funcionalidad</h2>
+            <h2>Modificación de Funcionalidad</h2>
             <div className={styles.detailsContainer}>
                 <div className={styles.inputBox}>
                     <label className={styles.details}>Nombre<span className={styles.requiredField}>*</span></label>
