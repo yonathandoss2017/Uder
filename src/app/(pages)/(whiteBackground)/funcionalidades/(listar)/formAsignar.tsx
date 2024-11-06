@@ -1,6 +1,6 @@
 import {ReactElement, useEffect, useState} from "react";
 import {useModal} from "@/app/hooks/modals/useModal";
-import styles from "@public/styles/modules/table/table.editformequipo.module.css";
+import styles from "@public/styles/modules/table/table.editformfuncionalidad.module.css";
 import FuncionalidadDTO from "@/types/dtos/FuncionalidadDTO";
 import PerfilDTO from "@/types/dtos/PerfilDTO";
 import FetchAPIError, {isFetchAPIError} from "@/types/errors/FetchAPIError";
@@ -109,11 +109,12 @@ function AsignarFuncionalidadesForm(props: Readonly<AsignarFuncionalidadesFormPr
 
     if(!loaded) return <LoadingPage/>
     return (
-        <form onSubmit={handleSubmit(onSubmit)}>
-            <p>Asignar funcionalidades</p>
-            <div className={styles.inputBox}>
+        <form onSubmit={handleSubmit(onSubmit)} className={`${styles.formContainer} ${styles.aparecer}`}>
+            <p style={{ fontWeight: "bold" }}>Asignar funcionalidades</p>
+            <div className={styles.detailsContainer}>
                 <div className={styles.scroll}>
-                    <label className={styles.details}>Permisos</label>
+                    <div className={styles.perfilesContainer}>
+                    <label className={styles.details}>Perfiles</label>
                     {perfiles.length > 0 ? (
                         <div className={styles.permisosContainer}>
                             {perfiles.map((perfil: PerfilDTO) => (
@@ -137,14 +138,15 @@ function AsignarFuncionalidadesForm(props: Readonly<AsignarFuncionalidadesFormPr
                             ))}
                         </div>
                     ) : (
-                        <p>No hay permisos disponibles para asignar.</p>
+                        <p>No hay perfiles disponibles para asignar.</p>
                     )}
+                    </div>
                 </div>
             </div>
+            <div className={styles.buttomM}>
             <button type="submit">Guardar</button>
-            <button type="button" onClick={props.onCancel}>
-                Cancelar
-            </button>
+            <button type="button" onClick={props.onCancel}>Cancelar</button>
+            </div>
         </form>
     );
 }
