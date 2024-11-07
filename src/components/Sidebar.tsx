@@ -259,7 +259,6 @@ if (!clientData || !clientData.id) return <LoadingPage/>
                     )
                 })}
             </ul>
-
             {/* Información del usuario */}
             <div className={styles.userInfo}>
                 <Avatar

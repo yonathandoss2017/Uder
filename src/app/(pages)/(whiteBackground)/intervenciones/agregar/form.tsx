@@ -165,7 +165,6 @@ const RegisterIntervencionForm: React.FC<RegisterIntervencionFormProps> = (props
                     </label>
                     {errors.motivo && <label className={styles.error}>{errors.motivo.message}</label>}
                 </div>
-
                 <div className={styles.inputBoxRe}>
                     <label className={styles.details}>
                         <span>Tipo de Intervención <span className={styles.requiredField}>*</span></span>
@@ -180,7 +179,6 @@ const RegisterIntervencionForm: React.FC<RegisterIntervencionFormProps> = (props
                         />
                     </label>
                 </div>
-
                 <div className={styles.inputBoxRe}>
                     <label className={styles.details}>
                         <span>Número de serie del equipo <span className={styles.requiredField}>*</span></span>
@@ -192,14 +190,12 @@ const RegisterIntervencionForm: React.FC<RegisterIntervencionFormProps> = (props
                     </label>
                     {errors.numSerieEquipo && <label className={styles.error}>{errors.numSerieEquipo.message}</label>}
                 </div>
-
                 <div className={styles.inputBoxRe}>
                     <label className={styles.details}>
                         <span>Comentarios</span>
                         <textarea {...register("comentarios")} placeholder="Comentarios adicionales" />
                     </label>
                 </div>
-
                 <div className={styles.buttomAe}>
                     <button type="submit">Agregar</button>
                 </div>

@@ -46,7 +46,6 @@ const ModalChangesFC = (changes: Readonly<ChangeEntry[]>): ReactElement => {
             )}
             <br/>
             <p>¿Desea continuar?</p>
-
         </>
     );
 };

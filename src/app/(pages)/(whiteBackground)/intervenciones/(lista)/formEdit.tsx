@@ -132,7 +132,6 @@ function TrabajarIntervencionForm(props: Readonly<EditIntervencionFormProps>): R
     return (
         <form onSubmit={handleSubmit(onSubmit)} className={`${styles.formContainer} ${styles.aparecer}`}>
             <h2>Trabajo de Intervención</h2>
-
             <div className={styles.detailsContainer}>
                 <div className={styles.inputBox}>
                     <label className={styles.details}>
@@ -145,7 +144,6 @@ function TrabajarIntervencionForm(props: Readonly<EditIntervencionFormProps>): R
                     />
                     {errors.fechaHora && <label className={styles.error}>{errors.fechaHora.message}</label>}
                 </div>
-
                 <div className={styles.inputBox}>
                     <label className={styles.details}>
                         Motivo<span className={styles.requiredField}>*</span>
@@ -157,12 +155,10 @@ function TrabajarIntervencionForm(props: Readonly<EditIntervencionFormProps>): R
                     />
                     {errors.motivo && <label className={styles.error}>{errors.motivo.message}</label>}
                 </div>
-
                 <div className={styles.inputBox}>
                     <label className={styles.details}>Comentarios</label>
                     <textarea {...register("comentarios")} defaultValue={props.editingIntervencion.comentarios || ""} />
                 </div>
-
                 <div className={styles.inputBox}>
                     <label className={styles.details}>Tipo de Intervención<span className={styles.requiredField}>*</span></label>
                     <ComboBoxFC
@@ -176,7 +172,6 @@ function TrabajarIntervencionForm(props: Readonly<EditIntervencionFormProps>): R
                     />
                 </div>
             </div>
-
             <div className={styles.buttomM}>
                 <button type="submit">Guardar</button>
                 <button type="button" onClick={props.onCancel}>Cancelar</button>

@@ -369,7 +369,6 @@ function TableFuncionalidadFC(props: Readonly<TableFuncionalidadFCProps>): React
                         >
                             Anterior
                         </button>
-
                         {currentPage > 4 && (
                             <>
                                 <button
@@ -381,9 +380,7 @@ function TableFuncionalidadFC(props: Readonly<TableFuncionalidadFCProps>): React
                                 <span>...</span>
                             </>
                         )}
-
                         {Array.from({length: 3}, (_, index) => {
-
                             const num = currentPage - (index + 1);
                             if (num < 1 || currentPage == 1) return;
                             return (
@@ -395,14 +392,12 @@ function TableFuncionalidadFC(props: Readonly<TableFuncionalidadFCProps>): React
                                 </button>
                             )
                         }).reverse()}
-
                         <button
                             key={currentPage}
                             className={stylesTable.activePage}
                         >
                             {currentPage}
                         </button>
-
                         {Array.from({length: 3}, (_, index) => {
                             const num = currentPage + (index + 1);
                             if (num > npage) return;
@@ -415,7 +410,6 @@ function TableFuncionalidadFC(props: Readonly<TableFuncionalidadFCProps>): React
                                 </button>
                             )
                         })}
-
                         {currentPage < npage - 3 && (
                             <>
                                 <span>...</span>
@@ -427,14 +421,12 @@ function TableFuncionalidadFC(props: Readonly<TableFuncionalidadFCProps>): React
                                 </button>
                             </>
                         )}
-
                         <button
                             onClick={() => setCurrentPage(currentPage + 1)}
                             disabled={currentPage === npage}
                         >
                             Siguiente
                         </button>
-
                     </div>
                 )}
             </div>

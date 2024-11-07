@@ -49,14 +49,12 @@ const ModalFC: React.FC<ModalFCProps> = (props: ModalFCProps) => {
 
             {/* Contenido del modal, evita cerrar al hacer clic dentro */}
             <div className={`${styles.modalContent} ${(props.isSidebarOpen) && styles.modalContentSidebarPosition}`}>
-
                 {props.title && (
                     <>
                         <h3>{props.title}</h3>
                         <br/>
                     </>
                 )}
-
                 {/* Muestra el contenido del modal */}
                 <div>
                     {props.children}

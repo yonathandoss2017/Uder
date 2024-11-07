@@ -110,7 +110,6 @@ const RegisterFuncionalidadForm : React.FC<RegisterFuncionalidadFormProps> = (pr
                             placeholder="Nombre de la funcionalidad"
                         />
                     </label>
-
                     {errors.nombre &&
                         <label className={styles.error}>{errors.nombre.message}</label>}
                 </div>

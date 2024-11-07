@@ -128,7 +128,6 @@ function EditFuncionalidadForm(props: Readonly<EditFuncionalidadFormProps>): Rea
                         <label className={styles.error} style={{color: 'red'}}>{errors.nombre.message}</label>}
                 </div>
             </div>
-
             <div className={styles.buttomM}>
                 <button type="submit">Guardar</button>
                 <button type="button" onClick={props.onCancel}>Cancelar</button>

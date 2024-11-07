@@ -444,9 +444,7 @@ function TableEquiposFC(props: Readonly<TableEquiposFCProps>): ReactElement {
                                 <span>...</span>
                             </>
                         )}
-
                         {Array.from({length: 3}, (_, index) => {
-
                             const num = currentPage - (index + 1);
                             if (num < 1 || currentPage == 1) return;
                             return (
@@ -458,14 +456,12 @@ function TableEquiposFC(props: Readonly<TableEquiposFCProps>): ReactElement {
                                 </button>
                             )
                         }).reverse()}
-
                         <button
                             key={currentPage}
                             className={stylesTable.activePage}
                         >
                             {currentPage}
                         </button>
-
                         {Array.from({length: 3}, (_, index) => {
                             const num = currentPage + (index + 1);
                             if (num > npage) return;
@@ -478,7 +474,6 @@ function TableEquiposFC(props: Readonly<TableEquiposFCProps>): ReactElement {
                                 </button>
                             )
                         })}
-
                         {currentPage < npage - 3 && (
                             <>
                                 <span>...</span>
@@ -490,14 +485,12 @@ function TableEquiposFC(props: Readonly<TableEquiposFCProps>): ReactElement {
                                 </button>
                             </>
                         )}
-
                         <button
                             onClick={() => setCurrentPage(currentPage + 1)}
                             disabled={currentPage === npage}
                         >
                             Siguiente
                         </button>
-
                     </div>
                 )}
                 <div className={stylesTable.filtersContainer}>

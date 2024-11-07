@@ -40,7 +40,6 @@ const ModalViewTelefonoFC = ({user}: ModalTelefonoProps): ReactElement => {
     return (
         <div>
             <h3>Teléfonos del Usuario</h3>
-
                 {telefonos.map((telefono: TelefonoDTO) => (
                     <p key={telefono.id}>
                         <p className={styles.numTelefono}>{formatTelefono(telefono.telefono)}</p>
