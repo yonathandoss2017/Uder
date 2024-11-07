@@ -50,7 +50,6 @@ const authOptions: NextAuthOptions = {
                         name: 'sessionToken',
                         value: response,
                         httpOnly: false,
-                        secure: true,
                         sameSite: 'strict',
                         maxAge: 300,
                         path: '/',
@@ -59,7 +58,6 @@ const authOptions: NextAuthOptions = {
                 // Retornamos un objeto con el token de sesión en la API para persistirlo en el JWT (JSON Web Token)
                 return {
                     sessionAPIToken: response,
-                    //exp: (Date.now() + 30000)
                 } as User;
 
             }
