@@ -120,11 +120,12 @@ function AuthLayout({children}: Readonly<{ children: ReactNode }>) {
 
                 if(timeRemaining<=0){
                     console.log("entre a time remaining < 0")
-                    if(pathname != "/login" && pathname != "/login/google" && pathname != "/signup" && pathname != "/signup/google") {
+                    if(pathname != "/login" && pathname != "/login/google" && pathname != "/signup" && pathname != "/signup/google" && pathname != "/signup/ad" ) {
                         document.cookie = `sessionToken=;max-age=0;path=/;samesite=strict;secure`;
                         signOut({redirect: true, callbackUrl: "/login"})
                     }
                 }
+
 
             }
 

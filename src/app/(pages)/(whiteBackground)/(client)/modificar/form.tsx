@@ -111,10 +111,6 @@ function FormEditUser(props: Readonly<EditUserFormProps>): ReactElement {
 
         if (dominio.length != 0) {
             if (clientData.nombreUsuario != null) {
-                console.log("Verificando con AD");
-                console.log(clientData.nombreUsuario);
-                console.log(contrasenia);
-                console.log(dominio);
                 const verificarAd = await verificarAD(clientData.nombreUsuario, contrasenia, dominio)
 
                 if (isFetchAPIError(verificarAd)) {
@@ -136,9 +132,10 @@ function FormEditUser(props: Readonly<EditUserFormProps>): ReactElement {
             }
         } else {
             // Verifica si la contraseña actual es correcta intentando hacer login con las credenciales del usuario
-            await loginCredentials(clientData.nombreUsuario as string, contrasenia).catch((): void => {
-                resultActualPassword = false; // Si hay un error, establece la bandera en falso (Contraseña incorrecta)
-            });
+            const loginResult = await loginCredentials(clientData.nombreUsuario as string, contrasenia);
+            if (isFetchAPIError(loginResult)) {
+                resultActualPassword = false;
+            }
         }
 
         // Si la contraseña actual no es correcta, muestra un mensaje y retorna
