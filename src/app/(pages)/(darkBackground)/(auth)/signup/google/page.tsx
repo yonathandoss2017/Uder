@@ -48,7 +48,6 @@ const GoogleAuthPageRegister = () => {
 
                 // Obtiene el token de autenticación de Google
                 const sessionGoogleToken: string | undefined = sessionData.user.sessionGoogleToken as string;
-                console.log("google token" ,sessionGoogleToken);
 
                 // Si no se obtiene el token de Google, cierra la sesión y muestra un mensaje de error
                 if (!sessionGoogleToken) {
@@ -63,7 +62,6 @@ const GoogleAuthPageRegister = () => {
 
                 // Verificamos si existe alguien registrado con ese correo
                 const response: boolean = await existeCorreo(sessionData?.user.email as string);
-                console.log("existe correo", response);
                 if (!response) { // Si no hay un usuario con ese correo
                     router.push("/signup"); // Redirige al usuario a la página de registro
                     return;

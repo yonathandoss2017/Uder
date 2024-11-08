@@ -86,10 +86,6 @@ function TableFuncionalidadFC(props: Readonly<TableFuncionalidadFCProps>): React
                 return;
             }
             setFuncionalidades(response);
-            funcionalidades.map((funcionalidad: FuncionalidadDTO) => {
-                console.log("PROBANDO")
-                console.log("Funcionalidad: ", funcionalidad.idInstitucion);
-            });
             calcularPaginas();
         })();
     }, [appliedSearchTerms, sessionAPIToken]); // Cuando cambian los términos de búsqueda

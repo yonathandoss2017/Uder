@@ -117,7 +117,6 @@ function TableEquiposFC(props: Readonly<TableEquiposFCProps>): ReactElement {
                         console.error("ERROR - lista de equipos - table.tsx - listarTiposEquipo", response.errorMessage);
                         return;
                     }
-                    console.log("tipos de equipos", response)
                     // Actualiza la lista de tipos de equipo
                     tiposEquipo.current = response;
                 });
@@ -163,7 +162,6 @@ function TableEquiposFC(props: Readonly<TableEquiposFCProps>): ReactElement {
                     console.error("ERROR - lista de equipos - table.tsx - listarUbicaciones", response.errorMessage);
                     return;
                 }
-                console.log(response)
                 // Actualiza la lista de ubicaciones
                 ubicaciones.current = response;
             });

@@ -98,12 +98,10 @@ const authOptions: NextAuthOptions = {
 
             // Si el trigger es "update", modificamos el
             if (trigger === "update" && session) {
-                console.log("JWT - Trigger: update");
                 token.user = session.user;
             }
 
             if(cookies().get('sessionToken')?.value !== undefined) {
-                console.log("ESTOY EN EL JWT ", cookies().get('sessionToken')?.value)
                 token.user.sessionAPIToken = cookies().get('sessionToken')?.value;
             }
 
@@ -123,37 +121,29 @@ const authOptions: NextAuthOptions = {
 
             // session.user.error = token.user.error;
             const sessionToken = cookies().get('sessionToken')?.value
-            console.log("TENGO COOKIE")
-            console.log(sessionToken)
             // Si el JWT (JSON Web Token) tiene el token de sesión del cliente en la API, lo guardamos en la sesión y obtenemos los datos del cliente
             if (sessionToken) {
-                console.log("TOKEN COOKIE DESDE EL SESSION", cookies().get('sessionToken')?.value)
                 session.user.sessionAPIToken = cookies().get('sessionToken')?.value
                 try {
                     if(cookies().get('sessionToken')?.value !== undefined) {
                         {
-                            console.log("POR OBTENER EL RESPONSE", cookies().get('sessionToken')?.value)
                             const response = await buscarClientePorToken(cookies().get('sessionToken')!!.value);
                             if (isFetchAPIError(response)) {
                                 throw new Error(response.errorMessage);
                             }
                             session.user.data = response;
                             session.user.sessionAPIToken = cookies().get('sessionToken')?.value;
-                            console.log(session.expires, "Expiracion del session auth")
                         }
                     }
                 } catch (error) {
-                    console.error("Error al buscar cliente por token: ", error);
                     session.user.sessionAPIToken = undefined;
                     session.user.error = "invalid_token"
                 }
             } else {
-                console.log("EN EL ELSE DEL SESSION")
                 session.user.sessionAPIToken = undefined;
                 session.user.error = "invalid_token"
             }
             // Retornamos la sesión de cliente modificada
-            console.log("SESSION", session)
             return session;
 
         },

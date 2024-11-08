@@ -32,8 +32,6 @@ const UsuariosPage = async (): Promise<ReactElement> => {
     // Si no se obtiene el token de sesión o el usuario, muestra la página de carga hasta obtenerlos
     if (!sessionAPIToken || !clientData?.id) return <LoadingPage/>
 
-    console.log("SESSION TOKEN ", sessionAPIToken)
-
     // Si no tiene permisos para acceder a la página, muestra un mensaje de acceso denegado
     if (!await verificarPermiso(sessionAPIToken, PermisoEnum.OBTENER_USUARIOS)) {
         return <ErrorFC message={"Acceso denegado"}/>;

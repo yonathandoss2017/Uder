@@ -83,7 +83,6 @@ function TableProveedoresFC(props: Readonly<TableProveedoresFCProps>): ReactElem
                 console.error("ERROR - lista de proveedores - table.tsx - listarProveedores", response.errorMessage);
                 return;
             }
-            console.log(response);
             setProveedores(response);
         })();
 

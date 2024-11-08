@@ -100,8 +100,6 @@ const RegisterIntervencionForm: React.FC<RegisterIntervencionFormProps> = (props
                 buttonsType: ModalButtonsType.CONFIRM,
             }).show();
         }else {
-            console.log("Equipo encontrado: ", equipo);
-            console.log("Equipo ID: ", equipo.id);
 
             const nuevaIntervencion = {
                 fechaHora: formValues.fechaHora,

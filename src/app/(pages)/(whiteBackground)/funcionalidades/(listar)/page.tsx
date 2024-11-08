@@ -30,8 +30,6 @@ const FuncionalidadPage = async (): Promise<ReactElement> => {
         return <ErrorFC message={"Acceso denegado"} />;
     }
 
-    console.log("CLIENT DATA", clientData.idInstitucion);
-
     const hasPermissionEdit: boolean = await verificarPermiso(sessionAPIToken, PermisoEnum.MODIFICAR_FUNCIONALIDAD);
     const hasPermissionBaja: boolean = await verificarPermiso(sessionAPIToken, PermisoEnum.BAJA_FUNCIONALIDAD);
     const hasPermissionView: boolean = await verificarPermiso(sessionAPIToken, PermisoEnum.OBTENER_FUNCIONALIDADES);

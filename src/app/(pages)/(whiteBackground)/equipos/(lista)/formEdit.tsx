@@ -158,7 +158,6 @@ function EditEquipoForm(props: Readonly<EditEquipoFormProps>): ReactElement {
 
         // Procedimiento auto-ejecutable (Para que sea asíncrono)
         (async (): Promise<void> => {
-            console.log("SESSION TOKEN NSJNS", sessionAPIToken)
             if (sessionAPIToken != null) {
                 // ------------------- Cargar marcas -------------------
 
@@ -195,7 +194,6 @@ function EditEquipoForm(props: Readonly<EditEquipoFormProps>): ReactElement {
                     }
                     return response;
                 }));
-                console.log("listado de equipos token", tiposEquipo)
 
                 // ------------------- Cargar proveedores -------------------
                 setProveedores(await listarProveedores(sessionAPIToken, {activo: true}).then((response: ProveedorDTO[] | FetchAPIError): ProveedorDTO[] => {
@@ -740,14 +738,8 @@ async function obtenerCambios(editingEquipo: EquipoDTO,
     }
     // Verifica si hay cambios en el modelo del equipo
     if (editingEquipo.idModelo != originalData.idModelo) {
-        console.log("editing equipo", editingEquipo)
-        console.log("id modelo editing equipo", editingEquipo.idModelo)
-        console.log("modelos",modelos)
         const previousModelo: ModeloDTO | undefined = modelos.find((modelo: ModeloDTO): boolean => modelo.id === Number(originalData.idModelo));
         const nextModelo: ModeloDTO | undefined = modelos.find((modelo: ModeloDTO): boolean => modelo.id === Number(editingEquipo.idModelo));
-
-        console.log("previousModelo", previousModelo);
-        console.log("nextModelo", nextModelo);
 
         if(previousModelo && nextModelo) {
             changes.push({
@@ -764,7 +756,7 @@ async function obtenerCambios(editingEquipo: EquipoDTO,
                 });
             }
         } else {
-            console.error("No se pudo encontrar el modelo previo o el siguiente.");
+            console.error("ERROR - modificar equipo - editForm.tsx - No se pudo encontrar el modelo previo o el siguiente.");
         }
 
     }

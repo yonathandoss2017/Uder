@@ -102,7 +102,6 @@ const RegisterUserForm = (props: RegisterUserFormProps) => {
             idInstitucion: props.clientData.idInstitucion,
         };
 
-        console.log(formValues.idPerfil)
         await registrarUsuario(usuario, contrasenia, telefono).then((response: UsuarioDTO | FetchAPIError): void => {
             if (isFetchAPIError(response)) {
                 console.error("ERROR - registro de usuario - form.tsx - registrarUsuario - error: ", response.errorMessage);

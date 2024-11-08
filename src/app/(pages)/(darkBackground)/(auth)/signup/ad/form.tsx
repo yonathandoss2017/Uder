@@ -99,8 +99,6 @@ const RegisterFormClientAd = () => {
     // Función que se ejecuta al enviar el formulario
     const onSubmit: SubmitHandler<FormValues> = async (formValues: FormValues): Promise<void> => {
 
-        console.log("ENTRE AL SUBMIT")
-
         const telefono: number = Number(formValues.telefono);
 
         const usuario: UsuarioDTO = {
@@ -117,11 +115,7 @@ const RegisterFormClientAd = () => {
             idInstitucion: idInstitucionSelected,
         };
 
-        console.log("USUARIO ", usuario)
-
         const nombreUsuario: string | FetchAPIError = await generarNombreUsuario(formValues.primerNombre, formValues?.segundoNombre, formValues.primerApellido, formValues?.segundoApellido);
-
-        console.log("NOMBRE USUARIO GENERADO " , nombreUsuario)
 
         if (isFetchAPIError(nombreUsuario)) {
             console.error("ERROR - Registro propio - onSubmit - generarNombreUsuario: ", nombreUsuario);
@@ -138,7 +132,6 @@ const RegisterFormClientAd = () => {
             return;
         }
 
-        console.log("Valores pasados a verificarAD ", nombreUsuario, formValues.contrasenia, formValues.dominio)
        const existeAd: boolean | FetchAPIError = await verificarAD(nombreUsuario, formValues.contrasenia, formValues.dominio);
 
         if (isFetchAPIError(existeAd)) {
@@ -156,11 +149,7 @@ const RegisterFormClientAd = () => {
             return
         }
 
-        console.log("EXISTE AD " , existeAd)
-
         if (existeAd && !isFetchAPIError(existeAd)) {
-
-            console.log("ENTRE AL IF de que existe ad")
 
             const response: UsuarioDTO | FetchAPIError = await registrarConAD(usuario, telefono);
             if (isFetchAPIError(response)) {

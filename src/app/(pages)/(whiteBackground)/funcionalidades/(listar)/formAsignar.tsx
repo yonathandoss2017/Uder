@@ -72,15 +72,6 @@ function AsignarFuncionalidadesForm(props: Readonly<AsignarFuncionalidadesFormPr
 
     }, [props.funcionalidad, props.sessionAPIToken, sessionAPIToken]);
 
-    useEffect(() => {
-        console.log("perfiles", perfiles)
-        console.log("perfilesFuncionalidad", perfilesFuncionalidad)
-    }, [perfilesFuncionalidad, perfiles]);
-
-    useEffect(() => {
-        console.log("perfilesSeleccionados", perfilesSeleccionados)
-    }, [perfilesSeleccionados]);
-
     const onSubmit = async (formValues: FormValues): Promise<void> => {
 
         if (sessionAPIToken == null) return;

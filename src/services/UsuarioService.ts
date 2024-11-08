@@ -55,8 +55,6 @@ export async function listarUsuarios(
         ...(!!filter.perfil && {filter_perfil: filter.perfil})
     });
 
-    console.log("TOKEN", token)
-
     // URL de la petición a la API
     const url: string = `${SERVICE_PATH}/listar?${queryParams}`; // queryParams =  ?size=10&page=1&fieldSort=id&sortDirectionAsc=true&filter_id=1&filter_nombre=nombre
 
@@ -283,7 +281,6 @@ export async function existeCorreo(correo: string): Promise<boolean> {
 
     return await fetchBodyWithErrorHandling<boolean>(url, options).then((response: boolean | FetchAPIError): boolean => {
 
-        console.log("RESPONSE existe correo", response)
         if (isFetchAPIError(response)) {
             // Sí ocurre un error en la solicitud o en el procesamiento de la respuesta
             // imprime el error en la consola y retorna false indicando que no existe el correo

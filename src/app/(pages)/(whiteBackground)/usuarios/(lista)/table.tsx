@@ -115,7 +115,6 @@ function TableUsersFC(props: Readonly<TableUsersFCProps>): ReactElement {
                 }
 
                 if (props.client.idPerfil) {
-                    console.log("iddelperfil", props.client.idPerfil)
                     const response: PerfilDTO | FetchAPIError = await buscarPerfilPorId(props.client.idPerfil, sessionAPIToken);
                     if (isFetchAPIError(response)) {
                         console.error("ERROR - lista de usuarios - page.tsx - buscarPerfilPorId: ", response);
@@ -225,10 +224,8 @@ function TableUsersFC(props: Readonly<TableUsersFCProps>): ReactElement {
                     continue;
                 }
 
-                console.log("antes de romperse")
                 // Obtiene el perfil del usuario
                 const perfil: PerfilDTO | FetchAPIError = await buscarPerfilPorId(usuario.idPerfil, sessionAPIToken);
-                console.log("despues de romperse")
                 // Si ocurre un error en la solicitud, muestra un mensaje de error en la consola y no lo agrega
                 if (isFetchAPIError(perfil)) {
                     const errorMessage: string = perfil.errorMessage;
