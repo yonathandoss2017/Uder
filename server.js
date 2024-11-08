@@ -4,6 +4,8 @@ const next = require('next');
 const path = require('path');
 
 const dev = process.env.NODE_ENV !== 'production';
+console.log(`Aplicación iniciada en modo ${dev ? 'desarrollo' : 'producción'}`);
+
 const app = next({ dev });
 const handle = app.getRequestHandler();
 
@@ -16,6 +18,6 @@ app.prepare().then(() => {
     https.createServer(httpsOptions, (req, res) => {
         handle(req, res);
     }).listen(3000, 'localhost', () => {
-        console.log("Funciona la web con https");
+        console.log("Funciona la web con HTTPS");
     });
 });
