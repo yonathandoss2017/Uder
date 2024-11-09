@@ -8,7 +8,7 @@ import LoadingPage from "@/app/(pages)/loading";
 import {verificarPermiso} from "@/services/SessionService";
 import PermisoEnum from "@/types/enums/PermisoEnum";
 import ErrorFC from "@/components/ErrorFC";
-import TablePerfilesFC from "@/app/(pages)/(whiteBackground)/perfiles/(lista)/table"; // Cambiar por el componente de tabla de perfiles
+import TablePerfilesFC from "@/app/(pages)/(whiteBackground)/perfiles/(lista)/table";
 
 export const metadata: Metadata = {
     title: 'PInfra DD - Lista de perfiles'
@@ -37,8 +37,8 @@ const PerfilesPage = async (): Promise<ReactElement> => {
     const hasPermissionEdit: boolean = await verificarPermiso(sessionAPIToken, PermisoEnum.MODIFICAR_PERFIL);
     const hasPermissionBaja: boolean = await verificarPermiso(sessionAPIToken, PermisoEnum.BAJA_PERFIL);
     const hasPermissionView: boolean = await verificarPermiso(sessionAPIToken, PermisoEnum.OBTENER_PERFILES);
+    const hasPermissionReactivar: boolean = await verificarPermiso(sessionAPIToken, PermisoEnum.REACTIVAR_PERFIL);
 
-    // Retorna el JSX de la página de lista de perfiles
     return (
         <main>
             <TablePerfilesFC
@@ -46,11 +46,13 @@ const PerfilesPage = async (): Promise<ReactElement> => {
                 hasPermissionBaja={hasPermissionBaja}
                 hasPermissionEdit={hasPermissionEdit}
                 hasPermissionView={hasPermissionView}
+                hasPermissionReactivar={hasPermissionReactivar}
                 idInstitucion={clientData.idInstitucion}
             />
         </main>
     );
 
 }
+
 
 export default PerfilesPage;

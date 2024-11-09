@@ -168,3 +168,20 @@ export async function darBajaPerfil(id: number, token: string): Promise<void | F
     // Realiza la petición a la API y retorna el resultado
     return await fetchVoidWithErrorHandling(url, options);
 }
+
+export async function reactivarPerfil(id: number, token: string): Promise<void | FetchAPIError> {
+    const url: string = `${SERVICE_PATH}/perfiles/reactivar/${id}`; // URL de la petición a la API para perfiles
+
+    // Opciones de la petición
+    const options: RequestInit = {
+        method: 'POST',
+        headers: {
+            'Authorization': 'Bearer ' + token, // Authorization header con token JWT
+            'Content-Type': 'application/json' // Tipo de contenido JSON
+        }
+    };
+
+    // Realiza la petición a la API y retorna el resultado
+    return await fetchVoidWithErrorHandling(url, options);
+}
+

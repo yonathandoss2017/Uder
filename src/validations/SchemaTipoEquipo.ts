@@ -3,7 +3,7 @@
 // =================================================================================================
 
 // Importa zod para la validación de los datos
-import {z, ZodObject} from "zod";
+import { z, ZodObject } from "zod";
 
 // Define el esquema de validación con Zod
 const SchemaTipoEquipo: ZodObject<any> = z.object({
@@ -11,10 +11,11 @@ const SchemaTipoEquipo: ZodObject<any> = z.object({
     nombre: z.string()
         .min(1, "El nombre no puede estar vacío")
         .max(30, "El nombre no puede tener más de 30 caracteres")
-        .refine((value: string) => value.replaceAll(" ", "").length != 0, {
+        .refine((value: string) => value.trim().length > 0, {
             message: "El nombre no puede estar vacío",
-        }).refine((value: string) => /^[A-Za-zÁÉÍÓÚáéíóúÑñ]+$/.test(value), {
-            message: "El primer nombre no debe contener números ni caracteres especiales",
+        })
+        .refine((value: string) => /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/.test(value), {
+            message: "El nombre solo puede contener letras",
         })
 });
 

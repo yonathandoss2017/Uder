@@ -6,13 +6,13 @@ import { useModal } from "@/app/hooks/modals/useModal";
 import { SubmitHandler, useForm, UseFormReturn } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import styles from "@public/styles/modules/register.perfiles.module.css"
-import SchemaPerfil from "@/validations/SchemaPerfil";
 import FetchAPIError, { isFetchAPIError } from "@/types/errors/FetchAPIError";
 import { agregarPerfil, listarPerfiles } from "@/services/PerfilService";
 import { ModalButtonsType } from "@/components/ModalFC";
 import PerfilFilter from "@/types/filters/PerfilFilter";
 import UsuarioDTO from "@/types/dtos/UsuarioDTO";
 import {useToken} from "@/app/hooks/TokenProvider";
+import SchemaPerfil from "@/validations/SchemaPerfil";
 
 interface RegisterPerfilFormProps {
     sessionAPIToken: string;
