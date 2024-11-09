@@ -170,7 +170,7 @@ export async function darBajaPerfil(id: number, token: string): Promise<void | F
 }
 
 export async function reactivarPerfil(id: number, token: string): Promise<void | FetchAPIError> {
-    const url: string = `${SERVICE_PATH}/perfiles/reactivar/${id}`; // URL de la petición a la API para perfiles
+    const url: string = `${SERVICE_PATH}/reactivar/${id}`; // URL de la petición a la API para perfiles
 
     // Opciones de la petición
     const options: RequestInit = {
