@@ -188,6 +188,12 @@ const RegisterEquipoForm: React.FC<RegisterEquipoFormProps> = (props: RegisterEq
     }, [selectedMarcaId, modelos]); // Se ejecuta al montar el componente y cuando cambia selectedMarcaId o modelos
 
 
+    // Obtiene la fecha actual en la zona horaria local
+    const today = new Date();
+    today.setMinutes(today.getMinutes() - today.getTimezoneOffset());
+    const defaultDate = today.toISOString().split('T')[0];
+
+
     // Función que se ejecuta al enviar el formulario
     const onSubmit: SubmitHandler<FormValues> = async (formValues: FormValues): Promise<void> => {
 
@@ -457,7 +463,7 @@ const RegisterEquipoForm: React.FC<RegisterEquipoFormProps> = (props: RegisterEq
                         <input
                             {...register("fechaAdquisicion", {required: "Este campo es requerido"})}
                             type="date"
-                            defaultValue={new Date().toISOString().split('T')[0]}
+                            defaultValue={defaultDate}
                         />
                     </label>
                     {errors.fechaAdquisicion &&
