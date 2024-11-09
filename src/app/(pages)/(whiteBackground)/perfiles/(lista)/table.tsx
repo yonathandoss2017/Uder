@@ -4,49 +4,29 @@ import React, {ChangeEvent, MutableRefObject, ReactElement, useEffect, useRef, u
 import {useModal} from "@/app/hooks/modals/useModal";
 import PerfilDTO from "@/types/dtos/PerfilDTO";
 import FetchAPIError, {isFetchAPIError} from "@/types/errors/FetchAPIError";
-import {darBajaPerfil, listarPerfiles} from "@/services/PerfilService";
+import {darBajaPerfil, listarPerfiles, reactivarPerfil} from "@/services/PerfilService"; // Asegúrate de importar `reactivarPerfil`
 import PerfilFilter from "@/types/filters/PerfilFilter";
 import stylesTable from "@public/styles/modules/table/table.tipoequipos.module.css";
-import {ModalInstance} from "@/app/hooks/modals/ModalProvider";
-import EditPerfilForm from "@/app/(pages)/(whiteBackground)/perfiles/(lista)/formEdit";
 import {ModalButtonsType} from "@/components/ModalFC";
 import {useToken} from "@/app/hooks/TokenProvider";
-
-/**
- *  Propiedades del componente TablePerfilesFC
- *  @interface TablePerfilesFCProps
- *  @property {string} sessionAPIToken - Token de la sesión del cliente en la API
- *  @property {boolean} hasPermissionEdit - Indica si el cliente tiene permisos para editar
- *  @property {boolean} hasPermissionBaja - Indica si el cliente tiene permisos para dar de baja
- *  @property {boolean} hasPermissionView - Indica si el cliente tiene permisos para ver
- *  @property {number} idInstitucion - ID de la institución del cliente
- **/
 
 interface TablePerfilesFCProps {
     sessionAPIToken: string;
     hasPermissionEdit: boolean;
     hasPermissionBaja: boolean;
+    hasPermissionReactivar: boolean;
     hasPermissionView: boolean;
     idInstitucion: number;
 }
-
-/**
- * Propiedades de los filtros de la tabla
- **/
 
 interface TableSearchTermsProps {
     filter: PerfilFilter;
 }
 
 function TablePerfilesFC(props: Readonly<TablePerfilesFCProps>): ReactElement {
-
-    // Obtenemos el token de sesión del cliente
     const {sessionAPIToken } = useToken();
-
-    // ----------------------- Modales -----------------------
     const {createModal} = useModal();
 
-    // ----------------------- Términos de búsqueda  -----------------------
     const [searchTerms, setSearchTerms]: [TableSearchTermsProps, (value: TableSearchTermsProps) => void]
         = useState<TableSearchTermsProps>({
         filter: {activo: true}
@@ -68,11 +48,9 @@ function TablePerfilesFC(props: Readonly<TablePerfilesFCProps>): ReactElement {
 
     }, [searchTerms]);
 
-    // ----------------------- Lista de perfiles -----------------------
     const [perfiles, setPerfiles] = useState<PerfilDTO[]>([]);
 
     useEffect((): void => {
-
         if(!sessionAPIToken) return;
 
         (async (): Promise<void> => {
@@ -83,72 +61,127 @@ function TablePerfilesFC(props: Readonly<TablePerfilesFCProps>): ReactElement {
                 return;
             }
 
-            // Ordenar perfiles por nivel de menor a mayor
             const sortedPerfiles = response.sort((a: PerfilDTO, b: PerfilDTO) => (a.nivel || 0) - (b.nivel || 0));
             setPerfiles(sortedPerfiles);
         })();
 
     }, [appliedSearchTerms, sessionAPIToken]);
 
-    // Procedimiento que se ejecuta al hacer clic en el botón 'Eliminar'
     const handleEliminarClick = (perfilSelected: PerfilDTO): void => {
-
         if(!sessionAPIToken) return;
 
-        if (!props.hasPermissionBaja) {
-            createModal({
-                children: (
-                    <p>No tienes permisos para dar de baja perfiles</p>
-                ),
-                buttonsType: ModalButtonsType.CONFIRM
-            }).show();
-            return;
-        }
+        if (perfilSelected.activo) {
+            // Dar de baja al perfil
+            if (!props.hasPermissionBaja) {
+                createModal({
+                    children: (
+                        <p>No tienes permisos para dar de baja perfiles</p>
+                    ),
+                    buttonsType: ModalButtonsType.CONFIRM
+                }).show();
+                return;
+            }
 
-        createModal({
-            title: "Dando de baja a \"" + perfilSelected.nombre + "\"",
-            children: (
-                <>
-                    <p>Estás por dar de baja al perfil <b>&quot;{perfilSelected.nombre}&quot;</b>.</p>
-                    <p>¿Desea continuar?</p>
-                </>
-            ),
-            buttonsType: ModalButtonsType.CONFIRM_CANCEL,
-            async onConfirm(): Promise<void> {
-                const response: void | FetchAPIError = await darBajaPerfil(perfilSelected.id as number, sessionAPIToken);
-                if (isFetchAPIError(response)) {
+            createModal({
+                title: "Dando de baja a \"" + perfilSelected.nombre + "\"",
+                children: (
+                    <>
+                        <p>Estás por dar de baja al perfil <b>&quot;{perfilSelected.nombre}&quot;</b>.</p>
+                        <p>¿Desea continuar?</p>
+                    </>
+                ),
+                buttonsType: ModalButtonsType.CONFIRM_CANCEL,
+                async onConfirm(): Promise<void> {
+                    const response: void | FetchAPIError = await darBajaPerfil(perfilSelected.id as number, sessionAPIToken);
+                    if (isFetchAPIError(response)) {
+                        createModal({
+                            children: (
+                                <p>Error al dar de baja el perfil: {response.errorMessage}</p>
+                            ),
+                            buttonsType: ModalButtonsType.CONFIRM
+                        }).show();
+                        return;
+                    }
+
+                    perfilSelected.activo = false;
+
                     createModal({
                         children: (
-                            <p>Error al dar de baja el perfil: {response.errorMessage}</p>
+                            <p>Perfil &quot;{perfilSelected.nombre}&quot; dado de baja correctamente</p>
                         ),
                         buttonsType: ModalButtonsType.CONFIRM
                     }).show();
-                    return;
+
+                    refSearchTermsTimer.current = setTimeout((): void => {
+                        setAppliedSearchTerms({ ...appliedSearchTerms });
+                    }, 1000);
+                },
+                onCancel(): void {
+                    createModal({
+                        title: "Baja Cancelada",
+                        children: (
+                            <p>Baja cancelada</p>
+                        ),
+                        buttonsType: ModalButtonsType.CONFIRM
+                    }).show();
                 }
-
-                perfilSelected.activo = false;
-
+            }).show();
+        } else {
+            // Reactivar el perfil
+            if (!props.hasPermissionReactivar) {
                 createModal({
                     children: (
-                        <p>Perfil &quot;{perfilSelected.nombre}&quot; dado de baja correctamente</p>
+                        <p>No tienes permisos para reactivar perfiles</p>
                     ),
                     buttonsType: ModalButtonsType.CONFIRM
                 }).show();
-
-                refSearchTermsTimer.current = setTimeout((): void => {
-                    setAppliedSearchTerms({ ...appliedSearchTerms });
-                }, 1000);
-            },
-            onCancel(): void {
-                createModal({
-                    title: "Baja Cancelada",
-                    children: (
-                        <p>Baja cancelada</p>
-                    ),
-                    buttonsType: ModalButtonsType.CONFIRM
-                }).show();
+                return;
             }
-        }).show();
+
+            createModal({
+                title: "Reactivando \"" + perfilSelected.nombre + "\"",
+                children: (
+                    <>
+                        <p>Estás por reactivar el perfil <b>&quot;{perfilSelected.nombre}&quot;</b>.</p>
+                        <p>¿Desea continuar?</p>
+                    </>
+                ),
+                buttonsType: ModalButtonsType.CONFIRM_CANCEL,
+                async onConfirm(): Promise<void> {
+                    const response: void | FetchAPIError = await reactivarPerfil(perfilSelected.id as number, sessionAPIToken);
+                    if (isFetchAPIError(response)) {
+                        createModal({
+                            children: (
+                                <p>Error al reactivar el perfil: {response.errorMessage}</p>
+                            ),
+                            buttonsType: ModalButtonsType.CONFIRM
+                        }).show();
+                        return;
+                    }
+
+                    perfilSelected.activo = true;
+
+                    createModal({
+                        children: (
+                            <p>Perfil &quot;{perfilSelected.nombre}&quot; reactivado correctamente</p>
+                        ),
+                        buttonsType: ModalButtonsType.CONFIRM
+                    }).show();
+
+                    refSearchTermsTimer.current = setTimeout((): void => {
+                        setAppliedSearchTerms({ ...appliedSearchTerms });
+                    }, 1000);
+                },
+                onCancel(): void {
+                    createModal({
+                        children: (
+                            <p>Reactivación cancelada</p>
+                        ),
+                        buttonsType: ModalButtonsType.CONFIRM
+                    }).show();
+                }
+            }).show();
+        }
     }
 
     return (
@@ -160,7 +193,7 @@ function TablePerfilesFC(props: Readonly<TablePerfilesFCProps>): ReactElement {
                             <thead>
                             <tr>
                                 <th>Nombre</th>
-                                <th>Nivel</th> {/* Nueva columna para mostrar el nivel */}
+                                <th>Nivel</th>
                                 <th></th>
                             </tr>
                             </thead>
@@ -168,12 +201,16 @@ function TablePerfilesFC(props: Readonly<TablePerfilesFCProps>): ReactElement {
                             {perfiles.map((perfil: PerfilDTO) => (
                                 <tr key={perfil.id}>
                                     <td>{perfil.nombre}</td>
-                                    <td>{perfil.nivel}</td> {/* Mostrar el nivel del perfil */}
-                                    {props.hasPermissionBaja ? (
+                                    <td>{perfil.nivel}</td>
+                                    {props.hasPermissionBaja || props.hasPermissionReactivar ? (
                                         <td>
-                                            <button onClick={(): void => handleEliminarClick(perfil)}>Eliminar</button>
+                                            <button onClick={(): void => handleEliminarClick(perfil)}>
+                                                {perfil.activo ? 'Eliminar' : 'Reactivar'}
+                                            </button>
                                         </td>
-                                    ) : <td></td>}
+                                    ) : (
+                                        <td></td>
+                                    )}
                                 </tr>
                             ))}
                             </tbody>
