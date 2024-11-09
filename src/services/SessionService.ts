@@ -185,8 +185,6 @@ export async function cambiarContrasenia(passActual: string, passNueva: string, 
     // Encripta las contraseñas para enviarlas en la petición (Authotization: Basic)
     const passEncoded: string = "Basic " + btoa(passActual + ":" + passNueva); // credenciales: passActual:passNueva en base64
 
-    console.log("CREDENCIALES PASSWORD: ", passEncoded);
-
     // Opciones de la petición
     const options: RequestInit = {
         method: 'POST',

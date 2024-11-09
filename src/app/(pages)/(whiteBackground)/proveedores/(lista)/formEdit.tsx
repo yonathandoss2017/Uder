@@ -153,7 +153,6 @@ function EditProveedorForm(props: Readonly<EditProveedorFormProps>): ReactElemen
                         onChange={(event) => {
                             const newValue = Number(event.target.value);
                             register("idPaisOrigen").onChange({target: {value: newValue}});
-                            console.log("Nuevo idPaisOrigen seleccionado:", newValue);
                         }}
                     />
 
@@ -190,10 +189,6 @@ async function obtenerCambios(modifiedProveedor: ProveedorDTO, paisesOrigen: Pai
         });
     }
 
-    console.log("paisesOrigen:", paisesOrigen);
-    console.log("Tipo de modifiedProveedor.idPaisOrigen:", typeof modifiedProveedor.idPaisOrigen);
-    console.log("Tipo de paisesOrigen[0].id:", typeof paisesOrigen[0]?.id);
-
     if (originalData.idPaisOrigen != modifiedProveedor.idPaisOrigen) {
         const previousCountry = paisesOrigen.find((pais: PaisDTO) => pais.id === originalData.idPaisOrigen);
         const nextCountry = paisesOrigen.find((pais: PaisDTO) => pais.id === Number(modifiedProveedor.idPaisOrigen)); // Convertir a número
@@ -205,9 +200,5 @@ async function obtenerCambios(modifiedProveedor: ProveedorDTO, paisesOrigen: Pai
         });
     }
 
-
-
-
-    console.log("Changes:", changes);
     return changes;
 }

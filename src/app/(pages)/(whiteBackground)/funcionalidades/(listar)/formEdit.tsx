@@ -72,7 +72,6 @@ function EditFuncionalidadForm(props: Readonly<EditFuncionalidadFormProps>): Rea
             children: ModalChangesFC(changes),
             buttonsType: ModalButtonsType.CONFIRM_CANCEL,
             async onConfirm(): Promise<void> {
-                console.log("ID INSTITUCION", modifiedFuncionalidad.idInstitucion);
                 // Realiza la modificación del tipo de equipo en la API
                 const response: void | FetchAPIError = await modificarFuncionalidad(modifiedFuncionalidad,sessionAPIToken);
 
@@ -113,7 +112,7 @@ function EditFuncionalidadForm(props: Readonly<EditFuncionalidadFormProps>): Rea
 
     return (
         <form onSubmit={handleSubmit(onSubmit)} className={`${styles.formContainer} ${styles.aparecer}`}>
-            <h2>Modificacion de Funcionalidad</h2>
+            <h2>Modificación de Funcionalidad</h2>
             <div className={styles.detailsContainer}>
                 <div className={styles.inputBox}>
                     <label className={styles.details}>Nombre<span className={styles.requiredField}>*</span></label>
@@ -128,7 +127,6 @@ function EditFuncionalidadForm(props: Readonly<EditFuncionalidadFormProps>): Rea
                         <label className={styles.error} style={{color: 'red'}}>{errors.nombre.message}</label>}
                 </div>
             </div>
-
             <div className={styles.buttomM}>
                 <button type="submit">Guardar</button>
                 <button type="button" onClick={props.onCancel}>Cancelar</button>

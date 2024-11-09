@@ -117,7 +117,6 @@ function TableEquiposFC(props: Readonly<TableEquiposFCProps>): ReactElement {
                         console.error("ERROR - lista de equipos - table.tsx - listarTiposEquipo", response.errorMessage);
                         return;
                     }
-                    console.log("tipos de equipos", response)
                     // Actualiza la lista de tipos de equipo
                     tiposEquipo.current = response;
                 });
@@ -163,7 +162,6 @@ function TableEquiposFC(props: Readonly<TableEquiposFCProps>): ReactElement {
                     console.error("ERROR - lista de equipos - table.tsx - listarUbicaciones", response.errorMessage);
                     return;
                 }
-                console.log(response)
                 // Actualiza la lista de ubicaciones
                 ubicaciones.current = response;
             });
@@ -444,9 +442,7 @@ function TableEquiposFC(props: Readonly<TableEquiposFCProps>): ReactElement {
                                 <span>...</span>
                             </>
                         )}
-
                         {Array.from({length: 3}, (_, index) => {
-
                             const num = currentPage - (index + 1);
                             if (num < 1 || currentPage == 1) return;
                             return (
@@ -458,14 +454,12 @@ function TableEquiposFC(props: Readonly<TableEquiposFCProps>): ReactElement {
                                 </button>
                             )
                         }).reverse()}
-
                         <button
                             key={currentPage}
                             className={stylesTable.activePage}
                         >
                             {currentPage}
                         </button>
-
                         {Array.from({length: 3}, (_, index) => {
                             const num = currentPage + (index + 1);
                             if (num > npage) return;
@@ -478,7 +472,6 @@ function TableEquiposFC(props: Readonly<TableEquiposFCProps>): ReactElement {
                                 </button>
                             )
                         })}
-
                         {currentPage < npage - 3 && (
                             <>
                                 <span>...</span>
@@ -490,14 +483,12 @@ function TableEquiposFC(props: Readonly<TableEquiposFCProps>): ReactElement {
                                 </button>
                             </>
                         )}
-
                         <button
                             onClick={() => setCurrentPage(currentPage + 1)}
                             disabled={currentPage === npage}
                         >
                             Siguiente
                         </button>
-
                     </div>
                 )}
                 <div className={stylesTable.filtersContainer}>

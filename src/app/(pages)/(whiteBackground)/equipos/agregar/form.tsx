@@ -188,6 +188,12 @@ const RegisterEquipoForm: React.FC<RegisterEquipoFormProps> = (props: RegisterEq
     }, [selectedMarcaId, modelos]); // Se ejecuta al montar el componente y cuando cambia selectedMarcaId o modelos
 
 
+    // Obtiene la fecha actual en la zona horaria local
+    const today = new Date();
+    today.setMinutes(today.getMinutes() - today.getTimezoneOffset());
+    const defaultDate = today.toISOString().split('T')[0];
+
+
     // Función que se ejecuta al enviar el formulario
     const onSubmit: SubmitHandler<FormValues> = async (formValues: FormValues): Promise<void> => {
 
@@ -295,14 +301,12 @@ const RegisterEquipoForm: React.FC<RegisterEquipoFormProps> = (props: RegisterEq
                             placeholder="Nombre del Equipo"
                         />
                     </label>
-
                     {errors.nombre &&
                         <label className={styles.error}>{errors.nombre.message}</label>}
                 </div>
                 <div className={styles.inputBoxRe}>
                     <label className={styles.details}>
                         <span>Tipo <span className={styles.requiredField}>*</span></span>
-
                         <ComboBoxFC
                             message={"Seleccione un tipo de equipo"}
                             register={register("idTipoEquipo")}
@@ -312,14 +316,12 @@ const RegisterEquipoForm: React.FC<RegisterEquipoFormProps> = (props: RegisterEq
                             }))}
                         />
                     </label>
-
                     {errors.idTipoEquipo &&
                         <label className={styles.error}>{errors.idTipoEquipo.message}</label>}
                 </div>
                 <div className={styles.inputBoxRe}>
                     <label className={styles.details}>
                         <span>Marca <span className={styles.requiredField}>*</span></span>
-
                         <ComboBoxFC
                             message={"Seleccione una marca"}
                             elements={marcas.map((marca: MarcaDTO): { key: number, value: string } => ({
@@ -330,12 +332,10 @@ const RegisterEquipoForm: React.FC<RegisterEquipoFormProps> = (props: RegisterEq
                             onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setSelectedMarcaId(parseInt(e.target.value))}
                         />
                     </label>
-
                 </div>
                 <div className={styles.inputBoxRe}>
                     <label className={styles.details}>
                         <span>Modelo <span className={styles.requiredField}>*</span></span>
-
                         {selectedMarcaId ?
                             (
                                 <ComboBoxFC
@@ -358,21 +358,18 @@ const RegisterEquipoForm: React.FC<RegisterEquipoFormProps> = (props: RegisterEq
                             )
                         }
                     </label>
-
                     {errors.idModelo &&
                         <label className={styles.error}>{errors.idModelo.message}</label>}
                 </div>
                 <div className={styles.inputBoxRe}>
                     <label className={styles.details}>
                         <span>Número de Serie <span className={styles.requiredField}>*</span></span>
-
                         <input
                             {...register("numSerie", {required: "Este campo es requerido"})}
                             type="text"
                             placeholder="Número de Serie"
                         />
                     </label>
-
                     {errors.numSerie &&
                         <label className={styles.error}>{errors.numSerie.message}</label>}
                 </div>
@@ -392,7 +389,6 @@ const RegisterEquipoForm: React.FC<RegisterEquipoFormProps> = (props: RegisterEq
                                 <input className={styles.fechaInput} id="garantiaMeses" type="number" {...register('garantiaMeses')} defaultValue={0}
                                        min={0} max={12}/>
                             </label>
-
                         </div>
                         <div>
                             <label htmlFor="garantiaDias">
@@ -400,7 +396,6 @@ const RegisterEquipoForm: React.FC<RegisterEquipoFormProps> = (props: RegisterEq
                                 <input className={styles.fechaInput}  id="garantiaDias" type="number" {...register('garantiaDias')} defaultValue={0}
                                        min={0} max={31}/>
                             </label>
-
                         </div>
                         <div>
                             <label className={styles.deporvida} htmlFor="garantiaDePorVida">
@@ -408,9 +403,7 @@ const RegisterEquipoForm: React.FC<RegisterEquipoFormProps> = (props: RegisterEq
                                 <input id="garantiaDePorVida" {...register('garantiaDePorVida')}
                                        type="checkbox"/>
                             </label>
-
                         </div>
-
                         {errors.garantiaAnios &&
                             <label className={styles.error}>{errors.garantiaAnios.message}</label>}
                         {errors.garantiaMeses &&
@@ -422,7 +415,6 @@ const RegisterEquipoForm: React.FC<RegisterEquipoFormProps> = (props: RegisterEq
                 <div className={styles.inputBoxRe}>
                     <label className={styles.details}>
                         <span>País de Origen <span className={styles.requiredField}>*</span></span>
-
                         <ComboBoxFC
                             message={"Seleccione un país"}
                             register={register("idPaisOrigen")}
@@ -432,14 +424,12 @@ const RegisterEquipoForm: React.FC<RegisterEquipoFormProps> = (props: RegisterEq
                             }))}
                         />
                     </label>
-
                     {errors.idPaisOrigen &&
                         <label className={styles.error}>{errors.idPaisOrigen.message}</label>}
                 </div>
                 <div className={styles.inputBoxRe}>
                     <label className={styles.details}>
                         <span>Proveedor<span className={styles.requiredField}>*</span></span>
-
                         <ComboBoxFC
                             message={"Seleccione un proveedor"}
                             register={register("idProveedor")}
@@ -449,14 +439,12 @@ const RegisterEquipoForm: React.FC<RegisterEquipoFormProps> = (props: RegisterEq
                             }))}
                         />
                     </label>
-
                     {errors.idProveedor &&
                         <label className={styles.error}>{errors.idProveedor.message}</label>}
                 </div>
                 <div className={styles.inputBoxRe}>
                     <label className={styles.details}>
                         <span>Ubicación <span className={styles.requiredField}>*</span></span>
-
                         <ComboBoxFC
                             message={"Seleccione una ubicación"}
                             register={register("idUbicacionActual")}
@@ -466,7 +454,6 @@ const RegisterEquipoForm: React.FC<RegisterEquipoFormProps> = (props: RegisterEq
                             }))}
                         />
                     </label>
-
                     {errors.idUbicacionActual &&
                         <label className={styles.error}>{errors.idUbicacionActual.message}</label>}
                 </div>
@@ -476,10 +463,9 @@ const RegisterEquipoForm: React.FC<RegisterEquipoFormProps> = (props: RegisterEq
                         <input
                             {...register("fechaAdquisicion", {required: "Este campo es requerido"})}
                             type="date"
-                            defaultValue={new Date().toISOString().split('T')[0]}
+                            defaultValue={defaultDate}
                         />
                     </label>
-
                     {errors.fechaAdquisicion &&
                         <label className={styles.error}>{errors.fechaAdquisicion.message}</label>}
                 </div>
@@ -491,7 +477,6 @@ const RegisterEquipoForm: React.FC<RegisterEquipoFormProps> = (props: RegisterEq
                                 <input id="imagen" type="file" {...register('imagen')}
                                        onChange={(event: ChangeEvent<HTMLInputElement>) => previewImage(event, '#imgPreview')}/>
                             </label>
-
                         </div>
                         <div className={styles.preview}>
                             <img id="imgPreview" src="" alt=""></img>

@@ -44,7 +44,6 @@ const ComboBoxFC = (props: ComboBoxEntitiesProps): ReactElement => {
         >
             {/* Opción para el mensaje inicial sí está definido */}
             {props.message && <option disabled={!props.messageSelectable} value={""}>{props.message}</option>}
-
             {/* Renderizado de las opciones del combobox */}
             {props.elements.map((element: { key: number | string, value: string }) => (
                 <option key={element.key} value={element.key}>

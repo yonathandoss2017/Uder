@@ -34,8 +34,6 @@ function LoginForm(): ReactElement {
             password: (e.currentTarget.elements.namedItem("password") as HTMLInputElement).value,
         };
 
-        console.log("en el form", credentials.username);
-
         // Inicia sesión con las credenciales proporcionadas
         await signIn(
             'credentials',
@@ -44,8 +42,6 @@ function LoginForm(): ReactElement {
                 ...credentials // Proporciona las credenciales al método de inicio de sesión
             }
         ).then((res: SignInResponse | undefined): void => {
-            console.log("en el .then", credentials.username)
-            console.log(res);
             if (res?.error) {
                 createModal({
                     children: (<p>{res?.error}</p>
@@ -71,6 +67,7 @@ function LoginForm(): ReactElement {
             <input type="password" name="password" id="pass" placeholder="Contraseña" required={true}/>
             <button type="submit">Ingresar</button>
             <p>No tienes una cuenta? <a href={"/signup/google"}>Regístrate</a></p>
+            <a href={"/signup/ad"}>Regístrate con Active Directory</a>
             <p>o</p>
             <button className="google" onClick={handleGoogleSignIn}>
                 Inicia Sesión con Google

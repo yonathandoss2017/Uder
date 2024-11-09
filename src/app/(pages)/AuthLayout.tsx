@@ -11,20 +11,22 @@ import {renovarToken} from "@/services/SessionService";
 import {useModal} from "@/app/hooks/modals/useModal";
 import {useIdleTimer} from "react-idle-timer";
 import {usePathname} from "next/navigation";
-import {useToken} from "@/app/hooks/TokenProvider";
+import {TokenProvider, useToken} from "@/app/hooks/TokenProvider";
 
 // Define el componente layout de autenticación
 function AuthLayout({children}: Readonly<{ children: ReactNode }>) {
 
+    const { sessionAPIToken, setSessionAPIToken } = useToken();
+
     const {data: session, status, update} = useSession();
-    const CHECK_SESSION_EXP_TIME = 5000;
+    const CHECK_SESSION_EXP_TIME = 15000;
     const RENEW_TOKEN = 60000;
     const SESSION_IDLE_TIME = 30000;
     const [hayToken, setHayToken] = useState<boolean>(false);
-    const { setSessionAPIToken } = useToken();
-    let expiresTimeTimestampRef = session?.user.expires
+    const expiresTimeTimestampRef = useRef<number>(Date.now() + 300000);
 
     const pathname = usePathname();
+
 
     const onUserIdle = () => {
         console.log('IDLE');
@@ -48,107 +50,74 @@ function AuthLayout({children}: Readonly<{ children: ReactNode }>) {
     const [showSessionExpiredError, setShowSessionExpiredError] = useState<boolean>(false);
     const [sessionModalActive, setSessionModalActive] = useState<boolean>(false);
 
-    const renderSessionExpiredError = (): ReactElement => {
-        return (<ErrorFC customContent={(
-                <>
-                    <h1>Error</h1>
-                    <h2>La sesión expiro por inactividad</h2>
-                    <h3>Por favor inicie sesión nuevamente.</h3>
-                    <br/>
-                    <button onClick={async (): Promise<void> => {
-                        await signOut({
-                            callbackUrl: "/login", // URL de redirección después del cierre de sesión
-                            redirect: true    // Redirige al usuario después de cerrar la sesión
-                        });
-                    }}>
-                        Volver a iniciar sesión
-                    </button>
-                </>
-            )}></ErrorFC>
-        );
-    };
-
     const sessionModal = createModal({
         children: (
             <p>Su sesión está por expirar, quiere renovarla?</p>
         ),
         buttonsType: ModalButtonsType.CONFIRM_CANCEL,
         onConfirm: async (): Promise<void> => {
-            if (expiresTimeTimestampRef != undefined) {
-                expiresTimeTimestampRef = Date.now() + 300000;
-                console.log("Renovando token en page");
-                if (session?.user.sessionAPIToken) {
-                    const response: string | FetchAPIError = await renovarToken(session?.user.sessionAPIToken);
-                    if (isFetchAPIError(response)) {
-                        console.error("ERROR - EquiposPage_renovarToken: ", response);
-                        throw new Error(response.errorMessage);
-                    }
-                    document.cookie = `sessionToken=${response};path=/;max-age=300;samesite=strict;secure`;
-                    session.user.sessionAPIToken = response;
-                    setSessionModalActive(false);
-                    setSessionAPIToken(response);
+            expiresTimeTimestampRef.current = Date.now() + 300000;
+            if (session?.user.sessionAPIToken) {
+                const response: string | FetchAPIError = await renovarToken(session?.user.sessionAPIToken);
+                if (isFetchAPIError(response)) {
+                    console.error("ERROR - EquiposPage_renovarToken: ", response);
+                    throw new Error(response.errorMessage);
                 }
+                document.cookie = `sessionToken=${response};path=/;max-age=300;samesite=strict;secure`;
+                session.user.sessionAPIToken = response;
+                setSessionAPIToken(response);
+                setSessionModalActive(false);
             }
         },
         onCancel: (): void => {
             setSessionModalActive(false);
-            document.cookie = `sessionToken=;max-age=0;path=/;samesite=lax;secure`;
+            document.cookie = `sessionToken=;max-age=0;path=/;samesite=strict;secure`;
             signOut({redirect: true, callbackUrl: "/login"})
-
         }
     });
 
 
     useEffect(() => {
 
-        if (pathname === "/login" || pathname === "/login/google" || pathname === "/signup" || pathname === "/signup/google") {
+        if (pathname === "/login" || pathname === "/login/google" || pathname === "/signup/google" || pathname === "/signup/ad" || pathname === "/signup") {
             return;
         }
-        console.log("HAY TOKEN BOOLEAN", document.cookie.includes('sessionToken'));
         const checkUserSession = setInterval(async () => {
-            if (expiresTimeTimestampRef != undefined) {
-                const currentTimestamp = Date.now();
-                const timeRemaining = expiresTimeTimestampRef - currentTimestamp;
-                console.log("Time Remaining:", timeRemaining); // Agrega este log
-                console.log("isIdle:", isIdle()); // Agrega este log
-                console.log("HAY TOKEN BOOLEAN2", document.cookie.includes('sessionToken'));
-                if (document.cookie.includes('sessionToken')) {
-                    setHayToken(true)
-                    console.log("DENTRO DEL PRIMER IF")
-                    if (!isIdle() && timeRemaining < RENEW_TOKEN) {
-                        console.log("entre a no idle")
-                        console.log("session ", session?.user?.sessionAPIToken)
-                        console.log("error", session?.user.error)
-                        if (session?.user?.sessionAPIToken && !session.user.error) {
-                            console.log("no idle con token renovando")
-                            expiresTimeTimestampRef = Date.now() + 300000;
-                            const response: string | FetchAPIError = await renovarToken(session?.user.sessionAPIToken);
-                            if (isFetchAPIError(response)) {
-                                console.error("ERROR - EquiposPage_renovarToken: ", response);
-                                sessionModal.close();
-                                return;
-                            }
-                            document.cookie = `sessionToken=${response};path=/;max-age=300;samesite=strict;secure`;
-                            session.user.sessionAPIToken = response;
-                            setSessionAPIToken(response);
+            const currentTimestamp = Date.now();
+            const timeRemaining = expiresTimeTimestampRef.current - currentTimestamp;
+            console.log("Time Remaining:", timeRemaining); // Agrega este log
+            console.log("isIdle:", isIdle()); // Agrega este log
+            if (document.cookie.includes('sessionToken')) {
+                setHayToken(true)
+                if (!isIdle() && timeRemaining < RENEW_TOKEN) {
+                    console.log("El tiempo restante es menor a 60 segundos y se encuentra activo")
+                    if (session?.user?.sessionAPIToken && !session.user.error) {
+                        console.log("Esta activo con token renovado")
+                        expiresTimeTimestampRef.current = Date.now() + 300000;
+                        const response: string | FetchAPIError = await renovarToken(session?.user.sessionAPIToken);
+                        if (isFetchAPIError(response)) {
+                            console.error("ERROR - EquiposPage_renovarToken: ", response);
+                            sessionModal.close();
+                            return;
                         }
-                    } else if (isIdle() && timeRemaining < RENEW_TOKEN) {
-                        if (!sessionModalActive) {
-                            console.log("entre a idle y modal no está activo");
-                            setSessionModalActive(true);
-                            console.log("modal ", sessionModalActive)
-                            console.log("entre a idle")
-                            sessionModal.show();
-                        }
+                        document.cookie = `sessionToken=${response};path=/;max-age=300;samesite=strict;secure`;
+                        session.user.sessionAPIToken = response;
+                        setSessionAPIToken(response);
                     }
-
-                    if(timeRemaining<=0){
-                        console.log("entre a time remaining < 0")
-                        if(pathname != "/login" && pathname != "/login/google" && pathname != "/signup" && pathname != "/signup/google") {
-                            signOut({redirect: true, callbackUrl: "/login"})
-                        }
+                } else if (isIdle() && timeRemaining < RENEW_TOKEN) {
+                    if (!sessionModalActive) {
+                        setSessionModalActive(true);
+                        sessionModal.show();
                     }
                 }
+
+                if(timeRemaining<=0){
+                    if(pathname != "/login" && pathname != "/login/google" && pathname != "/signup" && pathname != "/signup/google" && pathname != "/signup/ad" ) {
+                        document.cookie = `sessionToken=;max-age=0;path=/;samesite=strict;secure`;
+                        signOut({redirect: true, callbackUrl: "/login"})
+                    }
+                }
+
             }
 
         }, CHECK_SESSION_EXP_TIME);
@@ -160,12 +129,8 @@ function AuthLayout({children}: Readonly<{ children: ReactNode }>) {
 
     useEffect(() => {
         const intervalId = setInterval(async () => {
-            console.log("ESTOY DENTRO DEL SEGUNDO USE EFEFECT")
-            if (!document.cookie.includes('sessionToken') && pathname !== "/login" && pathname !== "/login/google" && pathname !== "/signup" && pathname !== "/signup/google") {
-                console.log("EN EL PRIMER IF DEL SEGUNDO USE EFFECT")
-                console.log("pase el if IF")
+            if (!document.cookie.includes('sessionToken') && pathname !== "/login" && pathname !== "/login/google" && pathname != "/signup/google" && pathname != "/signup/ad" && pathname != "/signup") {
                 sessionModal.close();
-                console.log("DESPUES DE CLOSE")
                 setSessionModalActive(false);
                 setShowSessionExpiredError(true);
             }
@@ -181,7 +146,7 @@ function AuthLayout({children}: Readonly<{ children: ReactNode }>) {
 // Muestra un mensaje de error si se produce un error de sesión
     // Muestra un mensaje de error si se produce un error de sesión
     if (showSessionExpiredError || session?.user?.error) {
-        if(pathname != "/login" && pathname != "/login/google" && pathname != "/signup" && pathname != "/signup/google") {
+        if(pathname != "/login" && pathname != "/login/google" && pathname != "/signup/google" && pathname != "/signup/ad" && pathname != "/signup") {
             signOut({redirect: true, callbackUrl: "/login"})
         }
     }

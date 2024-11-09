@@ -79,7 +79,6 @@ function TableModeloFC(props: Readonly<TableModeloFCProps>): ReactElement {
                 console.error("ERROR - lista de modelos", errorMessage);
                 return;
             }
-            console.log(response);
             setModelos(response);
         })();
     }, [appliedSearchTerms, sessionAPIToken]);

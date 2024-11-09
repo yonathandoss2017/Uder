@@ -59,7 +59,6 @@ const authOptions: NextAuthOptions = {
                 // Retornamos un objeto con el token de sesión en la API para persistirlo en el JWT (JSON Web Token)
                 return {
                     sessionAPIToken: response,
-                    //exp: (Date.now() + 30000)
                 } as User;
 
             }
@@ -99,29 +98,11 @@ const authOptions: NextAuthOptions = {
 
             // Si el trigger es "update", modificamos el
             if (trigger === "update" && session) {
-                console.log("JWT - Trigger: update");
                 token.user = session.user;
             }
 
-            const cacheDuration = 5 * 60 * 1000;
-
             if(cookies().get('sessionToken')?.value !== undefined) {
-                // Si el token ya tiene un timestamp y está dentro del tiempo de caché, no hacer la llamada
-                if (token.user.lastFetched && (Date.now() - token.user.lastFetched < cacheDuration)) {
-                    console.log("estoy dentro del if no hago la llamada")
-                    return token;
-                }else {
-                    console.log("ESTOY EN EL JWT ", cookies().get('sessionToken')?.value)
-                    token.user.sessionAPIToken = cookies().get('sessionToken')?.value;
-                    token.user.exp = Date.now() + 300000;
-
-                    const response = await buscarClientePorToken(cookies().get('sessionToken')!!.value);
-                    if (isFetchAPIError(response)) {
-                        throw new Error(response.errorMessage);
-                    }
-                    token.user.data = response;
-                    token.user.lastFetched = Date.now();
-                }
+                token.user.sessionAPIToken = cookies().get('sessionToken')?.value;
             }
 
             return token;
@@ -140,33 +121,29 @@ const authOptions: NextAuthOptions = {
 
             // session.user.error = token.user.error;
             const sessionToken = cookies().get('sessionToken')?.value
-            console.log("TENGO COOKIE")
-            console.log(sessionToken)
             // Si el JWT (JSON Web Token) tiene el token de sesión del cliente en la API, lo guardamos en la sesión y obtenemos los datos del cliente
             if (sessionToken) {
-                console.log("TOKEN COOKIE DESDE EL SESSION", cookies().get('sessionToken')?.value)
                 session.user.sessionAPIToken = cookies().get('sessionToken')?.value
                 try {
                     if(cookies().get('sessionToken')?.value !== undefined) {
                         {
-                            session.user.data = token.user.data;
+                            const response = await buscarClientePorToken(cookies().get('sessionToken')!!.value);
+                            if (isFetchAPIError(response)) {
+                                throw new Error(response.errorMessage);
+                            }
+                            session.user.data = response;
                             session.user.sessionAPIToken = cookies().get('sessionToken')?.value;
-                            session.user.expires = token.user.exp
-                            console.log(session.expires, "Expiracion del session auth")
                         }
                     }
                 } catch (error) {
-                    console.error("Error al buscar cliente por token: ", error);
                     session.user.sessionAPIToken = undefined;
                     session.user.error = "invalid_token"
                 }
             } else {
-                console.log("EN EL ELSE DEL SESSION")
                 session.user.sessionAPIToken = undefined;
                 session.user.error = "invalid_token"
             }
             // Retornamos la sesión de cliente modificada
-            console.log("SESSION", session)
             return session;
 
         },

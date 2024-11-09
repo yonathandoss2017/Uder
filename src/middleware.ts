@@ -21,7 +21,7 @@ async function middleware(req: NextRequest): Promise<NextResponse> {
         // Redirige al usuario a la página principal si ya está autenticado y trata de acceder a /login o /signup
         if (hassessionAPIToken) {
             return NextResponse.redirect(new URL('/', req.url));
-        } else if (pathname.startsWith('/signup') && !pathname.includes('google') && !isAuthenticated) {
+        } else if ((pathname.startsWith('/signup') && (!pathname.includes('google') && !pathname.includes('ad')) && !isAuthenticated)) {
             // Redirige al usuario a la página de inicio de sesión si intenta registrarse sin autenticarse (Google)
             return NextResponse.redirect(new URL('/login', req.url));
         }

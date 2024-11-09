@@ -28,10 +28,10 @@ const SchemaIntervencion: ZodObject<any> = z.object({
             z.string()
             .min(1, "El ID del tipo de intervención es requerido"),
         ),
-    idEquipo:
+    numSerieEquipo:
         z.preprocess(((val): string => val ? String(val) : ''), // Convierte el valor a string
             z.string()
-            .min(1, "El ID del equipo es requerido")
+            .min(1, "El número de serie del equipo es requerido")
         ),
     comentarios:
         z.string()

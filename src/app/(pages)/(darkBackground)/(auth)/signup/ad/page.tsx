@@ -13,6 +13,7 @@ import stylesForm from "@public/styles/modules/auth/signupForm.module.css";
 import React from "react";
 import RegisterFormClient from "./form";
 import {Metadata} from "next";
+import RegisterFormClientAd from "./form";
 
 // Define la metadata de la página principal
 export const metadata: Metadata = {
@@ -20,13 +21,13 @@ export const metadata: Metadata = {
 };
 
 // Define la página principal de la aplicación
-const RegisterPage = () => {
+const RegisterPageAd = () => {
     return (
         <main className={styles.containerWrap}>
             <div className={styles.container}>
                 <div className={stylesForm.register}>
                     <h2>Hospital</h2>
-                    <RegisterFormClient/>
+                    <RegisterFormClientAd/>
                 </div>
             </div>
         </main>
@@ -34,4 +35,4 @@ const RegisterPage = () => {
 }
 
 // Exporta la página
-export default RegisterPage;
+export default RegisterPageAd;

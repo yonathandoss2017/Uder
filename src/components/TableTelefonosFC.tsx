@@ -261,7 +261,6 @@ function TableTelefonosFC(props: Readonly<TableTelefonosFCProps>): ReactElement 
                                     </button>
                                 </td>
                             </tr>
-
                         ))}
                         </tbody>
                     </table>

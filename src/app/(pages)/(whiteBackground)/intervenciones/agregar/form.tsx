@@ -2,7 +2,7 @@
 import React, {useEffect, useState} from "react";
 import {SubmitHandler, useForm} from "react-hook-form";
 import {agregarIntervencion} from "@/services/IntervencionService";
-import {listarEquipos} from "@/services/EquiposService";
+import {buscarPorNumSerie, listarEquipos} from "@/services/EquiposService";
 import {listarTiposIntervencion} from "@/services/TipoIntervencionService";
 import {useModal} from "@/app/hooks/modals/useModal";
 import {ModalButtonsType} from "@/components/ModalFC";
@@ -15,6 +15,7 @@ import EquipoFieldSortEnum from "@/types/enums/EquipoFieldSortEnum";
 
 interface FormValues {
     fechaHora: string;
+    numSerieEquipo: string
     motivo: string;
     comentarios?: string;
 }
@@ -31,9 +32,6 @@ const RegisterIntervencionForm: React.FC<RegisterIntervencionFormProps> = (props
     const { createModal } = useModal();
     const { register, handleSubmit, formState: { errors }, reset } = useForm<FormValues>();
 
-    const [equipos, setEquipos] = useState<any[]>([]);
-    const [selectedEquipoId, setSelectedEquipoId] = useState<number | undefined>(undefined);
-    const [selectedEquipoName, setSelectedEquipoName] = useState<string | undefined>(undefined);
     const [tiposIntervencion, setTiposIntervencion] = useState<any[]>([]);
     const [selectedTipoIntervencionId, setSelectedTipoIntervencionId] = useState<number | undefined>(undefined);
     const [loaded, setLoaded] = useState<boolean>(false);
@@ -47,15 +45,6 @@ const RegisterIntervencionForm: React.FC<RegisterIntervencionFormProps> = (props
         if(sessionAPIToken==null) return;
 
         (async (): Promise<void> => {
-            const equiposResponse = await listarEquipos(sessionAPIToken, equiposPorPagina, 1,EquipoFieldSortEnum.NOMBRE, true, {activo: true});
-            if (isFetchAPIError(equiposResponse)) {
-                createModal({
-                    children: <div>Error al cargar los equipos: {equiposResponse.errorMessage}</div>,
-                    buttonsType: ModalButtonsType.CONFIRM,
-                }).show();
-                return;
-            }
-            setEquipos(equiposResponse);
 
             const tiposResponse = await listarTiposIntervencion(sessionAPIToken);
             if (isFetchAPIError(tiposResponse)) {
@@ -75,12 +64,12 @@ const RegisterIntervencionForm: React.FC<RegisterIntervencionFormProps> = (props
 
         if(sessionAPIToken==null)return;
 
-        if (!selectedEquipoId || !selectedTipoIntervencionId) {
+        if (!selectedTipoIntervencionId) {
             createModal({
                 children: (
                     <div>
                         <h2>Error</h2>
-                        <p>Debe seleccionar un equipo</p>
+                        <p>Debe seleccionar un tipo de intervención</p>
                     </div>
                 ),
                 buttonsType: ModalButtonsType.CONFIRM,
@@ -88,85 +77,65 @@ const RegisterIntervencionForm: React.FC<RegisterIntervencionFormProps> = (props
             return;
         }
 
-        const nuevaIntervencion = {
-            fechaHora: formValues.fechaHora,
-            motivo: formValues.motivo,
-            comentarios: formValues.comentarios,
-            idEquipo: selectedEquipoId,
-            idTipoIntervencion: selectedTipoIntervencionId,
-            idUsuario: props.clientData.id
-        };
-
-        const response = await agregarIntervencion(nuevaIntervencion, sessionAPIToken);
-
-        if (isFetchAPIError(response)) {
+        const equipo = await buscarPorNumSerie(formValues.numSerieEquipo, sessionAPIToken);
+        if (isFetchAPIError(equipo)) {
             createModal({
                 children: (
                     <div>
-                        <h2>Error al registrar la intervención</h2>
-                        <p>{response.errorMessage}</p>
+                        <h2>Error al buscar el equipo</h2>
+                        <p>{equipo.errorMessage}</p>
                     </div>
                 ),
                 buttonsType: ModalButtonsType.CONFIRM,
             }).show();
             return;
+        } else if(equipo == null || equipo.id == null){
+            createModal({
+                children: (
+                    <div>
+                        <h2>Error al buscar el equipo</h2>
+                        <p>No se encontró un equipo con el número de serie ingresado</p>
+                    </div>
+                ),
+                buttonsType: ModalButtonsType.CONFIRM,
+            }).show();
+        }else {
+
+            const nuevaIntervencion = {
+                fechaHora: formValues.fechaHora,
+                motivo: formValues.motivo,
+                comentarios: formValues.comentarios,
+                idEquipo: equipo.id,
+                idTipoIntervencion: selectedTipoIntervencionId,
+                idUsuario: props.clientData.id
+            };
+
+            const response = await agregarIntervencion(nuevaIntervencion, sessionAPIToken);
+
+            if (isFetchAPIError(response)) {
+                createModal({
+                    children: (
+                        <div>
+                            <h2>Error al registrar la intervención</h2>
+                            <p>{response.errorMessage}</p>
+                        </div>
+                    ),
+                    buttonsType: ModalButtonsType.CONFIRM,
+                }).show();
+                return;
+            }
+
+            createModal({
+                children: <div><h2>Intervención registrada correctamente</h2></div>,
+                buttonsType: ModalButtonsType.CONFIRM,
+            }).show();
+
+            reset();
         }
-
-        createModal({
-            children: <div><h2>Intervención registrada correctamente</h2></div>,
-            buttonsType: ModalButtonsType.CONFIRM,
-        }).show();
-
-        reset();
     };
 
     if (!loaded) return <LoadingPage />
 
-    // Función para abrir el modal y seleccionar un equipo
-    const openEquipoModal = () => {
-        const modalInstance = createModal({
-            children: (
-                <div>
-                    <h2>Seleccionar Equipo</h2>
-                    <ul>
-                        {equipos.slice((paginaActual - 1) * equiposPorPagina, paginaActual * equiposPorPagina).map(equipo => (
-                            <li key={equipo.id} onClick={() => handleSelectEquipo(equipo, modalInstance)}>
-                                {equipo.nombre}
-                            </li>
-                        ))}
-                    </ul>
-                    <div>
-                        <button onClick={handleAnterior} disabled={paginaActual === 1}>
-                            Anterior
-                        </button>
-                        <button onClick={handleSiguiente} disabled={paginaActual * equiposPorPagina >= equipos.length}>
-                            Siguiente
-                        </button>
-                    </div>
-                </div>
-            ),
-            buttonsType: ModalButtonsType.NONE // Sin botones adicionales, solo la lista de equipos
-        });
-        modalInstance.show(); // Mostrar el modal
-    };
-    const handleSelectEquipo = (equipo: any, modalInstance: any) => {
-        setSelectedEquipoId(equipo.id);
-        setSelectedEquipoName(equipo.nombre); // Mostrar el nombre del equipo seleccionado
-        modalInstance.close(); // Cerrar el modal una vez seleccionado el equipo
-    };
-
-    // Navegación entre páginas
-    const handleSiguiente = () => {
-        if (paginaActual * equiposPorPagina < equipos.length) {
-            setPaginaActual(prevPage => prevPage + 1);
-        }
-    };
-
-    const handleAnterior = () => {
-        if (paginaActual > 1) {
-            setPaginaActual(prevPage => prevPage - 1);
-        }
-    };
 
     return (
         <form onSubmit={handleSubmit(onSubmit)} className={styles.equipoForm}>
@@ -194,7 +163,6 @@ const RegisterIntervencionForm: React.FC<RegisterIntervencionFormProps> = (props
                     </label>
                     {errors.motivo && <label className={styles.error}>{errors.motivo.message}</label>}
                 </div>
-
                 <div className={styles.inputBoxRe}>
                     <label className={styles.details}>
                         <span>Tipo de Intervención <span className={styles.requiredField}>*</span></span>
@@ -209,23 +177,23 @@ const RegisterIntervencionForm: React.FC<RegisterIntervencionFormProps> = (props
                         />
                     </label>
                 </div>
-
                 <div className={styles.inputBoxRe}>
                     <label className={styles.details}>
-                        <span>Equipo <span className={styles.requiredField}>*</span></span>
-                        <button type="button" onClick={openEquipoModal}>
-                            {selectedEquipoName ? `Equipo: ${selectedEquipoName}` : "Seleccionar equipo"}
-                        </button>
+                        <span>Número de serie del equipo <span className={styles.requiredField}>*</span></span>
+                        <input
+                            {...register("numSerieEquipo", { required: "Este campo es requerido" })}
+                            type="text"
+                            placeholder="Número de serie del equipo"
+                        />
                     </label>
+                    {errors.numSerieEquipo && <label className={styles.error}>{errors.numSerieEquipo.message}</label>}
                 </div>
-
                 <div className={styles.inputBoxRe}>
                     <label className={styles.details}>
                         <span>Comentarios</span>
                         <textarea {...register("comentarios")} placeholder="Comentarios adicionales" />
                     </label>
                 </div>
-
                 <div className={styles.buttomAe}>
                     <button type="submit">Agregar</button>
                 </div>

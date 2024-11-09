@@ -10,6 +10,11 @@ import UsuarioFieldSortEnum from "@/types/enums/UsuarioFieldSortEnum";
 // URL base de la API REST de la API para los usuarios
 const SERVICE_PATH: string = process.env.NEXT_PUBLIC_BACKEND_API_URL + "/usuarios";
 
+interface UsernameAPIResponse {
+    username: string;
+}
+
+
 /**
  * Función para listar todos los usuarios.
  * @param token - Token de autenticación del usuario
@@ -49,8 +54,6 @@ export async function listarUsuarios(
         ...(!!filter.estado && {filter_estado: filter.estado}),
         ...(!!filter.perfil && {filter_perfil: filter.perfil})
     });
-
-    console.log("TOKEN", token)
 
     // URL de la petición a la API
     const url: string = `${SERVICE_PATH}/listar?${queryParams}`; // queryParams =  ?size=10&page=1&fieldSort=id&sortDirectionAsc=true&filter_id=1&filter_nombre=nombre
@@ -128,6 +131,69 @@ export async function registrarUsuario(usuario: UsuarioDTO, password: string, ph
 
     // Realiza la petición a la API y retorna el resultado
     return await fetchBodyWithErrorHandling<UsuarioDTO>(url, options);
+}
+
+export async function registrarConAD(usuario: UsuarioDTO, phone: number): Promise<UsuarioDTO | FetchAPIError>{
+
+    const url: string = `${SERVICE_PATH}/registrar-ad?phone=${phone}`; // URL de la petición a la API
+
+    // Opciones de la petición
+    const options: RequestInit = {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json' // Tipo de contenido JSON
+        },
+        body: JSON.stringify(usuario) // Cuerpo de la petición con los datos del usuario en formato JSON
+    };
+
+    // Realiza la petición a la API y retorna el resultado
+    return await fetchBodyWithErrorHandling<UsuarioDTO>(url, options);
+}
+
+export async function generarNombreUsuario(primerNombre: string, segundoNombre: string | undefined,  primerApellido: string, segundoApellido: string |undefined): Promise<string | FetchAPIError> {
+
+    const queryParams: URLSearchParams = new URLSearchParams({
+        ...(!!primerNombre && {primerNombre: primerNombre}),
+        ...(!!segundoNombre && {segundoNombre: segundoNombre}),
+        ...(!!primerApellido && {primerApellido: primerApellido}),
+        ...(!!segundoApellido && {segundoApellido: segundoApellido})
+    })
+
+    const url: string = `${SERVICE_PATH}/generar-nombre-usuario?${queryParams}`; // URL de la petición a la API
+
+    // Opciones de la petición
+    const options: RequestInit = {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json' // Tipo de contenido JSON
+        }
+    };
+
+    const response: UsernameAPIResponse | FetchAPIError = await fetchBodyWithErrorHandling<UsernameAPIResponse>(url, options);
+    if (isFetchAPIError(response)) return response;
+    return response.username;
+
+}
+
+export async function verificarAD(nombreUsuario: string, password: string, dominio: string): Promise<boolean | FetchAPIError> {
+    const queryParams: URLSearchParams = new URLSearchParams({
+        ...(!!nombreUsuario && {nombreUsuario: nombreUsuario}),
+        ...(!!password && {password: password}),
+        ...(!!dominio && {dominio: dominio})
+    })
+
+    const url: string = `${SERVICE_PATH}/verificar-ad?${queryParams}`; // URL de la petición a la API
+
+    // Opciones de la petición
+    const options: RequestInit = {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json' // Tipo de contenido JSON
+        }
+    };
+
+    return await fetchBodyWithErrorHandling<boolean>(url, options);
+
 }
 
 /**
@@ -214,6 +280,7 @@ export async function existeCorreo(correo: string): Promise<boolean> {
     };
 
     return await fetchBodyWithErrorHandling<boolean>(url, options).then((response: boolean | FetchAPIError): boolean => {
+
         if (isFetchAPIError(response)) {
             // Sí ocurre un error en la solicitud o en el procesamiento de la respuesta
             // imprime el error en la consola y retorna false indicando que no existe el correo

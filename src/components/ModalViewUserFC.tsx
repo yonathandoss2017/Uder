@@ -113,7 +113,6 @@ const ModalViewUserFC = ({ user, idAdministrador }: ModalViewUserProps): ReactEl
                     > Teléfonos
                     </button>
                 </div>
-
             </div>
         </div>
     );

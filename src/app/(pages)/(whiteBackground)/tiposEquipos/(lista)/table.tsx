@@ -104,7 +104,6 @@ function TableTiposEquiposFC(props: Readonly<TableTiposEquipoFCProps>): ReactEle
                 console.error("ERROR - lista de equipos - table.tsx - listarEquipos", errorMessage);
                 return;
             }
-            console.log("TIPOS EQUIPO ", response);
             // Guarda la lista de equipos
             setTiposEquipos(response);
         })();
