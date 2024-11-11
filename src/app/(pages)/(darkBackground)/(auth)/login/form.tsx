@@ -66,7 +66,8 @@ function LoginForm(): ReactElement {
             <input type="text" name="username" id="user" placeholder="Usuario" required={true}/>
             <input type="password" name="password" id="pass" placeholder="Contraseña" required={true}/>
             <button type="submit">Ingresar</button>
-            <p>No tienes una cuenta? <a href={"/signup/google"}>Regístrate</a></p>
+            <p>No tienes una cuenta? </p>
+            <a href={"/signup/google"}>Regístrate con Google</a>
             <a href={"/signup/ad"}>Regístrate con Active Directory</a>
             <p>o</p>
             <button className="google" onClick={handleGoogleSignIn}>

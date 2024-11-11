@@ -115,7 +115,7 @@ function ModalBajaEquipoFC(props: Readonly<ModalBajaEquipoFCProps>): ReactElemen
     // Retorna el JSX del componente (Formulario de edición de usuario)
     return (
         <form className={stylesForm.confirmar} onSubmit={handleSubmit(handleBajaSubmit)}>
-            <h3>Razon de la baja</h3>
+            <h3>Razón de la baja</h3>
             <input {...register('razon')} type="text" className="razonbaja"/>
             {errors.razon && <p className={stylesForm.error}>{errors.razon.message}</p>}
             <h4>Comentarios</h4>

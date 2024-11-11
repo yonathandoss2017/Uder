@@ -16,6 +16,8 @@ import {Carousel} from "react-responsive-carousel";
 import ImagenDTO from "@/types/dtos/ImagenDTO";
 import {listarImagenes} from "@/services/ImagenService";
 import {useToken} from "@/app/hooks/TokenProvider";
+import UbicacionDTO from "@/types/dtos/UbicacionDTO";
+import {buscarUbicacionPorId} from "@/services/UbicacionService";
 
 
 interface ModalViewEquipoFC {
@@ -31,6 +33,7 @@ const ModalViewEquipoFC = ({ equipo }: ModalViewEquipoFC): ReactElement => {
     const [proveedor, setProveedor] = useState<string>("");
     const [marca, setMarca] = useState<string>("");
     const [idMarca, setIdMarca] = useState<number>(0);
+    const [ubicacion, setUbicacion] = useState<string>("");
     const [modelo, setModelo] = useState<string>("");
     const [msgGarantia, setMsjGarantia] = useState<string>("");
 
@@ -122,6 +125,15 @@ const ModalViewEquipoFC = ({ equipo }: ModalViewEquipoFC): ReactElement => {
                     }
                 }
 
+                const obtenerUbicacion = async()=>{
+                    const reponse: UbicacionDTO | FetchAPIError = await buscarUbicacionPorId(equipo.idUbicacionActual, sessionAPIToken); //Buscamos ubicacion por id
+                    if (isFetchAPIError(reponse)) { //Si ocurre un error en el fetch
+                        console.error('Error al obtener la ubicacion', reponse);
+                    } else {
+                        setUbicacion(reponse.nombre); //Se setea la ubicacion
+                    }
+                }
+
                 const obtenerImagen= async ()=> {
                     const response: ImagenDTO[] | FetchAPIError = await listarImagenes(equipo.id as number, sessionAPIToken); //Buscamos imagenes por id de equipo
                     if (isFetchAPIError(response)) {
@@ -138,6 +150,7 @@ const ModalViewEquipoFC = ({ equipo }: ModalViewEquipoFC): ReactElement => {
                 obtenerProveedor(),
                 obtenerTipoEquipo(),
                 obtenerModelo(),
+                obtenerUbicacion(),
                 obtenerImagen(),
             ]);
 
@@ -197,6 +210,10 @@ const ModalViewEquipoFC = ({ equipo }: ModalViewEquipoFC): ReactElement => {
                 <div className={styles.inputBox}>
                     <label className={styles.details}>Modelo</label>
                     <p className={styles.detailsValue}>{modelo}</p>
+                </div>
+                <div className={styles.inputBox}>
+                    <label className={styles.details}>Ubicación Actual</label>
+                    <p className={styles.detailsValue}>{ubicacion}</p>
                 </div>
                 <div className={styles.inputBox}>
                     <label className={styles.details}>Garantía</label>
