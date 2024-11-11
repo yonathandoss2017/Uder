@@ -31,9 +31,6 @@ function TrabajarIntervencionForm(props: Readonly<EditIntervencionFormProps>): R
     const { createModal } = useModal();
     const [tiposIntervencion, setTiposIntervencion]: [TipoIntervencionDTO[], (value: TipoIntervencionDTO[]) => void] = useState<any[]>([]);
 
-    //Seleccionados
-    const [idTipoIntervencionSelected, setIdTipoIntervencionSelected]: [number, (value: number) => void] = useState<number>(props.editingIntervencion.idTipoIntervencion);
-
     const {
         register,
         handleSubmit,
@@ -64,8 +61,6 @@ function TrabajarIntervencionForm(props: Readonly<EditIntervencionFormProps>): R
     }, [props.sessionAPIToken, sessionAPIToken]);
 
     const onSubmit: SubmitHandler<FormValues> = async (formValues: FormValues): Promise<void> => {
-
-        console.log("Voy a submitear en formEdit")
 
         if(sessionAPIToken == null) return;
 

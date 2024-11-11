@@ -312,6 +312,7 @@ function EditEquipoForm(props: Readonly<EditEquipoFormProps>): ReactElement {
         createModal({
             title: "Modificando equipo con número de serie \"" + props.editingEquipo.numSerie + "\"",
             children: ModalChangesFC(changes),
+            buttonsType: ModalButtonsType.CONFIRM_CANCEL,
             async onConfirm(): Promise<void> {
                 if (sessionAPIToken == null) {
                     console.error("ERROR - Modificar Equipo - table.tsx - handleSave - sessionAPIToken es null");
@@ -556,25 +557,16 @@ function EditEquipoForm(props: Readonly<EditEquipoFormProps>): ReactElement {
                         <div>
                             <label htmlFor="garantiaAnios">Años</label>
                             <input id="garantiaAnios" type="number" {...register('garantiaAnios')}
-                                   onChange={(e: ChangeEvent<HTMLInputElement>): void => {
-                                       props.editingEquipo.garantia.anios = parseInt(e.target.value)
-                                   }}
                                    min={0} max={20}/>
                         </div>
                         <div>
                             <label htmlFor="garantiaMeses">Meses</label>
                             <input id="garantiaMeses" type="number" {...register('garantiaMeses')}
-                                   onChange={(e: ChangeEvent<HTMLInputElement>): void => {
-                                       props.editingEquipo.garantia.meses = parseInt(e.target.value)
-                                   }}
                                    min={0} max={12}/>
                         </div>
                         <div>
                             <label htmlFor="garantiaDias">Días</label>
                             <input id="garantiaDias" type="number" {...register('garantiaDias')}
-                                   onChange={(e: ChangeEvent<HTMLInputElement>): void => {
-                                       props.editingEquipo.garantia.dias = parseInt(e.target.value)
-                                   }}
                                    min={0} max={31}/>
                         </div>
                         <div>
@@ -771,6 +763,9 @@ async function obtenerCambios(editingEquipo: EquipoDTO,
         });
     }
 
+    console.log("Garantia anios origen ", originalData.garantia.anios);
+    console.log("Garantia anios edit ", editingEquipo.garantia.anios);
+
     // Verifica si hay cambios en la garantía del equipo
     // Años
     if (originalData.garantia.anios != editingEquipo.garantia.anios) {
@@ -781,6 +776,9 @@ async function obtenerCambios(editingEquipo: EquipoDTO,
         });
     }
 
+    console.log("Garantia meses origen ", originalData.garantia.meses);
+    console.log("Garantia meses edit ", editingEquipo.garantia.meses);
+
     // Meses
     if (originalData.garantia.meses != editingEquipo.garantia.meses) {
         changes.push({
@@ -789,6 +787,9 @@ async function obtenerCambios(editingEquipo: EquipoDTO,
             nextValue: editingEquipo.garantia.meses + " meses"
         });
     }
+
+    console.log("Garantia dias origen ", originalData.garantia.dias);
+    console.log("Garantia dias edit ", editingEquipo.garantia.dias);
 
     // Días
     if (originalData.garantia.dias != editingEquipo.garantia.dias) {
