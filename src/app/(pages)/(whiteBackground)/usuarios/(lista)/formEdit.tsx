@@ -346,6 +346,7 @@ export default EditUserForm;
  * Obtiene los cambios realizados en el usuario
  * @param editingUser Objeto con los datos del usuario editado
  * @param originalData Datos originales del usuario
+ * @param sessionApiToken Token de sesión del cliente
  */
 async function obtenerCambios(editingUser: UsuarioDTO, originalData: UsuarioDTO, sessionApiToken: string): Promise<ChangeEntry[]> {
 

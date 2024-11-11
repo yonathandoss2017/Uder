@@ -14,7 +14,6 @@
     flex-wrap: wrap;
     margin-bottom: 5px;
     justify-content: space-between;
-    margin: 0 auto
 }
 
 
@@ -44,7 +43,6 @@
 
 .details {
     display: block;
-    font-weight: 500;
     margin-bottom: 3px;
     text-align: left;
     font-weight: bold;

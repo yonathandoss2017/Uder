@@ -54,3 +54,16 @@ export async function listarUbicaciones(
     // Realiza la petición a la API y retorna el resultado
     return await fetchBodyWithErrorHandling<UbicacionDTO[]>(url, options);
 }
+
+export async function buscarUbicacionPorId(id:number, token: string): Promise<UbicacionDTO | FetchAPIError>{
+    const url: string = `${SERVICE_PATH}/buscar/${id}`;
+    const options: RequestInit = {
+        method: 'GET',
+        headers: {
+            'Authorization': 'Bearer ' + token,
+            'Content-Type': 'application/json'
+        }
+    };
+
+    return await fetchBodyWithErrorHandling<UbicacionDTO>(url, options);
+}

@@ -108,14 +108,13 @@
 
 
 .filtersContainerInputs select {
-    min-width: 250px; /* Ajusta según sea necesario */
-    padding: 5px;
+    min-width: 250px;
     border-radius: 10px;
     color: white;
     background: black;
     font-weight: 500;
-    width: 250px; /* Ancho fijo para todos */
-    margin: 5px 10px; /* Espaciado entre los elementos */
+    width: 250px;
+    margin: 5px 10px;
     padding: 10px;
 }
 

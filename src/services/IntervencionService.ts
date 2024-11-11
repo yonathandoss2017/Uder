@@ -99,6 +99,7 @@ export async function listarIntervenciones(token: string, filter: IntervencionFi
  * @returns Promise<void | FetchAPIError> - Si la solicitud se realiza correctamente.
  */
 export async function modificarIntervencion(intervencion: IntervencionDTO, token: string): Promise<void | FetchAPIError> {
+
     const url: string = `${SERVICE_PATH}/trabajar`; // URL de la petición a la API
     const options: RequestInit = {
         method: 'PUT',

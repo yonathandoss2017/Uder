@@ -86,6 +86,8 @@ const RegisterEquipoForm: React.FC<RegisterEquipoFormProps> = (props: RegisterEq
     const {
         register,               // Método para registrar los inputs del formulario
         handleSubmit,           // Método para manejar el envío del formulario
+        watch,                  // Método para observar los valores de los inputs
+        setValue,               // Método para establecer los valores de los inputs
         formState: {errors}     // Propiedad que contiene los errores del formulario
     }: UseFormReturn<FormValues> = useForm<FormValues>({ // Inicializamos useForm con el tipo EquipoFormData
         resolver: zodResolver(SchemaEquipo.and(SchemaEquipoImagen)),    // Usamos zodResolver para la validación del formulario con el esquema de Zod schemaEquipo
@@ -109,6 +111,17 @@ const RegisterEquipoForm: React.FC<RegisterEquipoFormProps> = (props: RegisterEq
 
     // Estado para almacenar la marca seleccionada
     const [selectedMarcaId, setSelectedMarcaId]: [number | undefined, (value: number | undefined) => void] = useState<number | undefined>(undefined);
+
+    // Observar los valores de los campos de garantía
+    const garantiaDePorVida = watch('garantiaDePorVida');
+
+    useEffect(() => {
+        if (garantiaDePorVida) { // Si la garantía es de por vida, deshabilita los campos de años, meses y días
+            setValue('garantiaAnios', 0);
+            setValue('garantiaMeses', 0);
+            setValue('garantiaDias', 0);
+        }
+    }, [garantiaDePorVida, setValue]); // Se ejecuta al montar el componente y cuando cambia garantiaDePorVida
 
     // Efecto que se ejecuta al montar el componente (Carga los datos de las listas de los ComboBox)
     useEffect((): void => {
@@ -380,21 +393,21 @@ const RegisterEquipoForm: React.FC<RegisterEquipoFormProps> = (props: RegisterEq
                             <label htmlFor="garantiaAnios">
                                 <span>Años</span>
                                 <input className={styles.fechaInput} id="garantiaAnios" type="number" {...register('garantiaAnios')} defaultValue={0}
-                                       min={0} max={20}/>
+                                       disabled={garantiaDePorVida} min={0} max={20}/>
                             </label>
                         </div>
                         <div>
                             <label htmlFor="garantiaMeses">
                                 <span>Meses</span>
                                 <input className={styles.fechaInput} id="garantiaMeses" type="number" {...register('garantiaMeses')} defaultValue={0}
-                                       min={0} max={12}/>
+                                       disabled={garantiaDePorVida} min={0} max={12}/>
                             </label>
                         </div>
                         <div>
                             <label htmlFor="garantiaDias">
                                 <span>Días</span>
                                 <input className={styles.fechaInput}  id="garantiaDias" type="number" {...register('garantiaDias')} defaultValue={0}
-                                       min={0} max={31}/>
+                                       disabled={garantiaDePorVida} min={0} max={31}/>
                             </label>
                         </div>
                         <div>
