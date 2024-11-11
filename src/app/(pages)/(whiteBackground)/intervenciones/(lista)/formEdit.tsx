@@ -13,6 +13,7 @@ import { listarTiposIntervencion } from "@/services/TipoIntervencionService";
 import ComboBoxFC from "@/components/ComboBoxFC";
 import styles from "@public/styles/modules/table/table.editformequipo.module.css";
 import {useToken} from "@/app/hooks/TokenProvider";
+import TipoIntervencionDTO from "@/types/dtos/TipoIntervencionDTO";
 
 interface EditIntervencionFormProps {
     sessionAPIToken: string;
@@ -21,41 +22,39 @@ interface EditIntervencionFormProps {
     onCancel?: () => void;
 }
 
+interface FormValues extends IntervencionDTO{}
+
 function TrabajarIntervencionForm(props: Readonly<EditIntervencionFormProps>): ReactElement {
+
+    console.log("Intervencion recibida", props.editingIntervencion)
 
     const {sessionAPIToken } = useToken();
 
     const { createModal } = useModal();
-    const [tiposIntervencion, setTiposIntervencion] = useState<any[]>([]);
+    const [tiposIntervencion, setTiposIntervencion]: [TipoIntervencionDTO[], (value: TipoIntervencionDTO[]) => void] = useState<any[]>([]);
+
+    //Seleccionados
+    const [idTipoIntervencionSelected, setIdTipoIntervencionSelected]: [number, (value: number) => void] = useState<number>(props.editingIntervencion.idTipoIntervencion);
 
     const {
         register,
         handleSubmit,
         setValue,
-        formState: { errors },
-        watch
+        formState: { errors }
     }: UseFormReturn<IntervencionDTO> = useForm<IntervencionDTO>({
         resolver: zodResolver(SchemaIntervencion),
         mode: "all",
-        defaultValues: props.editingIntervencion
+        defaultValues: {...props.editingIntervencion}
     });
 
-    useEffect(() => {
-        if (props.editingIntervencion) {
-            setValue("fechaHora", props.editingIntervencion.fechaHora);
-            setValue("motivo", props.editingIntervencion.motivo);
-            setValue("comentarios", props.editingIntervencion.comentarios || "");
-            setValue("idEquipo", props.editingIntervencion.idEquipo);
-            setValue("idTipoIntervencion", props.editingIntervencion.idTipoIntervencion);
-        }
-    }, [props.editingIntervencion, setValue]);
+    console.log("Form errors:", errors);
 
     useEffect(() => {
 
         if(sessionAPIToken == null) return;
 
         (async (): Promise<void> => {
-        listarTiposIntervencion(sessionAPIToken).then((response) => {
+         await listarTiposIntervencion(sessionAPIToken).then((response) => {
             if (isFetchAPIError(response)) {
                 createModal({
                     children: <div>Error al cargar los tipos de intervención: {response.errorMessage}</div>,
@@ -66,15 +65,21 @@ function TrabajarIntervencionForm(props: Readonly<EditIntervencionFormProps>): R
             setTiposIntervencion(response);
         });
         })();
-    }, [props.sessionAPIToken, createModal, sessionAPIToken]);
+    }, [props.sessionAPIToken, sessionAPIToken]);
 
-    const onSubmit: SubmitHandler<IntervencionDTO> = async (formValues: IntervencionDTO): Promise<void> => {
+    const onSubmit: SubmitHandler<FormValues> = async (formValues: FormValues): Promise<void> => {
+
+        console.log("Voy a submitear en formEdit")
 
         if(sessionAPIToken == null) return;
 
         const modifiedIntervencion: IntervencionDTO = {
             ...props.editingIntervencion,
-            ...formValues
+            fechaHora: formValues.fechaHora,
+            motivo: formValues.motivo,
+            comentarios: formValues.comentarios,
+            idTipoIntervencion: formValues.idTipoIntervencion,
+            idEquipo: props.editingIntervencion.idEquipo
         };
 
         if (!modifiedIntervencion.id) {
@@ -85,7 +90,11 @@ function TrabajarIntervencionForm(props: Readonly<EditIntervencionFormProps>): R
             return;
         }
 
-        const changes: ChangeEntry[] = await obtenerCambios(modifiedIntervencion, props.editingIntervencion);
+        const changes: ChangeEntry[] = await obtenerCambios(
+            modifiedIntervencion,
+            props.editingIntervencion,
+            tiposIntervencion
+        );
 
         if (changes.length === 0) {
             createModal({
@@ -98,6 +107,7 @@ function TrabajarIntervencionForm(props: Readonly<EditIntervencionFormProps>): R
         createModal({
             title: `Trabajando intervención`,
             children: ModalChangesFC(changes),
+            buttonsType: ModalButtonsType.CONFIRM_CANCEL,
             async onConfirm(): Promise<void> {
                 const response: void | FetchAPIError = await modificarIntervencion(modifiedIntervencion,sessionAPIToken);
 
@@ -126,8 +136,6 @@ function TrabajarIntervencionForm(props: Readonly<EditIntervencionFormProps>): R
             }
         }).show();
     };
-
-    const idTipoIntervencion = watch("idTipoIntervencion");
 
     return (
         <form onSubmit={handleSubmit(onSubmit)} className={`${styles.formContainer} ${styles.aparecer}`}>
@@ -158,18 +166,20 @@ function TrabajarIntervencionForm(props: Readonly<EditIntervencionFormProps>): R
                 <div className={styles.inputBox}>
                     <label className={styles.details}>Comentarios</label>
                     <textarea {...register("comentarios")} defaultValue={props.editingIntervencion.comentarios || ""} />
-                </div>
+                    {errors.comentarios &&
+                        <label className={styles.error} style={{color: 'red'}}>{errors.comentarios.message}</label>}                </div>
                 <div className={styles.inputBox}>
-                    <label className={styles.details}>Tipo de Intervención<span className={styles.requiredField}>*</span></label>
+                    <label className={styles.details}>Tipo de Intervención<span className={styles.requiredField}>*</span>
                     <ComboBoxFC
-                        message="Seleccione un tipo de intervención"
-                        elements={tiposIntervencion.map((tipo) => ({
-                            key: tipo.id,
+                        register={register("idTipoIntervencion")}
+                        selectedKey={props.editingIntervencion.idTipoIntervencion}
+                        elements={tiposIntervencion.map((tipo: TipoIntervencionDTO):{key:number, value:string} => ({
+                            key: tipo.id as number,
                             value: tipo.nombre
                         }))}
-                        selectedKey={props.editingIntervencion.idTipoIntervencion}
-                        onChange={(e) => setValue("idTipoIntervencion", parseInt(e.target.value))}
-                    />
+                        message={"Seleccione un tipo de intervención"} /> </label>
+                    {errors.idTipoIntervencion &&
+                        <label className={styles.error} style={{color: 'red'}}>{errors.idTipoIntervencion.message}</label>}
                 </div>
             </div>
             <div className={styles.buttomM}>
@@ -182,7 +192,8 @@ function TrabajarIntervencionForm(props: Readonly<EditIntervencionFormProps>): R
 
 export default TrabajarIntervencionForm;
 
-async function obtenerCambios(editingIntervencion: IntervencionDTO, originalData: IntervencionDTO): Promise<ChangeEntry[]> {
+async function obtenerCambios(editingIntervencion: IntervencionDTO, originalData: IntervencionDTO, tiposIntervencion: TipoIntervencionDTO[]): Promise<ChangeEntry[]> {
+
     const changes: ChangeEntry[] = [];
 
     if (originalData.fechaHora !== editingIntervencion.fechaHora) {
@@ -202,23 +213,29 @@ async function obtenerCambios(editingIntervencion: IntervencionDTO, originalData
     if (originalData.comentarios !== editingIntervencion.comentarios) {
         changes.push({
             field: "Comentarios",
-            previousValue: originalData.comentarios || "",
-            nextValue: editingIntervencion.comentarios || ""
+            previousValue: originalData.comentarios,
+            nextValue: editingIntervencion.comentarios
         });
     }
-    if (originalData.idTipoIntervencion !== editingIntervencion.idTipoIntervencion) {
+    if (originalData.idTipoIntervencion != editingIntervencion.idTipoIntervencion) {
+       let previosTipoIntervencion: string|undefined = undefined;
+       let nextTipoIntervencion: string|undefined = undefined;
+
+         if (originalData.idTipoIntervencion) {
+              previosTipoIntervencion = tiposIntervencion.find((tipo: TipoIntervencionDTO) => tipo.id === originalData.idTipoIntervencion)?.nombre;
+         }
+
+            if (editingIntervencion.idTipoIntervencion) {
+                const idTipoIntervencion = Number(editingIntervencion.idTipoIntervencion);
+                nextTipoIntervencion = tiposIntervencion.find((tipo: TipoIntervencionDTO) => tipo.id === idTipoIntervencion)?.nombre;
+            }
+
         changes.push({
-            field: "Tipo de Intervención",
-            previousValue: originalData.idTipoIntervencion.toString(),
-            nextValue: editingIntervencion.idTipoIntervencion.toString()
-        });
-    }
-    if (originalData.idEquipo !== editingIntervencion.idEquipo) {
-        changes.push({
-            field: "Equipo",
-            previousValue: originalData.idEquipo.toString(),
-            nextValue: editingIntervencion.idEquipo.toString()
-        });
+                field: "Tipo de Intervención",
+                previousValue: previosTipoIntervencion,
+                nextValue: nextTipoIntervencion
+            });
+
     }
 
     return changes;

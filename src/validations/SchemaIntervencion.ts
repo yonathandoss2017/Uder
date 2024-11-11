@@ -28,15 +28,12 @@ const SchemaIntervencion: ZodObject<any> = z.object({
             z.string()
             .min(1, "El ID del tipo de intervención es requerido"),
         ),
-    numSerieEquipo:
-        z.preprocess(((val): string => val ? String(val) : ''), // Convierte el valor a string
-            z.string()
-            .min(1, "El número de serie del equipo es requerido")
-        ),
-    comentarios:
+    comentarios: z
+    .preprocess((val) => (val ? String(val) : ''), // Convierte el valor a string
         z.string()
             .max(80, "El comentario no puede tener más de 80 caracteres")
-            .optional(),
+            .optional()
+    ),
 });
 
 export default SchemaIntervencion;

@@ -11,7 +11,7 @@ import IntervencionFilter from "@/types/filters/IntervencionFilter";
 import stylesTable from "@public/styles/modules/table/table.tipoequipos.module.css";
 import { ModalInstance } from "@/app/hooks/modals/ModalProvider";
 import { ModalButtonsType } from "@/components/ModalFC";
-import EditIntervencionForm from "@/app/(pages)/(whiteBackground)/intervenciones/(lista)/formEdit";
+import TrabajarIntervencionForm from "@/app/(pages)/(whiteBackground)/intervenciones/(lista)/formEdit";
 import EquipoDTO from "@/types/dtos/EquipoDTO";
 import TipoIntervencionDTO from "@/types/dtos/TipoIntervencionDTO";
 import styles from "@public/styles/modules/table/table.tipoequipos.module.css";
@@ -102,11 +102,16 @@ function TableIntervencionFC(props: Readonly<TableIntervencionFCProps>): ReactEl
     }, [appliedSearchTerms, props.sessionAPIToken, sessionAPIToken]);
 
     async function handleEditClick(intervencion: IntervencionDTO): Promise<void> {
+
+        console.log("Se hizo click en trabajar")
+
         if (!props.hasPermissionEdit) { return; }
+
+        console.log("Se tiene permiso para trabajar")
 
         const modalModificar: ModalInstance = createModal({
             children: (
-                <EditIntervencionForm
+                <TrabajarIntervencionForm
                     sessionAPIToken={props.sessionAPIToken}
                     editingIntervencion={intervencion}
                     onSave={(intervencionModified: IntervencionDTO): void => {
@@ -116,7 +121,7 @@ function TableIntervencionFC(props: Readonly<TableIntervencionFCProps>): ReactEl
                         modalModificar.close();
                         refSearchTermsTimer.current = setTimeout(() => {
                             setAppliedSearchTerms({ ...appliedSearchTerms });
-                        }, 1000);}}
+                        }, 3000);}}
                     onCancel={() => {
                         createModal({
                             children: (

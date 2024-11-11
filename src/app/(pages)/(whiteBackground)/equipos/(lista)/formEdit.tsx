@@ -292,7 +292,8 @@ function EditEquipoForm(props: Readonly<EditEquipoFormProps>): ReactElement {
             proveedores,
             ubicaciones,
             paisesOrigen,
-            marcas, modelos,
+            marcas,
+            modelos,
             imageToAdd,
             imagesToDelete
         );
