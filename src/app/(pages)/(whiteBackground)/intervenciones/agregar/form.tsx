@@ -11,7 +11,6 @@ import LoadingPage from "@/app/(pages)/loading";
 import ComboBoxFC from "@/components/ComboBoxFC";
 import {isFetchAPIError} from "@/types/errors/FetchAPIError";
 import {useToken} from "@/app/hooks/TokenProvider";
-import EquipoFieldSortEnum from "@/types/enums/EquipoFieldSortEnum";
 
 interface FormValues {
     fechaHora: string;

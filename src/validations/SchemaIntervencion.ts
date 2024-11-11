@@ -11,7 +11,7 @@ const SchemaIntervencion: ZodObject<any> = z.object({
                     (value: string):boolean => {
                         const fechaHora: Date = new Date(value);
                         const fechaActual: Date = new Date();
-                        return fechaHora < fechaActual;
+                        return fechaHora <= fechaActual;
                     },
                     {message: "La fecha debe ser anterior a la fecha actual"}
                 )
