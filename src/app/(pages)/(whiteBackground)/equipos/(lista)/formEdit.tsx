@@ -85,8 +85,8 @@ function EditEquipoForm(props: Readonly<EditEquipoFormProps>): ReactElement {
         register,               // Método para registrar los inputs del formulario
         handleSubmit,           // Método para manejar el envío del formulario
         formState: {errors},     // Propiedad que contiene los errores del formulario
-        setValue,
-        watch
+        setValue,               // Método para asignar un valor a un campo del formulario
+        watch                   // Método para observar los cambios en un campo del formulario
     }: UseFormReturn<FormValues> = useForm<FormValues>({ // Inicializamos useForm con el tipo EquipoFormData
         resolver: zodResolver(SchemaEquipo.merge(
             z.object({
@@ -133,15 +133,16 @@ function EditEquipoForm(props: Readonly<EditEquipoFormProps>): ReactElement {
     // Estado para almacenar las imágenes del equipo (Para el carrusel)
     let [images, setImages]: [ImagenDTO[], (value: ImagenDTO[]) => void] = useState<ImagenDTO[]>([]);
 
+    // Observar los cambios en la garantía de por vida
     const garantiaDePorVida = watch('garantiaDePorVida');
 
     useEffect(() => {
-        if (garantiaDePorVida) {
+        if (garantiaDePorVida) { // Si la garantía es de por vida, deshabilita los campos de años, meses y días
             setValue('garantiaAnios', 0);
             setValue('garantiaMeses', 0);
             setValue('garantiaDias', 0);
         }
-    }, [garantiaDePorVida, setValue]);
+    }, [garantiaDePorVida, setValue]); // Se ejecuta al cambiar el valor de garantiaDePorVida
 
     // Efecto que se ejecuta al montar el componente y cuando cambia el equipo a editar
     // - Carga las imágenes del equipo
