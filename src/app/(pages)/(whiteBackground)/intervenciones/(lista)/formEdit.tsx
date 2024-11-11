@@ -26,8 +26,6 @@ interface FormValues extends IntervencionDTO{}
 
 function TrabajarIntervencionForm(props: Readonly<EditIntervencionFormProps>): ReactElement {
 
-    console.log("Intervencion recibida", props.editingIntervencion)
-
     const {sessionAPIToken } = useToken();
 
     const { createModal } = useModal();
@@ -109,7 +107,10 @@ function TrabajarIntervencionForm(props: Readonly<EditIntervencionFormProps>): R
             children: ModalChangesFC(changes),
             buttonsType: ModalButtonsType.CONFIRM_CANCEL,
             async onConfirm(): Promise<void> {
-                const response: void | FetchAPIError = await modificarIntervencion(modifiedIntervencion,sessionAPIToken);
+
+                console.log("Voy a modificar la intervencion", modifiedIntervencion)
+
+                const response: void | FetchAPIError = await modificarIntervencion(modifiedIntervencion, sessionAPIToken);
 
                 if (isFetchAPIError(response)) {
                     createModal({

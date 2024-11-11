@@ -103,11 +103,7 @@ function TableIntervencionFC(props: Readonly<TableIntervencionFCProps>): ReactEl
 
     async function handleEditClick(intervencion: IntervencionDTO): Promise<void> {
 
-        console.log("Se hizo click en trabajar")
-
         if (!props.hasPermissionEdit) { return; }
-
-        console.log("Se tiene permiso para trabajar")
 
         const modalModificar: ModalInstance = createModal({
             children: (
