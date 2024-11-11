@@ -810,28 +810,40 @@ async function obtenerCambios(editingEquipo: EquipoDTO,
 
     // Verifica si hay cambios en el país de origen
     if (originalData.idPaisOrigen != editingEquipo.idPaisOrigen) {
+
+        const previousPais: PaisDTO | undefined = paisesOrigen.find((pais: PaisDTO): boolean => pais.id === originalData.idPaisOrigen);
+        const modifiedPais: PaisDTO | undefined = paisesOrigen.find((pais: PaisDTO): boolean => pais.id === Number(editingEquipo.idPaisOrigen));
+
         changes.push({
             field: "País de origen",
-            previousValue: paisesOrigen.filter((pais: PaisDTO): boolean => pais.id === originalData.idPaisOrigen)[0].nombre,
-            nextValue: paisesOrigen.filter((pais: PaisDTO): boolean => pais.id === editingEquipo.idPaisOrigen)[0].nombre
+            previousValue: previousPais?.nombre,
+            nextValue: modifiedPais?.nombre
         });
     }
 
     // Verifica si hay cambios en el proveedor
     if (originalData.idProveedor != editingEquipo.idProveedor) {
+
+        const previousProveedor: ProveedorDTO | undefined = proveedores.find((proveedor: ProveedorDTO): boolean => proveedor.id === originalData.idProveedor);
+        const modifiedProveedor: ProveedorDTO | undefined = proveedores.find((proveedor: ProveedorDTO): boolean => proveedor.id === Number(editingEquipo.idProveedor));
+
         changes.push({
             field: "Proveedor",
-            previousValue: proveedores.filter((proveedor: ProveedorDTO): boolean => proveedor.id === originalData.idProveedor)[0].nombre,
-            nextValue: proveedores.filter((proveedor: ProveedorDTO): boolean => proveedor.id === editingEquipo.idProveedor)[0].nombre
+            previousValue: previousProveedor?.nombre,
+            nextValue: modifiedProveedor?.nombre
         });
     }
 
     // Verifica si hay cambios en la ubicación actual
     if (originalData.idUbicacionActual != editingEquipo.idUbicacionActual) {
+
+        const previousUbicacion: UbicacionDTO | undefined = ubicaciones.find((ubicacion: UbicacionDTO): boolean => ubicacion.id === originalData.idUbicacionActual);
+        const modifiedUbicacion: UbicacionDTO | undefined = ubicaciones.find((ubicacion: UbicacionDTO): boolean => ubicacion.id === Number(editingEquipo.idUbicacionActual));
+
         changes.push({
             field: "Ubicación actual",
-            previousValue: ubicaciones.filter((ubicacion: UbicacionDTO): boolean => ubicacion.id === originalData.idUbicacionActual)[0].nombre,
-            nextValue: ubicaciones.filter((ubicacion: UbicacionDTO): boolean => ubicacion.id === editingEquipo.idUbicacionActual)[0].nombre
+            previousValue: previousUbicacion?.nombre,
+            nextValue: modifiedUbicacion?.nombre
         });
     }
 

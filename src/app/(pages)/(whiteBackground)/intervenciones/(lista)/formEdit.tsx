@@ -45,8 +45,6 @@ function TrabajarIntervencionForm(props: Readonly<EditIntervencionFormProps>): R
         defaultValues: {...props.editingIntervencion}
     });
 
-    console.log("Form errors:", errors);
-
     useEffect(() => {
 
         if(sessionAPIToken == null) return;
