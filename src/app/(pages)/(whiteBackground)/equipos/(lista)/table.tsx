@@ -29,7 +29,8 @@ import {listarProveedores} from "@/services/ProveedorService";
 import UbicacionDTO from "@/types/dtos/UbicacionDTO";
 import {listarUbicaciones} from "@/services/UbicacionService";
 import LoadingPage from "@/app/(pages)/loading";
-import ModeloFilter from "@/types/filters/ModeloFilter";
+import {useToken} from "@/app/hooks/TokenProvider";
+
 
 /**
  * Propiedades del componente Table
@@ -65,11 +66,14 @@ interface TableSearchTermsProps {
  */
 function TableEquiposFC(props: Readonly<TableEquiposFCProps>): ReactElement {
 
+    // Obtenemos el token de sesión del cliente
+    const {sessionAPIToken } = useToken();
+
     // ----------------------- Modales -----------------------
 
     const {createModal} = useModal();
 
-    // ----------------------- Términos de búsqueda  -----------------------
+    // ----------------------- Términos de paginación -----------------------
 
     const [currentPage, setCurrentPage] = useState<number>(1);
     const [npage, setNpage] = useState<number>(1);
@@ -98,22 +102,26 @@ function TableEquiposFC(props: Readonly<TableEquiposFCProps>): ReactElement {
     // Define el estado de las ubicaciones existentes para mostrar en la tabla
     const ubicaciones: MutableRefObject<UbicacionDTO[]> = useRef<UbicacionDTO[]>([]);
 
+
     // Efecto que se ejecuta al montar el componente (Carga los combobox de filtros)
     useEffect((): void => {
 
+        if(!sessionAPIToken) return;
+
         // Procedimiento asíncrono auto-ejecutable que actualiza la lista de tipos de equipo y la lista de equipos
         (async (): Promise<void> => {
-            // Consulta los tipos de equipo y ejecuta un procedimiento con la respuesta
-            await listarTiposEquipo(props.sessionAPIToken).then((response: TipoEquipoDTO[] | FetchAPIError): void => {
-                if (isFetchAPIError(response)) {
-                    console.error("ERROR - lista de equipos - table.tsx - listarTiposEquipo", response.errorMessage);
-                    return;
-                }
-                // Actualiza la lista de tipos de equipo
-                tiposEquipo.current = response;
-            });
 
-            await listarMarcas(props.sessionAPIToken).then((response: MarcaDTO[] | FetchAPIError): void => {
+                // Consulta los tipos de equipo y ejecuta un procedimiento con la respuesta
+                await listarTiposEquipo(sessionAPIToken).then((response: TipoEquipoDTO[] | FetchAPIError): void => {
+                    if (isFetchAPIError(response)) {
+                        console.error("ERROR - lista de equipos - table.tsx - listarTiposEquipo", response.errorMessage);
+                        return;
+                    }
+                    // Actualiza la lista de tipos de equipo
+                    tiposEquipo.current = response;
+                });
+
+            await listarMarcas(sessionAPIToken).then((response: MarcaDTO[] | FetchAPIError): void => {
                 if (isFetchAPIError(response)) {
                     console.error("ERROR - marcas - table.tsx - listarMarcas", response.errorMessage);
                     return;
@@ -122,7 +130,7 @@ function TableEquiposFC(props: Readonly<TableEquiposFCProps>): ReactElement {
                 marcas.current = response;
             });
 
-            await listarModelos(props.sessionAPIToken).then((response: ModeloDTO[] | FetchAPIError): void => {
+            await listarModelos(sessionAPIToken).then((response: ModeloDTO[] | FetchAPIError): void => {
                 if (isFetchAPIError(response)) {
                     console.error("ERROR - lista de equipos - table.tsx - listarModelos", response.errorMessage);
                     return;
@@ -131,7 +139,7 @@ function TableEquiposFC(props: Readonly<TableEquiposFCProps>): ReactElement {
                 modelos.current = response;
             });
 
-            await listarPaises(props.idInstitucion).then((response: PaisDTO[] | FetchAPIError): void => {
+            await listarPaises(sessionAPIToken).then((response: PaisDTO[] | FetchAPIError): void => {
                 if (isFetchAPIError(response)) {
                     console.error("ERROR - lista de equipos - table.tsx - listarPaises", response.errorMessage);
                     return;
@@ -140,7 +148,7 @@ function TableEquiposFC(props: Readonly<TableEquiposFCProps>): ReactElement {
                 paisOrigen.current = response;
             });
 
-            await listarProveedores(props.sessionAPIToken).then((response: ProveedorDTO[] | FetchAPIError): void => {
+            await listarProveedores(sessionAPIToken).then((response: ProveedorDTO[] | FetchAPIError): void => {
                 if (isFetchAPIError(response)) {
                     console.error("ERROR - lista de equipos - table.tsx - listarProveedores", response.errorMessage);
                     return;
@@ -149,19 +157,18 @@ function TableEquiposFC(props: Readonly<TableEquiposFCProps>): ReactElement {
                 proveedores.current = response;
             });
 
-            await listarUbicaciones(props.sessionAPIToken).then((response: UbicacionDTO[] | FetchAPIError): void => {
+            await listarUbicaciones(sessionAPIToken).then((response: UbicacionDTO[] | FetchAPIError): void => {
                 if (isFetchAPIError(response)) {
                     console.error("ERROR - lista de equipos - table.tsx - listarUbicaciones", response.errorMessage);
                     return;
                 }
-                console.log(response)
                 // Actualiza la lista de ubicaciones
                 ubicaciones.current = response;
             });
 
             setLoading(true);
         })();
-    }, [props]);
+    }, [props, sessionAPIToken]);
 
 
     // Define los términos de búsqueda introducidos por el usuario en tiempo real (searchTerms)
@@ -208,10 +215,13 @@ function TableEquiposFC(props: Readonly<TableEquiposFCProps>): ReactElement {
     // Efecto que se ejecuta al montar el componente y cuando cambian los términos de búsqueda.
     // Actualiza la lista de equipos según los términos de búsqueda.
     useEffect((): void => {
+
+        if(!sessionAPIToken) return;
+
         // Procedimiento asíncrono auto-ejecutable para ejecutar código asíncrono
         (async (): Promise<void> => {
             // Obtiene la lista de equipos de la API
-            const response: EquipoDTO[] | FetchAPIError = await listarEquipos(props.sessionAPIToken, appliedSearchTerms.size, appliedSearchTerms.page, appliedSearchTerms.fieldSort, appliedSearchTerms.sortDirectionAsc, appliedSearchTerms.filter);
+            const response: EquipoDTO[] | FetchAPIError = await listarEquipos(sessionAPIToken, appliedSearchTerms.size, appliedSearchTerms.page, appliedSearchTerms.fieldSort, appliedSearchTerms.sortDirectionAsc, appliedSearchTerms.filter);
 
             // Si ocurre un error en la solicitud, muestra un mensaje de error en la consola y no hace nada
             if (isFetchAPIError(response)) {
@@ -224,19 +234,22 @@ function TableEquiposFC(props: Readonly<TableEquiposFCProps>): ReactElement {
             calcularPaginas();
         })();
 
-    }, [appliedSearchTerms]);
+    }, [appliedSearchTerms, sessionAPIToken]);
 
     //Metodo para calcular paginas disponibles
     function calcularPaginas(): void {
-        contarEquipos(props.sessionAPIToken, appliedSearchTerms.filter)
+
+        if(!sessionAPIToken) return;
+
+        contarEquipos(sessionAPIToken, appliedSearchTerms.filter)
             .then((response: number | FetchAPIError) => {
                 if (isFetchAPIError(response)) { //Si hay error
                     console.error("ERROR: " + response.errorMessage)
                     return 0;
                 }
-                //Obtenemos el total de usuarios de la respuesta
+                //Obtenemos el total de equipos de la respuesta
                 const total = Number(response);
-                //La cantidad de paginas es el total de usuarios dividido la cantidad de usuarios por pagina que se muestran
+                //La cantidad de paginas es el total de equipos dividido la cantidad de usuarios por pagina que se muestran
                 const totalPages = Math.ceil(total / recordsPerPage)
                 setNpage(totalPages); //Seteamos el numero de paginas
                 if (totalPages > 0 && currentPage > totalPages) { //Si el total de paginas es mayor a 0 y la pagina actual es mayor al total de las paginas
@@ -257,7 +270,7 @@ function TableEquiposFC(props: Readonly<TableEquiposFCProps>): ReactElement {
     function handleVerClick(equipo: EquipoDTO): void {
         if (!props.hasPermissionView) return; //Si el cliente no tiene permisos para ver, no hace nada
         createModal({
-            children: <ModalViewEquipoFC equipo={equipo} sessionAPIToken={props.sessionAPIToken}/>, // Renderiza el componente como JSX
+            children: <ModalViewEquipoFC equipo={equipo}/>, // Renderiza el componente como JSX
             buttonsType: ModalButtonsType.CLOSE // Establece el tipo de botones del modal
         }).show();
     }
@@ -380,17 +393,13 @@ function TableEquiposFC(props: Readonly<TableEquiposFCProps>): ReactElement {
                                         return tipo.id === equipo.idTipoEquipo
                                     })?.nombre
                                     }</td>
-                                    <td>
-                                        {props.hasPermissionView && (
-                                            <>
-                                                {(
-                                                    <button onClick={() => handleVerClick(equipo)}>
-                                                        Ver
-                                                    </button>
-                                                )}
-                                            </>
-                                        )}
-                                    </td>
+                                    {props.hasPermissionView ?
+                                        <td>
+                                            <button onClick={() => handleVerClick(equipo)}>Ver</button>
+                                        </td>
+                                        :
+                                        <td></td>
+                                    }
                                     {props.hasPermissionEdit ?
                                         <td>
                                             <button onClick={() => handleEditClick(equipo)}>Modificar</button>
@@ -433,9 +442,7 @@ function TableEquiposFC(props: Readonly<TableEquiposFCProps>): ReactElement {
                                 <span>...</span>
                             </>
                         )}
-
                         {Array.from({length: 3}, (_, index) => {
-
                             const num = currentPage - (index + 1);
                             if (num < 1 || currentPage == 1) return;
                             return (
@@ -447,14 +454,12 @@ function TableEquiposFC(props: Readonly<TableEquiposFCProps>): ReactElement {
                                 </button>
                             )
                         }).reverse()}
-
                         <button
                             key={currentPage}
                             className={stylesTable.activePage}
                         >
                             {currentPage}
                         </button>
-
                         {Array.from({length: 3}, (_, index) => {
                             const num = currentPage + (index + 1);
                             if (num > npage) return;
@@ -467,7 +472,6 @@ function TableEquiposFC(props: Readonly<TableEquiposFCProps>): ReactElement {
                                 </button>
                             )
                         })}
-
                         {currentPage < npage - 3 && (
                             <>
                                 <span>...</span>
@@ -479,14 +483,12 @@ function TableEquiposFC(props: Readonly<TableEquiposFCProps>): ReactElement {
                                 </button>
                             </>
                         )}
-
                         <button
                             onClick={() => setCurrentPage(currentPage + 1)}
                             disabled={currentPage === npage}
                         >
                             Siguiente
                         </button>
-
                     </div>
                 )}
                 <div className={stylesTable.filtersContainer}>

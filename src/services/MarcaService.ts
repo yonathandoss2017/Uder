@@ -12,14 +12,16 @@ const SERVICE_PATH: string = process.env.NEXT_PUBLIC_BACKEND_API_URL + "/marcas"
 /**
  * Función para buscar por id.
  * @param id - ID de la marca
+ * @param token
  * @returns Promise<MarcaDTO> - Marca que brinda la API
  * @returns Promise<FetchAPIError> - Si ocurre un error en la solicitud o en el procesamiento de la respuesta.
  */
-export async function buscarMarcaPorId (id: number): Promise<MarcaDTO | FetchAPIError> {
+export async function buscarMarcaPorId (id: number, token: string): Promise<MarcaDTO | FetchAPIError> {
     const url: string = `${SERVICE_PATH}/buscar/${id}`; // URL de la petición a la API
     const options: RequestInit = { // Opciones de la petición
         method: 'GET',
         headers: {
+            'Authorization': 'Bearer ' + token, // Cabecera de autorización con el token de sesión
             'Content-Type': 'application/json' // Tipo de contenido JSON
         }
     };
@@ -116,6 +118,29 @@ export async function darBajaMarca(id: number, token: string): Promise<void | Fe
         method: 'POST',
         headers: {
             'Authorization': 'Bearer ' + token, // Cabecera de autorización con el token de sesión
+            'Content-Type': 'application/json' // Tipo de contenido JSON
+        }
+    };
+
+    // Realiza la petición a la API y retorna el resultado
+    return await fetchVoidWithErrorHandling(url, options);
+}
+
+/**
+ *
+ * @param id
+ * @param token
+ * @returns Promise<void> - Si la solicitud se realiza correctamente.
+ * @returns Promise<FetchAPIError> - Si ocurre un error en la solicitud o en el procesamiento de la respuesta.
+ *  */
+export async function reactivarMarca(id: number, token: string): Promise<void | FetchAPIError>{
+    const url: string = `${SERVICE_PATH}/reactivar/${id}`; // URL de la petición a la API
+
+    // Opciones de la petición
+    const options: RequestInit = {
+        method: 'POST',
+        headers: {
+            'Authorization': 'Bearer ' + token, // Authorization header con token JWT
             'Content-Type': 'application/json' // Tipo de contenido JSON
         }
     };

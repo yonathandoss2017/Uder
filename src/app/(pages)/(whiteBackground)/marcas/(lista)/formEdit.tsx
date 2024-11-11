@@ -10,6 +10,7 @@ import ModalChangesFC from "@/components/ModalChangesFC";
 import FetchAPIError, {isFetchAPIError} from "@/types/errors/FetchAPIError";
 import {modificarMarca} from "@/services/MarcaService";
 import styles from "@public/styles/modules/table/table.editformequipo.module.css";
+import {useToken} from "@/app/hooks/TokenProvider";
 
 
 interface EditMarcaFormProps{
@@ -21,6 +22,8 @@ interface EditMarcaFormProps{
 }
 
 function EditMarcaForm(props: Readonly<EditMarcaFormProps>): ReactElement{
+
+    const {sessionAPIToken } = useToken();
 
     // ----------------------- Modales -----------------------
 
@@ -40,6 +43,8 @@ function EditMarcaForm(props: Readonly<EditMarcaFormProps>): ReactElement{
 
     // Procedimiento que se ejecuta al hacer clic en el botón 'Guardar'
     const onSubmit: SubmitHandler<MarcaDTO> = async (formValues: MarcaDTO): Promise<void> => {
+
+        if (sessionAPIToken == null) return;
 
         const modifiedMarca: MarcaDTO = {
             ...props.editingMarca, // Copia los valores originales del equipo
@@ -66,9 +71,10 @@ function EditMarcaForm(props: Readonly<EditMarcaFormProps>): ReactElement{
         createModal({
             title: "Modificando marca \"" + props.editingMarca + "\"",
             children: ModalChangesFC(changes),
+            buttonsType: ModalButtonsType.CONFIRM_CANCEL,
             async onConfirm(): Promise<void> {
                 // Realiza la modificación de marca en la API
-                const response: void | FetchAPIError = await modificarMarca(modifiedMarca, props.sessionAPIToken);
+                const response: void | FetchAPIError = await modificarMarca(modifiedMarca, sessionAPIToken);
 
                 if (isFetchAPIError(response)) {
                     createModal({

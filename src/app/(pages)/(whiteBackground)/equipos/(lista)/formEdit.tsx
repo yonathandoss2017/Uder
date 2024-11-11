@@ -34,6 +34,7 @@ import ModalChangesFC from "@/components/ModalChangesFC";
 import {modificarEquipo} from "@/services/EquiposService";
 import {imageToBase64} from "@/utils/Utils";
 import styles from "@public/styles/modules/table/table.editformequipo.module.css";
+import {useToken} from "@/app/hooks/TokenProvider";
 
 /**
  * Propiedades del componente
@@ -72,6 +73,8 @@ interface FormValues extends EquipoDTO {
  */
 function EditEquipoForm(props: Readonly<EditEquipoFormProps>): ReactElement {
 
+    const { sessionAPIToken } = useToken();
+
     // ----------------------- Modales -----------------------
 
     const {createModal} = useModal();
@@ -81,7 +84,8 @@ function EditEquipoForm(props: Readonly<EditEquipoFormProps>): ReactElement {
     const {
         register,               // Método para registrar los inputs del formulario
         handleSubmit,           // Método para manejar el envío del formulario
-        formState: {errors}     // Propiedad que contiene los errores del formulario
+        formState: {errors},     // Propiedad que contiene los errores del formulario
+        setValue
     }: UseFormReturn<FormValues> = useForm<FormValues>({ // Inicializamos useForm con el tipo EquipoFormData
         resolver: zodResolver(SchemaEquipo.merge(
             z.object({
@@ -130,11 +134,14 @@ function EditEquipoForm(props: Readonly<EditEquipoFormProps>): ReactElement {
     // Efecto que se ejecuta al montar el componente y cuando cambia el equipo a editar
     // - Carga las imágenes del equipo
     useEffect((): void => {
-
+        if(sessionAPIToken == null){
+            console.error("ERROR - Modificar Equipo - table.tsx - useEffect - sessionAPIToken es null");
+            return;
+        }
         // Procedimiento auto-ejecutable (Para que sea asíncrono)
         (async (): Promise<void> => {
             // Obtiene las imágenes del equipo desde la API
-            await listarImagenes(props.editingEquipo.id as number).then((response: ImagenDTO[] | FetchAPIError): void => {
+            await listarImagenes(props.editingEquipo.id as number, sessionAPIToken).then((response: ImagenDTO[] | FetchAPIError): void => {
                 if (isFetchAPIError(response)) {
                     console.error("ERROR - Modificar Equipo - listarImagenes: ", response);
                     setImages([]); // Limpia la lista de imágenes
@@ -143,7 +150,7 @@ function EditEquipoForm(props: Readonly<EditEquipoFormProps>): ReactElement {
                 setImages(response); // Almacena las imágenes en el estado
             });
         })();
-    }, [props.editingEquipo]); // Se ejecuta al montar el componente y cuando cambia el equipo a editar
+    }, [props.editingEquipo, sessionAPIToken]); // Se ejecuta al montar el componente y cuando cambia el equipo a editar
 
 
     // Efecto que se ejecuta al montar el componente (Carga los datos de las listas de los ComboBox)
@@ -151,98 +158,101 @@ function EditEquipoForm(props: Readonly<EditEquipoFormProps>): ReactElement {
 
         // Procedimiento auto-ejecutable (Para que sea asíncrono)
         (async (): Promise<void> => {
+            if (sessionAPIToken != null) {
+                // ------------------- Cargar marcas -------------------
 
-            // ------------------- Cargar marcas -------------------
+                setMarcas(await listarMarcas(sessionAPIToken, {activo: true}).then((response: MarcaDTO[] | FetchAPIError): MarcaDTO[] => {
+                    if (isFetchAPIError(response)) {
+                        console.error("ERROR - Modificar Equipo - listarMarcas: ", response);
+                        return [];
+                    }
+                    return response;
+                }));
 
-            setMarcas(await listarMarcas(props.sessionAPIToken).then((response: MarcaDTO[] | FetchAPIError): MarcaDTO[] => {
-                if (isFetchAPIError(response)) {
-                    console.error("ERROR - Modificar Equipo - listarMarcas: ", response);
-                    return [];
-                }
-                return response;
-            }));
+                // ------------------- Cargar modelos -------------------
+                setModelos(await listarModelos(sessionAPIToken, {activo: true}).then((response: ModeloDTO[] | FetchAPIError): ModeloDTO[] => {
+                    if (isFetchAPIError(response)) {
+                        console.error("ERROR - Modificar Equipo - listarModelos: ", response);
+                        return [];
+                    }
 
-            // ------------------- Cargar modelos -------------------
+                    if (props.editingEquipo.idModelo) {
+                        const modelo = response.find((modelo: ModeloDTO): boolean => modelo.id === Number(props.editingEquipo.idModelo));
+                        if (modelo != undefined) {
+                            setSelectedMarcaId(modelo.idMarca);
+                        }
+                    }
 
-            setModelos(await listarModelos(props.sessionAPIToken).then((response: ModeloDTO[] | FetchAPIError): ModeloDTO[] => {
-                if (isFetchAPIError(response)) {
-                    console.error("ERROR - Modificar Equipo - listarModelos: ", response);
-                    return [];
-                }
+                    return response;
+                }));
 
-                if (props.editingEquipo.idModelo) {
-                    setSelectedMarcaId(response.filter((modelo: ModeloDTO): boolean => modelo.id === props.editingEquipo.idModelo)[0].idMarca);
-                }
+                // ------------------- Cargar tipos de equipo -------------------
+                setTiposEquipo(await listarTiposEquipo(sessionAPIToken, {activo: true}).then((response: TipoEquipoDTO[] | FetchAPIError): TipoEquipoDTO[] => {
+                    if (isFetchAPIError(response)) {
+                        console.error("ERROR - Modificar Equipo - listarTiposEquipo: ", response);
+                        return [];
+                    }
+                    return response;
+                }));
 
-                return response;
-            }));
+                // ------------------- Cargar proveedores -------------------
+                setProveedores(await listarProveedores(sessionAPIToken, {activo: true}).then((response: ProveedorDTO[] | FetchAPIError): ProveedorDTO[] => {
+                    if (isFetchAPIError(response)) {
+                        console.error("ERROR - Modificar Equipo - listarProveedores: ", response);
+                        return [];
+                    }
+                    return response;
+                }));
 
-            // ------------------- Cargar tipos de equipo -------------------
+                // ------------------- Cargar ubicaciones -------------------
 
-            setTiposEquipo(await listarTiposEquipo(props.sessionAPIToken).then((response: TipoEquipoDTO[] | FetchAPIError): TipoEquipoDTO[] => {
-                if (isFetchAPIError(response)) {
-                    console.error("ERROR - Modificar Equipo - listarTiposEquipo: ", response);
-                    return [];
-                }
-                return response;
-            }));
+                setUbicaciones(await listarUbicaciones(
+                    sessionAPIToken, 0, 1, "id", true, {activo: true}).then((response: UbicacionDTO[] | FetchAPIError): UbicacionDTO[] => {
+                    if (isFetchAPIError(response)) {
+                        console.error('Error al obtener las ubicaciones:', response);
+                        return [];
+                    }
+                    return response;
+                }));
 
-            // ------------------- Cargar proveedores -------------------
+                // ------------------- Cargar países de origen -------------------
 
-            setProveedores(await listarProveedores(props.sessionAPIToken).then((response: ProveedorDTO[] | FetchAPIError): ProveedorDTO[] => {
-                if (isFetchAPIError(response)) {
-                    console.error("ERROR - Modificar Equipo - listarProveedores: ", response);
-                    return [];
-                }
-                return response;
-            }));
-
-            // ------------------- Cargar ubicaciones -------------------
-
-            setUbicaciones(await listarUbicaciones(
-                props.sessionAPIToken, 0, 1, "id", true, {activo: true}).then((response: UbicacionDTO[] | FetchAPIError): UbicacionDTO[] => {
-                if (isFetchAPIError(response)) {
-                    console.error('Error al obtener las ubicaciones:', response);
-                    return [];
-                }
-                return response;
-            }));
-
-            // ------------------- Cargar países de origen -------------------
-
-            setPaisesOrigen(await listarPaises(props.idInstitucion).then((response: PaisDTO[] | FetchAPIError): PaisDTO[] => {
-                if (isFetchAPIError(response)) {
-                    console.error("ERROR - Modificar Equipo - listarPaises: ", response);
-                    return [];
-                }
-                return response;
-            }));
+                setPaisesOrigen(await listarPaises(sessionAPIToken, {activo: true}).then((response: PaisDTO[] | FetchAPIError): PaisDTO[] => {
+                    if (isFetchAPIError(response)) {
+                        console.error("ERROR - Modificar Equipo - listarPaises: ", response);
+                        return [];
+                    }
+                    return response;
+                }));
+            }
 
             setLoaded(true);
 
         })();
 
-    }, [props.sessionAPIToken, props.editingEquipo.idModelo]); // Se ejecuta solo al montar el componente o si cambia el sessionAPIToken
+    }, [props.sessionAPIToken, props.editingEquipo.idModelo, sessionAPIToken]); // Se ejecuta solo al montar el componente o si cambia el sessionAPIToken
 
 
     // Efecto que se ejecuta al cambiar la marca seleccionada (Carga los modelos de la marca seleccionada)
     useEffect((): void => {
+        if (selectedMarcaId) {
+            const nuevosModelosPorMarca = modelos.filter((modelo: ModeloDTO) => modelo.idMarca === selectedMarcaId);
+            setModelosPorMarca(nuevosModelosPorMarca);
 
-        // Procedimiento auto-ejecutable (Para que sea asíncrono)
-        (async (): Promise<void> => {
-
-            // Si se ha seleccionado una marca se cargan los modelos de la marca seleccionada
-            if (selectedMarcaId) {
-
-                // Filtra por idMarca
-                setModelosPorMarca(modelos.filter((modelo: ModeloDTO): boolean => modelo.idMarca === selectedMarcaId));
-
-            } else { // Si no, se limpia la lista de modelos
-                setModelosPorMarca([]);
+            // Actualizar el idModelo solo si existen modelos para la marca seleccionada
+            if (nuevosModelosPorMarca.length > 0 && nuevosModelosPorMarca[0].id) {
+                // Establecemos el valor explícitamente en el formulario para que lo detecte como cambio
+                setValue("idModelo", nuevosModelosPorMarca[0].id, { shouldDirty: true });
+            } else {
+                // Si no hay modelos, se resetea el valor del modelo
+                setValue("idModelo", 0, { shouldDirty: true });
             }
-        })();
+        } else {
+            setModelosPorMarca([]);
+            setValue("idModelo", 0, { shouldDirty: true });
+        }
+    }, [selectedMarcaId, modelos, setValue]);
 
-    }, [modelos, selectedMarcaId]); // Se ejecuta al montar el componente y cuando cambia selectedMarcaId o la lista de modelos
 
 
     // ----------------------- Eventos del formulario de edición de equipo -----------------------
@@ -302,8 +312,12 @@ function EditEquipoForm(props: Readonly<EditEquipoFormProps>): ReactElement {
             title: "Modificando equipo con número de serie \"" + props.editingEquipo.numSerie + "\"",
             children: ModalChangesFC(changes),
             async onConfirm(): Promise<void> {
+                if (sessionAPIToken == null) {
+                    console.error("ERROR - Modificar Equipo - table.tsx - handleSave - sessionAPIToken es null");
+                    return;
+                }
                 // Realiza la modificación del equipo en la API
-                const response: void | FetchAPIError = await modificarEquipo(modifiedEquipo, props.sessionAPIToken);
+                const response: void | FetchAPIError = await modificarEquipo(modifiedEquipo, sessionAPIToken);
 
                 if (isFetchAPIError(response)) {
                     createModal({
@@ -317,7 +331,7 @@ function EditEquipoForm(props: Readonly<EditEquipoFormProps>): ReactElement {
                 }
 
                 for (const imagen of imagesToDelete) {
-                    await eliminarImagen(imagen.id as number, props.sessionAPIToken).catch((error: FetchAPIError): void => {
+                    await eliminarImagen(imagen.id as number, sessionAPIToken).catch((error: FetchAPIError): void => {
                         console.error("ERROR - Modificar Equipo - table.tsx - handleSave - eliminarImagen", error);
                     });
                 }
@@ -330,7 +344,7 @@ function EditEquipoForm(props: Readonly<EditEquipoFormProps>): ReactElement {
                         tipoImagen: imageToAdd.type.split('/')[1]
                     };
 
-                    await agregarImagen(imagenDTO, props.sessionAPIToken).then((response: void | FetchAPIError): void => {
+                    await agregarImagen(imagenDTO, sessionAPIToken).then((response: void | FetchAPIError): void => {
                         if (isFetchAPIError(response)) {
                             console.error("ERROR - Modificar Equipo - table.tsx - handleSave - agregarImagen", response);
                             createModal({
@@ -482,7 +496,18 @@ function EditEquipoForm(props: Readonly<EditEquipoFormProps>): ReactElement {
                             value: marca.nombre
                         }))}
                         selectedKey={selectedMarcaId}
-                        onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setSelectedMarcaId(parseInt(e.target.value))}
+                        onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {setSelectedMarcaId(parseInt(e.target.value))
+                            // Filtra los modelos para la nueva marca seleccionada y selecciona el primero
+                            const nuevosModelosPorMarca = modelos.filter((modelo: ModeloDTO) => modelo.idMarca === selectedMarcaId);
+                            setModelosPorMarca(nuevosModelosPorMarca);
+
+                            // Actualiza `idModelo` en el formulario si hay modelos disponibles
+                            if (nuevosModelosPorMarca.length > 0 && nuevosModelosPorMarca[0].id) {
+                            setValue("idModelo", nuevosModelosPorMarca[0].id);
+                        } else {
+                            setValue("idModelo", 0);
+                        }
+                    }}
                     />
                 </div>
                 <div className={styles.inputBox}>
@@ -713,24 +738,27 @@ async function obtenerCambios(editingEquipo: EquipoDTO,
     }
     // Verifica si hay cambios en el modelo del equipo
     if (editingEquipo.idModelo != originalData.idModelo) {
-        const previousModelo: ModeloDTO = modelos.filter((modelo: ModeloDTO): boolean => modelo.id === originalData.idModelo)[0];
-        const nextModelo: ModeloDTO = modelos.filter((modelo: ModeloDTO): boolean => modelo.id === editingEquipo.idModelo)[0];
+        const previousModelo: ModeloDTO | undefined = modelos.find((modelo: ModeloDTO): boolean => modelo.id === Number(originalData.idModelo));
+        const nextModelo: ModeloDTO | undefined = modelos.find((modelo: ModeloDTO): boolean => modelo.id === Number(editingEquipo.idModelo));
 
-        changes.push({
-            field: "Modelo",
-            previousValue: previousModelo.nombre,
-            nextValue: nextModelo.nombre
-        });
-
-
-        // Verifica si hay cambios en la marca del equipo
-        if (modelos[editingEquipo.idModelo].idMarca != modelos[originalData.idModelo].idMarca) {
+        if(previousModelo && nextModelo) {
             changes.push({
-                field: "Marca",
-                previousValue: marcas.filter((marca: MarcaDTO): boolean => marca.id === previousModelo.idMarca)[0].nombre,
-                nextValue: marcas.filter((marca: MarcaDTO): boolean => marca.id === nextModelo.idMarca)[0].nombre
+                field: "Modelo",
+                previousValue: previousModelo.nombre,
+                nextValue: nextModelo.nombre
             });
+
+            if (previousModelo.idMarca !== nextModelo.idMarca) {
+                changes.push({
+                    field: "Marca",
+                    previousValue: marcas.find((marca: MarcaDTO) => marca.id === previousModelo.idMarca)?.nombre,
+                    nextValue: marcas.find((marca: MarcaDTO) => marca.id === nextModelo.idMarca)?.nombre
+                });
+            }
+        } else {
+            console.error("ERROR - modificar equipo - editForm.tsx - No se pudo encontrar el modelo previo o el siguiente.");
         }
+
     }
 
     // Verifica si hay cambios en el número de serie

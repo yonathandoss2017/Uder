@@ -5,7 +5,6 @@ import {fetchBodyWithErrorHandling, fetchVoidWithErrorHandling} from "@/utils/Se
 import FetchAPIError, {isFetchAPIError} from "@/types/errors/FetchAPIError";
 import UsuarioDTO from "@/types/dtos/UsuarioDTO";
 import PermisoEnum from "@/types/enums/PermisoEnum";
-import {encodeToBase64} from "next/dist/build/webpack/loaders/utils";
 
 // URL base de la API REST de la API para las sesiones
 const SERVICE_PATH: string = process.env.NEXT_PUBLIC_BACKEND_API_URL + "/session";
@@ -179,15 +178,17 @@ export async function modificarCliente(usuario: UsuarioDTO, token: string): Prom
  * @returns Promise<FetchAPIError> - Si ocurre un error en la solicitud o en el procesamiento de la respuesta.
  */
 export async function cambiarContrasenia(passActual: string, passNueva: string, token: string): Promise<void | FetchAPIError> {
+
+
     // URL del servicio de cambio de contraseña
     const url: string = `${SERVICE_PATH}/cambiar-pass`;
 
     // Encripta las contraseñas para enviarlas en la petición (Authotization: Basic)
-    const passEncoded: string = btoa(passActual + ":" + passNueva); // credenciales: passActual:passNueva en base64
+    const passEncoded: string = "Basic " + btoa(passActual + ":" + passNueva); // credenciales: passActual:passNueva en base64
 
     // Opciones de la petición
     const options: RequestInit = {
-        method: 'PUT',
+        method: 'POST',
         headers: {
             'Authorization': 'Bearer ' + token, // Cabecera de autorización con el token de sesión
             'Content-Type': 'application/json' // Tipo de contenido JSON

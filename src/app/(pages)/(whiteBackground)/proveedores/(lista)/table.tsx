@@ -4,12 +4,13 @@ import React, {ChangeEvent, MutableRefObject, ReactElement, useEffect, useRef, u
 import {useModal} from "@/app/hooks/modals/useModal";
 import ProveedorDTO from "@/types/dtos/ProveedorDTO";
 import FetchAPIError, {isFetchAPIError} from "@/types/errors/FetchAPIError";
-import {darBajaProveedor, listarProveedores} from "@/services/ProveedorService";
+import {darBajaProveedor, listarProveedores, reactivarProveedor} from "@/services/ProveedorService";
 import ProveedorFilter from "@/types/filters/ProveedorFilter";
 import stylesTable from "@public/styles/modules/table/table.tipoequipos.module.css";
 import {ModalInstance} from "@/app/hooks/modals/ModalProvider";
 import EditProveedorForm from "@/app/(pages)/(whiteBackground)/proveedores/(lista)/formEdit";
 import {ModalButtonsType} from "@/components/ModalFC";
+import {useToken} from "@/app/hooks/TokenProvider";
 
 /**
  *  Propiedades del componente TableProveedoresFC
@@ -25,6 +26,7 @@ interface TableProveedoresFCProps {
     sessionAPIToken: string;
     hasPermissionEdit: boolean;
     hasPermissionBaja: boolean;
+    hasPermissionReactivar: boolean;
     hasPermissionView: boolean;
     idInstitucion: number;
 }
@@ -38,6 +40,9 @@ interface TableSearchTermsProps {
 }
 
 function TableProveedoresFC(props: Readonly<TableProveedoresFCProps>): ReactElement {
+
+    // Obtenemos el token de sesión del cliente
+    const {sessionAPIToken } = useToken();
 
     // ----------------------- Modales -----------------------
     const {createModal} = useModal();
@@ -68,18 +73,20 @@ function TableProveedoresFC(props: Readonly<TableProveedoresFCProps>): ReactElem
     const [proveedores, setProveedores] = useState<ProveedorDTO[]>([]);
 
     useEffect((): void => {
+
+        if(!sessionAPIToken) return;
+
         (async (): Promise<void> => {
-            const response: ProveedorDTO[] | FetchAPIError = await listarProveedores(props.sessionAPIToken, appliedSearchTerms.filter);
+            const response: ProveedorDTO[] | FetchAPIError = await listarProveedores(sessionAPIToken, appliedSearchTerms.filter);
 
             if (isFetchAPIError(response)) {
                 console.error("ERROR - lista de proveedores - table.tsx - listarProveedores", response.errorMessage);
                 return;
             }
-            console.log(response);
             setProveedores(response);
         })();
 
-    }, [appliedSearchTerms]);
+    }, [appliedSearchTerms, sessionAPIToken]);
 
     // Procedimiento que se ejecuta al hacer clic en el botón 'Modificar'
     async function handleEditClick(proveedor: ProveedorDTO): Promise<void> {
@@ -92,90 +99,155 @@ function TableProveedoresFC(props: Readonly<TableProveedoresFCProps>): ReactElem
                     idInstitucion={props.idInstitucion}
                     editingProveedor={proveedor}
                     onSave={(proveedorModified: ProveedorDTO): void => {
-                        setProveedores(proveedores.map((p: ProveedorDTO): ProveedorDTO => {
-                            return p.id === proveedorModified.id ? proveedorModified : p;
-                        }));
+                        setProveedores(proveedores.map(p => p.id === proveedorModified.id ? proveedorModified : p));
                         modalModificar.close();
-                        refSearchTermsTimer.current = setTimeout((): void => {
-                            setAppliedSearchTerms({ ...appliedSearchTerms });
-                        }, 1000);
+                        setAppliedSearchTerms({ ...appliedSearchTerms });
                     }}
                     onCancel={(): void => {
                         createModal({
-                            children: (
-                                <p>¿Estás seguro de que deseas cancelar la modificación del proveedor?</p>
-                            ),
+                            children: <p>¿Estás seguro de que deseas cancelar la modificación del proveedor?</p>,
                             buttonsType: ModalButtonsType.CONFIRM_CANCEL,
-                            onConfirm: (): void => {
-                                modalModificar.close();
-                            }
+                            onConfirm: (): void => modalModificar.close(),
                         }).show();
                     }}
                 />
             ),
-            buttonsType: ModalButtonsType.NONE
+            buttonsType: ModalButtonsType.NONE,
         });
+
 
         modalModificar.show();
     }
 
     // Procedimiento que se ejecuta al hacer clic en el botón 'Eliminar'
     const handleEliminarClick = (proveedorSelected: ProveedorDTO): void => {
-        if (!props.hasPermissionBaja) {
-            createModal({
-                children: (
-                    <p>No tienes permisos para dar de baja proveedores</p>
-                ),
-                buttonsType: ModalButtonsType.CONFIRM
-            }).show();
-            return;
-        }
 
-        createModal({
-            title: "Dando de baja a \"" + proveedorSelected.nombre + "\"",
-            children: (
-                <>
-                    <p>Estas por dar de baja al proveedor <b>&quot;{proveedorSelected.nombre}&quot;</b>.</p>
-                    <p>¿Desea continuar?</p>
-                </>
-            ),
-            buttonsType: ModalButtonsType.CONFIRM_CANCEL,
-            async onConfirm(): Promise<void> {
-                const response: void | FetchAPIError = await darBajaProveedor(proveedorSelected.id as number, props.sessionAPIToken);
-                if (isFetchAPIError(response)) {
+        if(!sessionAPIToken) return;
+
+        if (!proveedorSelected.activo) { // Si el proveedor está inactivo, entonces se reactiva
+            if (!props.hasPermissionReactivar) { // Verifica si el usuario tiene permiso para reactivar
+                createModal({
+                    children: (
+                        <p>No tienes permisos para reactivar el proveedor</p>
+                    ),
+                    buttonsType: ModalButtonsType.CONFIRM
+                }).show();
+                return;
+            }
+
+            // Crea un modal para confirmar la reactivación del proveedor
+            createModal({
+                title: "Reactivando \"" + proveedorSelected.nombre + "\"",
+                children: (
+                    <>
+                        <p>Estás por reactivar el proveedor <b>&quot;{proveedorSelected.nombre}&quot;</b>.</p>
+                        <p>¿Desea continuar?</p>
+                    </>
+                ),
+                buttonsType: ModalButtonsType.CONFIRM_CANCEL,
+                async onConfirm(): Promise<void> { // Acción al confirmar
+                    // Realiza la reactivación del proveedor en la API
+                    const response: void | FetchAPIError = await reactivarProveedor(proveedorSelected.id as number, sessionAPIToken);
+                    if (isFetchAPIError(response)) {
+                        // Si ocurre un error en la solicitud, muestra un mensaje de error
+                        createModal({
+                            children: (
+                                <p>Error al reactivar el proveedor: {response.errorMessage}</p>
+                            ),
+                            buttonsType: ModalButtonsType.CONFIRM
+                        }).show();
+                        console.error('ERROR - Reactivar Proveedor - handleEliminarClick - reactivarProveedor', response);
+                        return;
+                    }
+
+                    proveedorSelected.activo = true; // Actualiza el estado del proveedor a activo
+
+                    // Muestra un mensaje de éxito al reactivar el proveedor
                     createModal({
                         children: (
-                            <p>Error al dar de baja el proveedor: {response.errorMessage}</p>
+                            <p>Proveedor &quot;{proveedorSelected.nombre}&quot; reactivado correctamente</p>
                         ),
                         buttonsType: ModalButtonsType.CONFIRM
                     }).show();
-                    return;
+
+                    refSearchTermsTimer.current = setTimeout((): void => {
+                        setAppliedSearchTerms({ ...appliedSearchTerms }); // Actualiza los términos de búsqueda
+                    }, 1000);
+                },
+                onCancel(): void { // Acción al cancelar
+                    // Muestra un mensaje de cancelación
+                    createModal({
+                        children: (
+                            <p>Reactivación cancelada</p>
+                        ),
+                        buttonsType: ModalButtonsType.CONFIRM
+                    }).show();
                 }
-
-                proveedorSelected.activo = false;
-
+            }).show();
+        } else { // Si el proveedor está activo, entonces se da de baja
+            if (!props.hasPermissionBaja) { // Si el cliente no tiene permisos para dar de baja, muestra un mensaje de error
                 createModal({
                     children: (
-                        <p>Proveedor &quot;{proveedorSelected.nombre}&quot; dado de baja correctamente</p>
+                        <p>No tienes permisos para dar de baja proveedores</p>
                     ),
                     buttonsType: ModalButtonsType.CONFIRM
                 }).show();
-
-                refSearchTermsTimer.current = setTimeout((): void => {
-                    setAppliedSearchTerms({ ...appliedSearchTerms });
-                }, 1000);
-            },
-            onCancel(): void {
-                createModal({
-                    title: "Baja Cancelada",
-                    children: (
-                        <p>Baja cancelada</p>
-                    ),
-                    buttonsType: ModalButtonsType.CONFIRM
-                }).show();
+                return;
             }
-        }).show();
-    }
+
+            // Crea un modal para confirmar la baja del proveedor
+            createModal({
+                title: "Dando de baja a \"" + proveedorSelected.nombre + "\"",
+                children: (
+                    <>
+                        <p>Estás por dar de baja al proveedor <b>&quot;{proveedorSelected.nombre}&quot;</b>.</p>
+                        <p>¿Desea continuar?</p>
+                    </>
+                ),
+                buttonsType: ModalButtonsType.CONFIRM_CANCEL,
+                async onConfirm(): Promise<void> { // Acción al confirmar
+                    // Realiza la baja del proveedor en la API
+                    const response: void | FetchAPIError = await darBajaProveedor(proveedorSelected.id as number, sessionAPIToken);
+                    if (isFetchAPIError(response)) {
+                        // Si ocurre un error en la solicitud, muestra un mensaje de error
+                        createModal({
+                            children: (
+                                <p>Error al dar de baja el proveedor: {response.errorMessage}</p>
+                            ),
+                            buttonsType: ModalButtonsType.CONFIRM
+                        }).show();
+                        console.error('ERROR - Dar de baja Proveedor - handleEliminarClick - darBajaProveedor', response);
+                        return;
+                    }
+
+                    proveedorSelected.activo = false; // Actualiza el estado del proveedor a inactivo
+
+                    // Muestra un mensaje de éxito al dar de baja el proveedor
+                    createModal({
+                        children: (
+                            <p>Proveedor &quot;{proveedorSelected.nombre}&quot; dado de baja correctamente</p>
+                        ),
+                        buttonsType: ModalButtonsType.CONFIRM
+                    }).show();
+
+                    refSearchTermsTimer.current = setTimeout((): void => {
+                        setAppliedSearchTerms({ ...appliedSearchTerms }); // Actualiza los términos de búsqueda
+                    }, 1000);
+                },
+                onCancel(): void { // Acción al cancelar
+                    // Muestra un mensaje de cancelación
+                    createModal({
+                        title: "Baja Cancelada",
+                        children: (
+                            <p>Baja cancelada</p>
+                        ),
+                        buttonsType: ModalButtonsType.CONFIRM
+                    }).show();
+                }
+            }).show();
+        }
+    };
+
 
     return (
         <div className={stylesTable.containerPage}>
@@ -198,11 +270,15 @@ function TableProveedoresFC(props: Readonly<TableProveedoresFCProps>): ReactElem
                                             <button onClick={() => handleEditClick(proveedor)}>Modificar</button>
                                         </td>
                                     ) : <td></td>}
-                                    {props.hasPermissionBaja ? (
+                                    {props.hasPermissionBaja || props.hasPermissionReactivar ? (
                                         <td>
-                                            <button onClick={(): void => handleEliminarClick(proveedor)}>Eliminar</button>
+                                            <button onClick={(): void => handleEliminarClick(proveedor)}>
+                                                {proveedor.activo ? 'Eliminar' : 'Reactivar'}
+                                            </button>
                                         </td>
-                                    ) : <td></td>}
+                                    ) : (
+                                        <td></td>
+                                    )}
                                 </tr>
                             ))}
                             </tbody>

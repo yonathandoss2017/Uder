@@ -39,14 +39,16 @@ export async function listarModelos(token: string, filter: ModeloFilter = {}): P
 /**
  * Función para buscar modelo por id.
  * @param id - ID del modelo
+ * @param token
  * @returns Promise<ModeloDTO> - Modelo devuelto por la API
  * @returns Promise<FetchAPIError> - Si ocurre un error en la solicitud o en el procesamiento de la respuesta.
  */
-export async function buscarModeloPorId(id: number): Promise<ModeloDTO | FetchAPIError> {
+export async function buscarModeloPorId(id: number, token: string): Promise<ModeloDTO | FetchAPIError> {
     const url: string = `${SERVICE_PATH}/buscar/${id}`; // URL de la petición a la API
     const options: RequestInit = { // Opciones de la petición
         method: 'GET',
         headers: {
+            'Authorization': 'Bearer ' + token, // Cabecera de autorización con el token de sesión
             'Content-Type': 'application/json' // Tipo de contenido JSON
         }
     };
@@ -112,6 +114,29 @@ export async function darBajaModelo(id: number, token: string): Promise<void | F
         method: 'POST',
         headers: {
             'Authorization': 'Bearer ' + token, // Cabecera de autorización con el token de sesión
+            'Content-Type': 'application/json' // Tipo de contenido JSON
+        }
+    };
+
+    // Realiza la petición a la API y retorna el resultado
+    return await fetchVoidWithErrorHandling(url, options);
+}
+
+/**
+ *
+ * @param id
+ * @param token
+ * @returns Promise<void> - Si la solicitud se realiza correctamente.
+ * @returns Promise<FetchAPIError>
+ */
+export async function reactivarModelo(id: number, token: string): Promise<void | FetchAPIError>{
+    const url: string = `${SERVICE_PATH}/reactivar/${id}`; // URL de la petición a la API
+
+    // Opciones de la petición
+    const options: RequestInit = {
+        method: 'POST',
+        headers: {
+            'Authorization': 'Bearer ' + token, // Authorization header con token JWT
             'Content-Type': 'application/json' // Tipo de contenido JSON
         }
     };

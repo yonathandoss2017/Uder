@@ -9,8 +9,8 @@ const SchemaUserPhone: ZodObject<any> = z.object({
     telefono: z.preprocess(((val): string => val ? String(val).replace(/^0/, '') : ''), // Quita el primer 0 si lo tiene
         z.string()
             .min(1, 'El teléfono no puede estar vacío')
-            .min(8, "El teléfono debe tener entre 8 caracteres sin contar el 0 inicial")
-            .max(8, "El teléfono debe tener entre 8 caracteres sin contar el 0 inicial")
+            .min(8, "El teléfono debe tener 9 caracteres")
+            .max(8, "El teléfono debe tener 9 caracteres")
             .regex(/^\d+$/, 'El teléfono debe contener solo números')),
 });
 

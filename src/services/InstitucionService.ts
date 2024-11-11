@@ -29,14 +29,16 @@ export async function listarInstituciones(): Promise<InstitucionDTO[] | FetchAPI
 /**
  * Función para buscar una institución por su ID.
  * @param id - ID de la institución a buscar
+ * @param token
  * @returns Promise<InstitucionDTO> - Institución encontrada en la API
  * @returns Promise<FetchAPIError> - Si ocurre un error en la solicitud o en el procesamiento de la respuesta.
  */
-export async function buscarInstitucionPorId(id: number): Promise<InstitucionDTO | FetchAPIError> {
+export async function buscarInstitucionPorId(id: number, token:string): Promise<InstitucionDTO | FetchAPIError> {
     const url: string = `${SERVICE_PATH}/buscar/${id}`; // URL de la petición a la API
     const options: RequestInit = { // Opciones de la petición
         method: 'GET',
         headers: {
+            'Authorization': 'Bearer ' + token, // Cabecera de autorización con el token de sesión
             'Content-Type': 'application/json' // Tipo de contenido JSON
         },
     };

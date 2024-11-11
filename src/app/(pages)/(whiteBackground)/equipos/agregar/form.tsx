@@ -35,6 +35,11 @@ import ImagenDTO from "@/types/dtos/ImagenDTO";
 import {agregarImagen} from "@/services/ImagenService";
 import {useModal} from "@/app/hooks/modals/useModal";
 import {ModalButtonsType} from "@/components/ModalFC";
+import MarcaFilter from "@/types/filters/MarcaFilter";
+import ModeloFilter from "@/types/filters/ModeloFilter";
+import TipoEquipoFilter from "@/types/filters/TipoEquipoFilter";
+import ProveedorFilter from "@/types/filters/ProveedorFilter";
+import {useToken} from "@/app/hooks/TokenProvider";
 
 /**
  * Propiedades del componente
@@ -68,6 +73,8 @@ interface FormValues extends EquipoDTO {
  * @param {RegisterEquipoFormProps} props - Propiedades del componente
  */
 const RegisterEquipoForm: React.FC<RegisterEquipoFormProps> = (props: RegisterEquipoFormProps) => {
+
+    const { sessionAPIToken } = useToken();
 
     // ----------------------- Modales -----------------------
 
@@ -109,30 +116,30 @@ const RegisterEquipoForm: React.FC<RegisterEquipoFormProps> = (props: RegisterEq
         // Procedimiento auto-ejecutable (Para que sea asíncrono)
         (async (): Promise<void> => {
 
-            // ------------------- Cargar marcas -------------------
+            if (sessionAPIToken == null){
+                return;
+            }
 
-            setMarcas(await listarMarcas(props.sessionAPIToken).then((response: MarcaDTO[] | FetchAPIError): MarcaDTO[] => {
+            // ------------------- Cargar marcas -------------------
+            setMarcas(await listarMarcas(sessionAPIToken, {activo: true}).then((response: MarcaDTO[] | FetchAPIError): MarcaDTO[] => {
                 if (isFetchAPIError(response)) return [];
                 return response;
             }));
 
             // ------------------- Cargar modelos -------------------
-
-            setModelos(await listarModelos(props.sessionAPIToken).then((response: ModeloDTO[] | FetchAPIError): ModeloDTO[] => {
+            setModelos(await listarModelos(sessionAPIToken, {activo: true}).then((response: ModeloDTO[] | FetchAPIError): ModeloDTO[] => {
                 if (isFetchAPIError(response)) return [];
                 return response;
             }));
 
             // ------------------- Cargar tipos de equipo -------------------
-
-            setTiposEquipo(await listarTiposEquipo(props.sessionAPIToken).then((response: TipoEquipoDTO[] | FetchAPIError): TipoEquipoDTO[] => {
+            setTiposEquipo(await listarTiposEquipo(sessionAPIToken, {activo: true}).then((response: TipoEquipoDTO[] | FetchAPIError): TipoEquipoDTO[] => {
                 if (isFetchAPIError(response)) return [];
                 return response;
             }));
 
             // ------------------- Cargar proveedores -------------------
-
-            setProveedores(await listarProveedores(props.sessionAPIToken).then((response: ProveedorDTO[] | FetchAPIError): ProveedorDTO[] => {
+            setProveedores(await listarProveedores(sessionAPIToken, {activo: true}).then((response: ProveedorDTO[] | FetchAPIError): ProveedorDTO[] => {
                 if (isFetchAPIError(response)) return [];
                 return response;
             }));
@@ -141,7 +148,7 @@ const RegisterEquipoForm: React.FC<RegisterEquipoFormProps> = (props: RegisterEq
 
             setUbicaciones(
                 await listarUbicaciones(
-                    props.sessionAPIToken, 0, 1, "id", true, {activo: true}
+                    sessionAPIToken, 0, 1, "id", true, {activo: true}
                 ).then((response: UbicacionDTO[] | FetchAPIError): UbicacionDTO[] => {
                     if (isFetchAPIError(response)) {
                         console.error("Error al obtener las ubicaciones: ", response);
@@ -151,15 +158,14 @@ const RegisterEquipoForm: React.FC<RegisterEquipoFormProps> = (props: RegisterEq
                 }));
 
             // ------------------- Cargar países de origen -------------------
-
-            setPaisesOrigen(await listarPaises(props.clientData.idInstitucion).then((response: PaisDTO[] | FetchAPIError): PaisDTO[] => {
+            setPaisesOrigen(await listarPaises(sessionAPIToken, {activo: true}).then((response: PaisDTO[] | FetchAPIError): PaisDTO[] => {
                 if (isFetchAPIError(response)) return [];
                 return response;
             }));
 
         })();
 
-    }, [props.sessionAPIToken]); // Se ejecuta solo al montar el componente o si cambia el sessionAPIToken
+    }, [props.sessionAPIToken, sessionAPIToken]); // Se ejecuta solo al montar el componente o si cambia el sessionAPIToken
 
 
     // Efecto que se ejecuta al cambiar la marca seleccionada (Carga los modelos de la marca seleccionada)
@@ -182,8 +188,19 @@ const RegisterEquipoForm: React.FC<RegisterEquipoFormProps> = (props: RegisterEq
     }, [selectedMarcaId, modelos]); // Se ejecuta al montar el componente y cuando cambia selectedMarcaId o modelos
 
 
+    // Obtiene la fecha actual en la zona horaria local
+    const today = new Date();
+    today.setMinutes(today.getMinutes() - today.getTimezoneOffset());
+    const defaultDate = today.toISOString().split('T')[0];
+
+
     // Función que se ejecuta al enviar el formulario
     const onSubmit: SubmitHandler<FormValues> = async (formValues: FormValues): Promise<void> => {
+
+        if (sessionAPIToken == null){
+            return;
+        }
+
         // Se crea un nuevo objeto GarantiaDTO con los valores de garantía del formulario
         const nuevoGarantiaDTO: GarantiaDTO = {
             anios: formValues.garantiaAnios,
@@ -210,7 +227,7 @@ const RegisterEquipoForm: React.FC<RegisterEquipoFormProps> = (props: RegisterEq
         const imagenFile: File = formValues.imagen.item(0) as File;
 
         // Se registra el equipo en la API
-        const response: EquipoDTO | FetchAPIError = await agregarEquipo(nuevoEquipoDTO, props.sessionAPIToken);
+        const response: EquipoDTO | FetchAPIError = await agregarEquipo(nuevoEquipoDTO, sessionAPIToken);
 
         // Se verifica si hay un error en la respuesta
         if (isFetchAPIError(response)) {
@@ -241,7 +258,7 @@ const RegisterEquipoForm: React.FC<RegisterEquipoFormProps> = (props: RegisterEq
         };
 
         // Se registra la imagen en la API
-        await agregarImagen(imagenDTO, props.sessionAPIToken).then((response: void | FetchAPIError): void => {
+        await agregarImagen(imagenDTO, sessionAPIToken).then((response: void | FetchAPIError): void => {
             if (isFetchAPIError(response)) {
                 // Si ocurre un error al registrar la imagen se muestra un mensaje de error
                 createModal({
@@ -284,14 +301,12 @@ const RegisterEquipoForm: React.FC<RegisterEquipoFormProps> = (props: RegisterEq
                             placeholder="Nombre del Equipo"
                         />
                     </label>
-
                     {errors.nombre &&
                         <label className={styles.error}>{errors.nombre.message}</label>}
                 </div>
                 <div className={styles.inputBoxRe}>
                     <label className={styles.details}>
                         <span>Tipo <span className={styles.requiredField}>*</span></span>
-
                         <ComboBoxFC
                             message={"Seleccione un tipo de equipo"}
                             register={register("idTipoEquipo")}
@@ -301,14 +316,12 @@ const RegisterEquipoForm: React.FC<RegisterEquipoFormProps> = (props: RegisterEq
                             }))}
                         />
                     </label>
-
                     {errors.idTipoEquipo &&
                         <label className={styles.error}>{errors.idTipoEquipo.message}</label>}
                 </div>
                 <div className={styles.inputBoxRe}>
                     <label className={styles.details}>
                         <span>Marca <span className={styles.requiredField}>*</span></span>
-
                         <ComboBoxFC
                             message={"Seleccione una marca"}
                             elements={marcas.map((marca: MarcaDTO): { key: number, value: string } => ({
@@ -319,12 +332,10 @@ const RegisterEquipoForm: React.FC<RegisterEquipoFormProps> = (props: RegisterEq
                             onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setSelectedMarcaId(parseInt(e.target.value))}
                         />
                     </label>
-
                 </div>
                 <div className={styles.inputBoxRe}>
                     <label className={styles.details}>
                         <span>Modelo <span className={styles.requiredField}>*</span></span>
-
                         {selectedMarcaId ?
                             (
                                 <ComboBoxFC
@@ -347,21 +358,18 @@ const RegisterEquipoForm: React.FC<RegisterEquipoFormProps> = (props: RegisterEq
                             )
                         }
                     </label>
-
                     {errors.idModelo &&
                         <label className={styles.error}>{errors.idModelo.message}</label>}
                 </div>
                 <div className={styles.inputBoxRe}>
                     <label className={styles.details}>
                         <span>Número de Serie <span className={styles.requiredField}>*</span></span>
-
                         <input
                             {...register("numSerie", {required: "Este campo es requerido"})}
                             type="text"
                             placeholder="Número de Serie"
                         />
                     </label>
-
                     {errors.numSerie &&
                         <label className={styles.error}>{errors.numSerie.message}</label>}
                 </div>
@@ -381,7 +389,6 @@ const RegisterEquipoForm: React.FC<RegisterEquipoFormProps> = (props: RegisterEq
                                 <input className={styles.fechaInput} id="garantiaMeses" type="number" {...register('garantiaMeses')} defaultValue={0}
                                        min={0} max={12}/>
                             </label>
-
                         </div>
                         <div>
                             <label htmlFor="garantiaDias">
@@ -389,7 +396,6 @@ const RegisterEquipoForm: React.FC<RegisterEquipoFormProps> = (props: RegisterEq
                                 <input className={styles.fechaInput}  id="garantiaDias" type="number" {...register('garantiaDias')} defaultValue={0}
                                        min={0} max={31}/>
                             </label>
-
                         </div>
                         <div>
                             <label className={styles.deporvida} htmlFor="garantiaDePorVida">
@@ -397,9 +403,7 @@ const RegisterEquipoForm: React.FC<RegisterEquipoFormProps> = (props: RegisterEq
                                 <input id="garantiaDePorVida" {...register('garantiaDePorVida')}
                                        type="checkbox"/>
                             </label>
-
                         </div>
-
                         {errors.garantiaAnios &&
                             <label className={styles.error}>{errors.garantiaAnios.message}</label>}
                         {errors.garantiaMeses &&
@@ -411,7 +415,6 @@ const RegisterEquipoForm: React.FC<RegisterEquipoFormProps> = (props: RegisterEq
                 <div className={styles.inputBoxRe}>
                     <label className={styles.details}>
                         <span>País de Origen <span className={styles.requiredField}>*</span></span>
-
                         <ComboBoxFC
                             message={"Seleccione un país"}
                             register={register("idPaisOrigen")}
@@ -421,14 +424,12 @@ const RegisterEquipoForm: React.FC<RegisterEquipoFormProps> = (props: RegisterEq
                             }))}
                         />
                     </label>
-
                     {errors.idPaisOrigen &&
                         <label className={styles.error}>{errors.idPaisOrigen.message}</label>}
                 </div>
                 <div className={styles.inputBoxRe}>
                     <label className={styles.details}>
                         <span>Proveedor<span className={styles.requiredField}>*</span></span>
-
                         <ComboBoxFC
                             message={"Seleccione un proveedor"}
                             register={register("idProveedor")}
@@ -438,14 +439,12 @@ const RegisterEquipoForm: React.FC<RegisterEquipoFormProps> = (props: RegisterEq
                             }))}
                         />
                     </label>
-
                     {errors.idProveedor &&
                         <label className={styles.error}>{errors.idProveedor.message}</label>}
                 </div>
                 <div className={styles.inputBoxRe}>
                     <label className={styles.details}>
                         <span>Ubicación <span className={styles.requiredField}>*</span></span>
-
                         <ComboBoxFC
                             message={"Seleccione una ubicación"}
                             register={register("idUbicacionActual")}
@@ -455,7 +454,6 @@ const RegisterEquipoForm: React.FC<RegisterEquipoFormProps> = (props: RegisterEq
                             }))}
                         />
                     </label>
-
                     {errors.idUbicacionActual &&
                         <label className={styles.error}>{errors.idUbicacionActual.message}</label>}
                 </div>
@@ -465,10 +463,9 @@ const RegisterEquipoForm: React.FC<RegisterEquipoFormProps> = (props: RegisterEq
                         <input
                             {...register("fechaAdquisicion", {required: "Este campo es requerido"})}
                             type="date"
-                            defaultValue={new Date().toISOString().split('T')[0]}
+                            defaultValue={defaultDate}
                         />
                     </label>
-
                     {errors.fechaAdquisicion &&
                         <label className={styles.error}>{errors.fechaAdquisicion.message}</label>}
                 </div>
@@ -480,7 +477,6 @@ const RegisterEquipoForm: React.FC<RegisterEquipoFormProps> = (props: RegisterEq
                                 <input id="imagen" type="file" {...register('imagen')}
                                        onChange={(event: ChangeEvent<HTMLInputElement>) => previewImage(event, '#imgPreview')}/>
                             </label>
-
                         </div>
                         <div className={styles.preview}>
                             <img id="imgPreview" src="" alt=""></img>

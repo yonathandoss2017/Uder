@@ -16,7 +16,7 @@ import {Metadata} from "next";
 
 // Define la metadata de la página principal
 export const metadata: Metadata = {
-    title: 'PInfra DD - Registro Usuario'
+    title: 'PFT - Registro Usuario'
 };
 
 // Define la página principal de la aplicación
@@ -25,7 +25,7 @@ const RegisterPage = () => {
         <main className={styles.containerWrap}>
             <div className={styles.container}>
                 <div className={stylesForm.register}>
-                    <h2>Digital Disruption</h2>
+                    <h2>Hospital</h2>
                     <RegisterFormClient/>
                 </div>
             </div>

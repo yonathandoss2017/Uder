@@ -11,14 +11,16 @@ const SERVICE_PATH: string = process.env.NEXT_PUBLIC_BACKEND_API_URL + "/img";
 /**
  * Función para listar todas las imágenes asociadas a un equipo
  * @param idEquipo - ID del equipo del cual se listarán las imágenes
+ * @param token
  * @returns Promise<ImagenDTO[]> - Lista de imágenes del equipo recuperadas de la API
  * @returns Promise<FetchAPIError> - Si ocurre un error en la solicitud o en el procesamiento de la respuesta.
  */
-export async function listarImagenes(idEquipo: number): Promise<ImagenDTO[] | FetchAPIError> {
+export async function listarImagenes(idEquipo: number, token: string): Promise<ImagenDTO[] | FetchAPIError> {
     const url: string = `${SERVICE_PATH}/equipo/${idEquipo}`; // URL de la petición a la API
     const options: RequestInit = { // Opciones de la petición
         method: 'GET',
         headers: {
+            'Authorization': 'Bearer ' + token, // Cabecera de autorización con el token de sesión
             'Content-Type': 'application/json' // Tipo de contenido JSON
         }
     };

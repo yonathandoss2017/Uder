@@ -1,0 +1,430 @@
+.page {
+    display: flex;
+    height: 100vh;
+    justify-content: center;
+    align-items: center;
+    background-color: #f6f6f7;
+}
+
+.container {
+    max-width: 700px;
+    width: 100%;
+    padding: 25px 30px;
+    background: #fff;
+    border-radius: 20px;
+    max-height: 95%;
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.23);
+}
+
+.form {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    z-index: 0;
+    margin-top: 10px;
+    font-size: 1vw;
+    padding-top: 15px;
+    padding-bottom: 15px;
+}
+
+.containerTable {
+    margin-left: 280px;
+    margin-right: auto;
+    background-color: #e5e5e533;
+    padding: 30px 30px 0 30px;
+    border-radius: 20px;
+    box-shadow: 5px 4px 10px 0 #00000017;
+    backdrop-filter: blur(7px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    z-index: 0;
+}
+.containerTable h3 {
+    padding-bottom: 30px;
+}
+
+.containerTable table {
+    border-collapse: collapse;
+}
+
+.containerTable tbody {
+    text-align: center;
+    font-size: 0.9vw;
+}
+
+.containerTable tbody tr td {
+    padding: 8px 15px;
+    color: #1b1b1b;
+    font-weight: 500;
+}
+
+.containerTable tbody tr td button {
+    color: white;
+    background: black;
+    padding: 7px 12px;
+    border-radius: 10px;
+    border: none;
+    font-size: 0.9vw;
+    font-weight: 600;
+
+}
+
+.containerTable tbody tr {
+    border-bottom: solid 1px #0000002e;
+}
+
+.containerTable tbody td input:checked {
+    appearance: none;
+    border-radius: 50%;
+    transition: 0.2s all linear;
+    border: solid 9px #00e930;
+}
+
+.containerTable tbody td input {
+    appearance: none;
+    border-radius: 50%;
+    transition: 0.2s all linear;
+    border: solid 9px #ff0000;
+}
+
+
+.scroll {
+    width: 100%;
+    overflow-y: auto;
+    max-height: 350px;
+    height: 200px;
+    padding: 8px;
+    border-bottom: solid 1px #8080804d;
+    margin-right: 280px;
+}
+
+
+.error{
+    color: #ff3860;
+}
+.imagen{
+    display: flex;
+    flex-direction: column;
+}
+.container form .userDetailsRe {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    width: 100%;
+}
+
+form .userDetailsRe .inputBoxRe {
+    margin-bottom: 15px;
+    width: 100%; /* Adjusted to avoid overflow */
+}
+.inputBoxRe input::placeholder {
+    font-size: 14px; /* Ajusta el tamaño de la fuente del placeholder si es necesario */
+    white-space: nowrap; /* Evita que el placeholder se corte si es largo */
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.userDetailsRe .inputBoxRe .details {
+    display: flex;
+    flex-direction: column;
+    font-weight: 500;
+    margin-bottom: 5px;
+}
+
+.userDetailsRe .inputBoxRe .error input {
+    color: red;
+    border-color: #ff3860;
+    font-size: 0.9vw;
+}
+
+.requiredField {
+    color: red;
+    font-weight: bold;
+    font-size: 18px;
+}
+
+.gInputRe {
+    display: flex;
+    margin: 0;
+    font-size: 0.8vw;
+}
+
+.gInputRe div {
+    margin: 0 !important;
+    text-align: center;
+
+}
+.deporvida{
+    font-size: 12px;
+}
+.inputBoxRe input{
+    height: 39px;
+    border-radius: 13px;
+    padding: 8px 15px;
+    color: black;
+    border: solid 2px black;
+}
+.inputBoxRe select{
+    height: 39px;
+    border-radius: 13px;
+    width: 100%;
+    background: black;
+    padding: 8px 15px;
+    color: #ffffff;
+    border: solid 2px black;
+}
+.fechaInput{
+    height: 37px;
+    text-align: center;
+    border-radius: 13px;
+    width: 43px;
+    color: black;
+    padding: 0 !important;
+    border: solid 2px black;
+}
+.inputBoxRe option{
+    color: white;
+}
+
+.ultimobtnRe {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.ultimobtnRe div {
+    display: flex;
+    margin: 5px 0 10px 0;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.sImagen {
+    display: flex;
+}
+
+@media screen and (max-width: 1390px), screen and (resolution: 120dpi) {
+    form .buttomAe {
+        position: relative;
+        margin-bottom: 10px;
+    }
+    .gInputRe{
+        font-size: 1.2vw;
+    }
+    .sImagen {
+        flex-direction: row !important;
+        width: 100%;
+        margin-bottom: 0;
+        justify-content: space-around;
+
+    }
+    form .userDetailsRe .inputBoxRe{
+        margin-bottom: 5px !important;
+    }
+    .container{
+        padding: 5px 30px;
+    }
+    .preview{
+        width: 120px !important;
+        height: 120px  !important;
+    }
+
+}
+
+
+.buttomAe {
+    height: 45px;
+    width: 100%;
+    text-align: center;
+}
+
+.buttomAe button {
+    height: 100%;
+    width: 100%;
+    border-radius: 25px;
+    outline: none;
+    color: #fff;
+    border: none;
+    font-size: 18px;
+    font-weight: 500;
+    letter-spacing: 1px;
+    cursor: pointer;
+    background: linear-gradient(148deg, #444444, #000000);
+    transition: background 0.8s, color 0.8s, border 0.8s;
+}
+
+.buttomAe button:hover {
+    background: linear-gradient(-135deg, #ffffff, #d3d3d3);
+    color: black;
+    border: 2px solid rgba(0, 0, 0, 0.582);
+}
+
+.preview {
+    height: 150px;
+    width: 150px;
+    margin: 50px auto;
+    border: dashed 2px rgb(128, 128, 128);
+}
+
+.preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Ensures image fits within the preview */
+}
+
+
+
+.error{
+    color: #ff3860;
+}
+.imagen{
+    display: flex;
+    flex-direction: column;
+}
+.container form .userDetailsRe {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    width: 200px;
+}
+
+form .userDetailsRe .inputBoxRe {
+    margin-bottom: 15px;
+    width: 100%;
+}
+
+.userDetailsRe .inputBoxRe .details {
+    display: flex;
+    flex-direction: column;
+    font-weight: 500;
+    margin-bottom: 5px;
+}
+
+.userDetailsRe .inputBoxRe .error input {
+    color: red;
+    border-color: #ff3860;
+    font-size: 0.9vw;
+}
+
+.requiredField {
+    color: red;
+    font-weight: bold;
+    font-size: 18px;
+}
+
+.gInputRe {
+    display: flex;
+    margin: 0;
+    font-size: 0.8vw;
+}
+
+.gInputRe div {
+    margin: 0 !important;
+    text-align: center;
+
+}
+
+.inputBoxRe input{
+    width: 250px;
+    height: 45px;
+    border-radius: 13px;
+    padding: 8px 15px;
+    color: black;
+    border: solid 2px black;
+    margin-top: 8px;
+}
+.inputBoxRe select{
+    height: 39px;
+    border-radius: 13px;
+    width: 100%;
+    background: black;
+    padding: 8px 15px;
+    color: #ffffff;
+    border: solid 2px black;
+}
+
+.inputBoxRe option{
+    color: white;
+}
+
+.ultimobtnRe {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.ultimobtnRe div {
+    display: flex;
+    margin: 5px 0 10px 0;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.sImagen {
+    display: flex;
+}
+
+@media screen and (max-width: 1390px), screen and (resolution: 120dpi) {
+    form .buttomAe {
+        position: relative;
+        margin-bottom: 10px;
+    }
+    .gInputRe{
+        font-size: 1.2vw;
+    }
+    .sImagen {
+        flex-direction: row !important;
+        width: 100%;
+        margin-bottom: 0;
+        justify-content: space-around;
+
+    }
+    form .userDetailsRe .inputBoxRe{
+        margin-bottom: 5px !important;
+    }
+    .container{
+        padding: 5px 30px;
+    }
+    .preview{
+        width: 120px !important;
+        height: 120px  !important;
+    }
+
+}
+
+
+.buttomAe {
+    height: 45px;
+    width: 100%;
+    text-align: center;
+    margin-top: 10px;
+}
+
+.buttomAe button {
+    height: 100%;
+    width: 100%;
+    border-radius: 25px;
+    outline: none;
+    color: #fff;
+    border: none;
+    font-size: 18px;
+    font-weight: 500;
+    letter-spacing: 1px;
+    cursor: pointer;
+    background: linear-gradient(148deg, #444444, #000000);
+    transition: background 0.8s, color 0.8s, border 0.8s;
+}
+
+.buttomAe button:hover {
+    background: linear-gradient(-135deg, #ffffff, #d3d3d3);
+    color: black;
+    border: 2px solid rgba(0, 0, 0, 0.582);
+}
+

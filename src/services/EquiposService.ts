@@ -179,3 +179,18 @@ export async function contarEquipos(token: string, filter: EquipoFilter = {}): P
         return response; // Retorna la cantidad de equipos registrados
     });
 }
+
+    export async function buscarPorNumSerie(numSerie: string, token: string): Promise<EquipoDTO | FetchAPIError> {
+
+        const url: string = `${SERVICE_PATH}/buscarPorNumSerie/${numSerie}`;
+        const options: RequestInit = {
+            method: 'GET',
+            headers: {
+                'Authorization': 'Bearer ' + token,
+                'Content-Type': 'application/json'
+            }
+        };
+
+        return await fetchBodyWithErrorHandling<EquipoDTO>(url, options);
+
+    }

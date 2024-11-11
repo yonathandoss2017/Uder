@@ -13,6 +13,7 @@ import SchemaUserPhone from "@/validations/SchemaUserPhone";
 import {agregarTelefono, eliminarTelefono, obtenerTelefonosPorUsuario} from "@/services/TelefonoService";
 import {useModal} from "@/app/hooks/modals/useModal";
 import {ModalButtonsType} from "@/components/ModalFC";
+import {useToken} from "@/app/hooks/TokenProvider";
 
 /**
  * Propiedades del componente
@@ -31,6 +32,9 @@ interface TableTelefonosFCProps {
  */
 function TableTelefonosFC(props: Readonly<TableTelefonosFCProps>): ReactElement {
 
+    // Obtenemos el token de sesión del cliente
+    const {sessionAPIToken } = useToken();
+
     // ----------------------- Modales -----------------------
 
     const {createModal} = useModal();
@@ -43,11 +47,13 @@ function TableTelefonosFC(props: Readonly<TableTelefonosFCProps>): ReactElement 
     // Actualiza la lista de perfiles y teléfonos del usuario
     useEffect((): void => {
 
+        if(!sessionAPIToken) return;
+
         // Procedimiento asíncrono auto-ejecutable que actualiza la lista de perfiles y teléfonos
         (async (): Promise<void> => {
 
             // Obtiene la lista de teléfonos del usuario
-            await obtenerTelefonosPorUsuario(props.usuario.id as number, props.sessionAPIToken).then((response: TelefonoDTO[] | FetchAPIError): void => {
+            await obtenerTelefonosPorUsuario(props.usuario.id as number, sessionAPIToken).then((response: TelefonoDTO[] | FetchAPIError): void => {
                 if (isFetchAPIError(response)) {
                     console.error('Error al obtener los teléfonos del usuario:', response);
                     setTelefonos([]);
@@ -58,10 +64,13 @@ function TableTelefonosFC(props: Readonly<TableTelefonosFCProps>): ReactElement 
 
         })();
 
-    }, []);
+    }, [sessionAPIToken, props.usuario.id]);
 
     // Procedimiento que se ejecuta al hacer clic en el botón 'Agregar' en el modal de teléfonos
     const handleAgregarTelefono = async (): Promise<void> => {
+
+        if(!sessionAPIToken) return;
+
         // Válida el nuevo teléfono con el esquema de Zod (SchemaUserPhone)
         const validationResponse: SafeParseReturnType<{ [x: string]: any; }, { [x: string]: any; }>
             = SchemaUserPhone.safeParse({telefono: nuevoTelefono});
@@ -103,7 +112,7 @@ function TableTelefonosFC(props: Readonly<TableTelefonosFCProps>): ReactElement 
                 }
 
                 // Agrega el teléfono a la base de datos
-                await agregarTelefono(nuevoTelefonoDTO, props.sessionAPIToken).then((response: TelefonoDTO | FetchAPIError): void => {
+                await agregarTelefono(nuevoTelefonoDTO, sessionAPIToken).then((response: TelefonoDTO | FetchAPIError): void => {
 
                     if (isFetchAPIError(response)) {
                         console.error('Error al agregar el teléfono:', response);
@@ -157,6 +166,9 @@ function TableTelefonosFC(props: Readonly<TableTelefonosFCProps>): ReactElement 
 
     // Procedimiento que se ejecuta al hacer clic en el botón 'Eliminar' de un teléfono
     async function handleEliminarTelefono(idTelefono: number): Promise<void> {
+
+        if(!sessionAPIToken) return;
+
         // Verifica si hay más de un teléfono, si no, muestra un mensaje y retorna
         if (telefonos.length <= 1) {
             createModal({
@@ -181,7 +193,7 @@ function TableTelefonosFC(props: Readonly<TableTelefonosFCProps>): ReactElement 
             ),
             buttonsType: ModalButtonsType.CONFIRM_CANCEL,
             onConfirm: async (): Promise<void> => {
-                const response: void | FetchAPIError = await eliminarTelefono(idTelefono, props.sessionAPIToken);
+                const response: void | FetchAPIError = await eliminarTelefono(idTelefono, sessionAPIToken);
                 if (isFetchAPIError(response)) {
                     console.error('Error al eliminar el teléfono:', response);
                     createModal({
@@ -249,7 +261,6 @@ function TableTelefonosFC(props: Readonly<TableTelefonosFCProps>): ReactElement 
                                     </button>
                                 </td>
                             </tr>
-
                         ))}
                         </tbody>
                     </table>

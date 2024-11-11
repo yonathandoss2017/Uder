@@ -5,7 +5,8 @@
 
 // Importa los módulos necesarios
 import {getToken, JWT} from 'next-auth/jwt'; // Importa funciones relacionadas con JWT de NextAuth
-import {NextRequest, NextResponse} from 'next/server'; // Importa clases relacionadas con Next.js server-side
+import {NextRequest, NextResponse} from 'next/server';
+import {cookies} from "next/headers"; // Importa clases relacionadas con Next.js server-side
 
 // Define la función middleware
 async function middleware(req: NextRequest): Promise<NextResponse> {
@@ -20,7 +21,7 @@ async function middleware(req: NextRequest): Promise<NextResponse> {
         // Redirige al usuario a la página principal si ya está autenticado y trata de acceder a /login o /signup
         if (hassessionAPIToken) {
             return NextResponse.redirect(new URL('/', req.url));
-        } else if (pathname.startsWith('/signup') && !pathname.includes('google') && !isAuthenticated) {
+        } else if ((pathname.startsWith('/signup') && (!pathname.includes('google') && !pathname.includes('ad')) && !isAuthenticated)) {
             // Redirige al usuario a la página de inicio de sesión si intenta registrarse sin autenticarse (Google)
             return NextResponse.redirect(new URL('/login', req.url));
         }
@@ -29,7 +30,7 @@ async function middleware(req: NextRequest): Promise<NextResponse> {
         if (!isAuthenticated) {
             return NextResponse.redirect(new URL('/login', req.url));
         }
-    } else if (!hassessionAPIToken) {
+    } else if (!hassessionAPIToken && !cookies().get('sessionToken')?.value) {
         // Redirige al usuario a la página de inicio de sesión si intenta acceder a una ruta protegida sin autenticarse
         return NextResponse.redirect(new URL('/login', req.url));
     }

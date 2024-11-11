@@ -12,6 +12,7 @@ import BajaEquipoDTO from "@/types/dtos/BajaEquipoDTO";
 import {zodResolver} from "@hookform/resolvers/zod";
 import SchemaBajaEquipo from "@/validations/SchemaBajaEquipo";
 import {darBajaEquipo} from "@/services/EquiposService";
+import {useToken} from "@/app/hooks/TokenProvider";
 
 /**
  * Propiedades del componente
@@ -34,6 +35,9 @@ interface ModalBajaEquipoFCProps {
  */
 function ModalBajaEquipoFC(props: Readonly<ModalBajaEquipoFCProps>): ReactElement {
 
+    // Obtenemos el token de sesión del cliente
+    const {sessionAPIToken } = useToken();
+
     // ----------------------- Modales -----------------------
 
     const {createModal} = useModal();
@@ -50,6 +54,9 @@ function ModalBajaEquipoFC(props: Readonly<ModalBajaEquipoFCProps>): ReactElemen
     });
 
     const handleBajaSubmit = async (data: BajaEquipoDTO): Promise<void> => {
+
+        if(!sessionAPIToken) return;
+
         // Muestra un modal de confirmación antes de dar de baja el equipo
         createModal({
             title: "Eliminando equipo con num de serie: \"" + props.equipo.numSerie + "\"",
@@ -67,7 +74,7 @@ function ModalBajaEquipoFC(props: Readonly<ModalBajaEquipoFCProps>): ReactElemen
                     idEquipo: props.equipo.id as number
                 };
 
-                await darBajaEquipo(Baja, props.sessionAPIToken).then(async (response: void | FetchAPIError): Promise<void> => {
+                await darBajaEquipo(Baja, sessionAPIToken).then(async (response: void | FetchAPIError): Promise<void> => {
                     if (isFetchAPIError(response)) {
                         console.error("ERROR - Modal Baja Equipo - handleBajaSubmit - darBajaEquipo", response);
                         createModal({

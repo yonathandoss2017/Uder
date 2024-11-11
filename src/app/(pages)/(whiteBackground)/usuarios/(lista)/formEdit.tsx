@@ -22,6 +22,7 @@ import {ModalButtonsType} from "@/components/ModalFC";
 import ModalChangesFC from "@/components/ModalChangesFC";
 import {modificarUsuario} from "@/services/UsuarioService";
 import TableTelefonosFC from "@/components/TableTelefonosFC";
+import {useToken} from "@/app/hooks/TokenProvider";
 
 /**
  * Propiedades del componente
@@ -45,6 +46,9 @@ interface EditUserFormProps {
  * @param {EditUserFormProps} props - Propiedades del componente
  */
 function EditUserForm(props: Readonly<EditUserFormProps>): ReactElement {
+
+    // Obtenemos el token de sesión del cliente
+    const {sessionAPIToken } = useToken();
 
     // ----------------------- Modales -----------------------
 
@@ -72,11 +76,13 @@ function EditUserForm(props: Readonly<EditUserFormProps>): ReactElement {
     // Actualiza la lista de perfiles y teléfonos del usuario
     useEffect((): void => {
 
+        if(sessionAPIToken == null) return;
+
         // Procedimiento asíncrono auto-ejecutable que actualiza la lista de perfiles y teléfonos
         (async (): Promise<void> => {
 
             // Obtiene la lista de perfiles para el combobox
-            await listarPerfiles(props.editingUser.idInstitucion).then((response: PerfilDTO[] | FetchAPIError): void => {
+            await listarPerfiles(sessionAPIToken).then((response: PerfilDTO[] | FetchAPIError): void => {
                 if (isFetchAPIError(response)) {
                     console.error('Error al obtener los perfiles:', response);
                     setPerfiles([]);
@@ -104,12 +110,14 @@ function EditUserForm(props: Readonly<EditUserFormProps>): ReactElement {
 
         })();
 
-    }, []);
+    }, [sessionAPIToken, props.perfilCliente, props.isClientAdministrador]);
 
     // ----------------------- Eventos del formulario de edición de usuario ----------------------------
 
     // Define la función que maneja el envío del formulario
     const onSubmit: SubmitHandler<UsuarioDTO> = async (formValues: UsuarioDTO): Promise<void> => {
+
+        if(sessionAPIToken == null) return;
 
         if (formValues.segundoNombre === "") formValues.segundoNombre = undefined;
         if (formValues.segundoApellido === "") formValues.segundoApellido = undefined;
@@ -124,7 +132,7 @@ function EditUserForm(props: Readonly<EditUserFormProps>): ReactElement {
         }
 
         // Obtiene la lista de cambios realizados en el usuario
-        const changes: ChangeEntry[] = await obtenerCambios(userModified, props.editingUser);
+        const changes: ChangeEntry[] = await obtenerCambios(userModified, props.editingUser, sessionAPIToken);
 
         // Si no hay cambios, no se realiza la modificación
         if (changes.length === 0) {
@@ -148,7 +156,7 @@ function EditUserForm(props: Readonly<EditUserFormProps>): ReactElement {
             buttonsType: ModalButtonsType.CONFIRM_CANCEL,
             async onConfirm(): Promise<void> { // Acción al confirmar
                 // Realiza la modificación del usuario en la API
-                const response: void | FetchAPIError = await modificarUsuario(userModified, props.sessionAPIToken)
+                const response: void | FetchAPIError = await modificarUsuario(userModified, sessionAPIToken)
 
                 if (isFetchAPIError(response)) {
                     const errorMessage: string = response.errorMessage;
@@ -192,8 +200,11 @@ function EditUserForm(props: Readonly<EditUserFormProps>): ReactElement {
     // ------------------------------------------------------------------------
 
     function handleBtnTelefonos(): void {
+
+        if(sessionAPIToken == null) return;
+
         createModal({
-            children: (<TableTelefonosFC usuario={props.editingUser} sessionAPIToken={props.sessionAPIToken}/>),
+            children: (<TableTelefonosFC usuario={props.editingUser} sessionAPIToken={sessionAPIToken}/>),
             buttonsType: ModalButtonsType.CLOSE
         }).show();
     }
@@ -336,7 +347,7 @@ export default EditUserForm;
  * @param editingUser Objeto con los datos del usuario editado
  * @param originalData Datos originales del usuario
  */
-async function obtenerCambios(editingUser: UsuarioDTO, originalData: UsuarioDTO): Promise<ChangeEntry[]> {
+async function obtenerCambios(editingUser: UsuarioDTO, originalData: UsuarioDTO, sessionApiToken: string): Promise<ChangeEntry[]> {
 
     // Lista de cambios en la modificación del usuario
     const changes: ChangeEntry[] = [];
@@ -350,7 +361,7 @@ async function obtenerCambios(editingUser: UsuarioDTO, originalData: UsuarioDTO)
         let newPerfilName: string | undefined = undefined;
 
         if (originalData.idPerfil) {
-            await buscarPerfilPorId(originalData.idPerfil).then(async (response: PerfilDTO | FetchAPIError): Promise<void> => {
+            await buscarPerfilPorId(originalData.idPerfil, sessionApiToken).then(async (response: PerfilDTO | FetchAPIError): Promise<void> => {
                 if (isFetchAPIError(response)) {
                     console.error('Error al obtener el perfil anterior:', response);
                     return;
@@ -360,7 +371,7 @@ async function obtenerCambios(editingUser: UsuarioDTO, originalData: UsuarioDTO)
         }
 
         if (editingUser.idPerfil) {
-            await buscarPerfilPorId(editingUser.idPerfil).then(async (response: PerfilDTO | FetchAPIError): Promise<void> => {
+            await buscarPerfilPorId(editingUser.idPerfil, sessionApiToken).then(async (response: PerfilDTO | FetchAPIError): Promise<void> => {
                 if (isFetchAPIError(response)) {
                     console.error('Error al obtener el nuevo perfil:', response);
                     return;
