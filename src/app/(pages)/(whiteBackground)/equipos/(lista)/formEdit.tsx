@@ -85,7 +85,8 @@ function EditEquipoForm(props: Readonly<EditEquipoFormProps>): ReactElement {
         register,               // Método para registrar los inputs del formulario
         handleSubmit,           // Método para manejar el envío del formulario
         formState: {errors},     // Propiedad que contiene los errores del formulario
-        setValue
+        setValue,
+        watch
     }: UseFormReturn<FormValues> = useForm<FormValues>({ // Inicializamos useForm con el tipo EquipoFormData
         resolver: zodResolver(SchemaEquipo.merge(
             z.object({
@@ -118,6 +119,7 @@ function EditEquipoForm(props: Readonly<EditEquipoFormProps>): ReactElement {
 
     // Estado para almacenar la marca seleccionada
     const [selectedMarcaId, setSelectedMarcaId]: [number | undefined, (value: number | undefined) => void] = useState<number | undefined>(undefined);
+    const [selectedModelId, setSelectedModelId] = useState<number | undefined>(props.editingEquipo.idModelo);
 
     // Estado para almacenar los modelos de la marca seleccionada (Se actualiza al cambiar la marca seleccionada)
     let [modelosPorMarca, setModelosPorMarca]: [ModeloDTO[], (value: ModeloDTO[]) => void] = useState<ModeloDTO[]>([]); // Es let porque cambía según la marca seleccionada
@@ -130,6 +132,16 @@ function EditEquipoForm(props: Readonly<EditEquipoFormProps>): ReactElement {
 
     // Estado para almacenar las imágenes del equipo (Para el carrusel)
     let [images, setImages]: [ImagenDTO[], (value: ImagenDTO[]) => void] = useState<ImagenDTO[]>([]);
+
+    const garantiaDePorVida = watch('garantiaDePorVida');
+
+    useEffect(() => {
+        if (garantiaDePorVida) {
+            setValue('garantiaAnios', 0);
+            setValue('garantiaMeses', 0);
+            setValue('garantiaDias', 0);
+        }
+    }, [garantiaDePorVida, setValue]);
 
     // Efecto que se ejecuta al montar el componente y cuando cambia el equipo a editar
     // - Carga las imágenes del equipo
@@ -233,26 +245,27 @@ function EditEquipoForm(props: Readonly<EditEquipoFormProps>): ReactElement {
     }, [props.sessionAPIToken, props.editingEquipo.idModelo, sessionAPIToken]); // Se ejecuta solo al montar el componente o si cambia el sessionAPIToken
 
 
-    // Efecto que se ejecuta al cambiar la marca seleccionada (Carga los modelos de la marca seleccionada)
-    useEffect((): void => {
+    useEffect(() => {
+        // Cuando cambia la marca seleccionada, filtra los modelos para esa marca
         if (selectedMarcaId) {
-            const nuevosModelosPorMarca = modelos.filter((modelo: ModeloDTO) => modelo.idMarca === selectedMarcaId);
-            setModelosPorMarca(nuevosModelosPorMarca);
+            const modelosFiltrados = modelos.filter(modelo => modelo.idMarca === selectedMarcaId);
+            setModelosPorMarca(modelosFiltrados);
 
-            // Actualizar el idModelo solo si existen modelos para la marca seleccionada
-            if (nuevosModelosPorMarca.length > 0 && nuevosModelosPorMarca[0].id) {
-                // Establecemos el valor explícitamente en el formulario para que lo detecte como cambio
-                setValue("idModelo", nuevosModelosPorMarca[0].id, { shouldDirty: true });
-            } else {
-                // Si no hay modelos, se resetea el valor del modelo
-                setValue("idModelo", 0, { shouldDirty: true });
+            const modeloEquipo = modelosFiltrados.find(modelo => modelo.id === props.editingEquipo.idModelo);
+            if (modeloEquipo) {
+                // Si el modelo actual del equipo está en los modelos filtrados, lo selecciona
+                setSelectedModelId(props.editingEquipo.idModelo);
+            } else if (modelosFiltrados.length > 0) {
+                // Si el modelo no está, selecciona el primero de la lista
+                setSelectedModelId(modelosFiltrados[0].id);
             }
-        } else {
-            setModelosPorMarca([]);
-            setValue("idModelo", 0, { shouldDirty: true });
         }
-    }, [selectedMarcaId, modelos, setValue]);
+    }, [selectedMarcaId, modelos, props.editingEquipo.idModelo]);
 
+    useEffect(() => {
+        if(selectedModelId)
+        setValue("idModelo", selectedModelId);
+    }, [selectedModelId, setValue]);
 
 
     // ----------------------- Eventos del formulario de edición de equipo -----------------------
@@ -519,14 +532,12 @@ function EditEquipoForm(props: Readonly<EditEquipoFormProps>): ReactElement {
                             <ComboBoxFC
                                 message={"Seleccione un modelo"}
                                 register={register("idModelo")}
-                                elements={modelosPorMarca.map((modelo: ModeloDTO): {
-                                    key: number,
-                                    value: string
-                                } => ({
+                                elements={modelosPorMarca.map((modelo: ModeloDTO) => ({
                                     key: modelo.id as number,
                                     value: modelo.nombre
                                 }))}
-                                selectedKey={props.editingEquipo.idModelo}
+                                selectedKey={selectedModelId}
+                                onChange={(e) => setSelectedModelId(parseInt(e.target.value))}
                             />
                         )
                         :
@@ -557,16 +568,19 @@ function EditEquipoForm(props: Readonly<EditEquipoFormProps>): ReactElement {
                         <div>
                             <label htmlFor="garantiaAnios">Años</label>
                             <input id="garantiaAnios" type="number" {...register('garantiaAnios')}
+                                   disabled={garantiaDePorVida}
                                    min={0} max={20}/>
                         </div>
                         <div>
                             <label htmlFor="garantiaMeses">Meses</label>
                             <input id="garantiaMeses" type="number" {...register('garantiaMeses')}
+                                   disabled={garantiaDePorVida}
                                    min={0} max={12}/>
                         </div>
                         <div>
                             <label htmlFor="garantiaDias">Días</label>
                             <input id="garantiaDias" type="number" {...register('garantiaDias')}
+                                   disabled={garantiaDePorVida}
                                    min={0} max={31}/>
                         </div>
                         <div>
