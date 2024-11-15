@@ -12,7 +12,7 @@ import {Metadata} from "next";
 
 // Define la metadata de la página
 export const metadata: Metadata = {
-    title: 'PInfra DD - Lista de equipos'
+    title: 'PFT - Lista de equipos'
 };
 
 // Define la página de lista de equipos ("/equipos")

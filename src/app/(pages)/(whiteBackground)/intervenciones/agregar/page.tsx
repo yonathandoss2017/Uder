@@ -13,7 +13,7 @@ import UsuarioDTO from "@/types/dtos/UsuarioDTO"; // DTO del usuario
 
 // Metadata de la página
 export const metadata: Metadata = {
-    title: 'PInfra DD - Agregar intervención'
+    title: 'PFT - Agregar intervención'
 };
 
 // Componente de página principal

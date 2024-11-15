@@ -10,7 +10,7 @@ import ErrorFC from "@/components/ErrorFC";
 import TableIntervencionFC from "@/app/(pages)/(whiteBackground)/intervenciones/(lista)/table";
 
 export const metadata: Metadata = {
-    title: 'PInfra DD - Lista de Intervenciones',
+    title: 'PFT - Lista de Intervenciones',
 };
 
 const IntervencionPage = async (): Promise<ReactElement> => {

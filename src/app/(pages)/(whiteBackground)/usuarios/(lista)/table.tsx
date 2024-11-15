@@ -122,9 +122,6 @@ function TableUsersFC(props: Readonly<TableUsersFCProps>): ReactElement {
                         setPerfilCliente(response)
                     }
                 }
-
-                // Aquí puedes manejar lo que harás con los datos de la institución y el perfilCliente
-                // Por ejemplo, actualizar el estado o realizar otras acciones
             } catch (error) {
                 console.error("ERROR - lista de usuarios - page.tsx - obtenerDatosCliente: ", error);
             }

@@ -17,7 +17,7 @@ import {buscarInstitucionPorId} from "@/services/InstitucionService";
 
 // Define la metadata de la página
 export const metadata: Metadata = {
-    title: 'PInfra DD - Lista de usuarios'
+    title: 'PFT - Lista de usuarios'
 };
 
 // Define la página de lista de usuarios

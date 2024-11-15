@@ -16,7 +16,7 @@ import LoadingPage from "@/app/(pages)/loading";
 
 // Define la metadata de la página
 export const metadata: Metadata = {
-    title: 'PInfra DD - Registrar usuario'
+    title: 'PFT - Registrar usuario'
 };
 
 // Define la página de registro de usuario

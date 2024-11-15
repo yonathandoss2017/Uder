@@ -11,7 +11,7 @@ import ErrorFC from "@/components/ErrorFC";
 import RegisterPerfilForm from "@/app/(pages)/(whiteBackground)/perfiles/agregar/form";
 
 export const metadata: Metadata = {
-    title: 'PInfra DD - Agregar perfil'
+    title: 'PFT - Agregar perfil'
 };
 
 const RegisterPerfilPage = async (): Promise<ReactElement> => {

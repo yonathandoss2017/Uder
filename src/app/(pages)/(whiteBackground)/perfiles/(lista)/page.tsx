@@ -11,7 +11,7 @@ import ErrorFC from "@/components/ErrorFC";
 import TablePerfilesFC from "@/app/(pages)/(whiteBackground)/perfiles/(lista)/table";
 
 export const metadata: Metadata = {
-    title: 'PInfra DD - Lista de perfiles'
+    title: 'PFT - Lista de perfiles'
 };
 
 const PerfilesPage = async (): Promise<ReactElement> => {

@@ -10,7 +10,7 @@ import ErrorFC from "@/components/ErrorFC";
 import TableModeloFC from "@/app/(pages)/(whiteBackground)/modelos/(lista)/table"; // Cambiado a TableModeloFC
 
 export const metadata: Metadata = {
-    title: 'PInfra DD - Lista de modelos',
+    title: 'PFT - Lista de modelos',
 };
 
 const ModeloPage = async (): Promise<ReactElement> => {
