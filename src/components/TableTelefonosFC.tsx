@@ -125,7 +125,7 @@ function TableTelefonosFC(props: Readonly<TableTelefonosFCProps>): ReactElement 
                                     <br/>
                                     <p>Detalles del error:</p>
                                     <div>
-                                        <pre>{JSON.stringify(response, null, 2)}</pre>
+                                        <p>{response.errorMessage}</p>
                                     </div>
                                 </div>
                             ),
