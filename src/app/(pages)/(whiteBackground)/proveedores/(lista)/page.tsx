@@ -11,7 +11,7 @@ import ErrorFC from "@/components/ErrorFC";
 import TableProveedoresFC from "@/app/(pages)/(whiteBackground)/proveedores/(lista)/table";
 
 export const metadata: Metadata = {
-    title: 'PInfra DD - Lista de proveedores'
+    title: 'PFT - Lista de proveedores'
 };
 
 const ProveedoresPage = async (): Promise<ReactElement> => {

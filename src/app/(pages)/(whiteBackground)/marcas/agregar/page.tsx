@@ -12,7 +12,7 @@ import ErrorFC from "@/components/ErrorFC";
 import styles from "@public/styles/modules/register.equipo.module.css";
 
 export const metadata: Metadata = {
-    title: 'PInfra DD - Agregar equipo'
+    title: 'PFT - Agregar equipo'
 };
 
 const RegisterMarcaPage = async(): Promise<ReactElement> => {

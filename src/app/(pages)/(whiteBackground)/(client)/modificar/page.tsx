@@ -18,7 +18,7 @@ import {verificarPermiso} from "@/services/SessionService";
 
 // Define la metadata de la página
 export const metadata = {
-    title: 'PInfra DD - Modificar Cuenta'
+    title: 'PFT - Modificar Cuenta'
 };
 
 // Define la página de registro de usuario

@@ -11,7 +11,7 @@ import ErrorFC from "@/components/ErrorFC";
 import RegisterProveedorForm from "@/app/(pages)/(whiteBackground)/proveedores/agregar/form";
 
 export const metadata: Metadata = {
-    title: 'PInfra DD - Agregar proveedor'
+    title: 'PFT - Agregar proveedor'
 };
 
 const RegisterProveedorPage = async (): Promise<ReactElement> => {

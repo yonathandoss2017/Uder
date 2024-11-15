@@ -11,7 +11,7 @@ import ErrorFC from "@/components/ErrorFC";
 import RegisterModeloForm from "@/app/(pages)/(whiteBackground)/modelos/agregar/form";
 
 export const metadata: Metadata = {
-    title: 'PInfra DD - Agregar modelo'
+    title: 'PFT - Agregar modelo'
 };
 
 const RegisterModeloPage = async (): Promise<ReactElement> => {

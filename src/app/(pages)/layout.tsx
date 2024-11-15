@@ -9,8 +9,8 @@ import AuthLayout from "./AuthLayout";
 
 // Define los metadatos de la aplicación
 export const metadata = {
-    title: 'PInfra DD', // Título de la aplicación
-    description: 'LTI - Proyecto de Infraestructura', // Descripción de la aplicación
+    title: 'PFT', // Título de la aplicación
+    description: 'LTI - Proyecto Final de Tecnicatura', // Descripción de la aplicación
     icons: [
         {rel: 'icon', url: Favicon.src}, // Icono de la aplicación
     ]

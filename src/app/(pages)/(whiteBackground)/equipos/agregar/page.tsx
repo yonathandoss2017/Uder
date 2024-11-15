@@ -18,7 +18,7 @@ import ErrorFC from "@/components/ErrorFC";
 
 // Define la metadata de la página
 export const metadata: Metadata = {
-    title: 'PInfra DD - Agregar equipo'
+    title: 'PFT - Agregar equipo'
 };
 
 // Define la página de registro de equipos

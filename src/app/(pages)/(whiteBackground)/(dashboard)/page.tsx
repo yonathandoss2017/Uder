@@ -16,7 +16,7 @@ import {listarAuditorias} from "@/services/AuditoriaService";
 
 // Define la metadata de la página principal
 export const metadata: Metadata = {
-    title: 'PInfra DD - Panel Principal',
+    title: 'PFT - Panel Principal',
 };
 
 // Define la página principal de la aplicación
