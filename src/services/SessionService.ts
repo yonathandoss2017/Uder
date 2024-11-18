@@ -90,6 +90,7 @@ export async function renovarToken(token: string): Promise<string | FetchAPIErro
     return response.token;
 }
 
+
 /**
  * Función para buscar un usuario por medio de un token de sesión.
  * @param token - Token de sesión del cliente en la API
