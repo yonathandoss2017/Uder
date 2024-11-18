@@ -33,13 +33,12 @@ sonarqube-check:
     paths:
       - .sonar/cache
   script:
-    - sonar-scanner 
-      -Dsonar.projectKey=$SONAR_PROJECT_KEY
-      -Dsonar.host.url=$SONAR_HOST_URL
-      -Dsonar.login=$SONAR_TOKEN
+    - sonar-scanner \
+      -D"sonar.projectKey=$SONAR_PROJECT_KEY_WEB" \
+      -D"sonar.host.url=$SONAR_HOST_URL" \
+      -D"sonar.login=$SONAR_TOKEN_WEB"
   allow_failure: true
   only:
     - sonarQube
   tags:
     - web
-    
