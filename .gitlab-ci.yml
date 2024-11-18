@@ -1,6 +1,7 @@
 stages:
   - build
   - deploy
+  - sonarqube
 
 build-job:
   stage: build
@@ -9,7 +10,6 @@ build-job:
     - echo "Compile complete."
   tags:
     - web
-
 
 deploy-job:
   stage: deploy
@@ -21,6 +21,7 @@ deploy-job:
     - web
 
 sonarqube-check:
+  stage: sonarqube
   image:
     name: sonarsource/sonar-scanner-cli:latest
     entrypoint: [""]
