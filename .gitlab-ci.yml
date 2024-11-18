@@ -33,9 +33,9 @@ sonarqube-check:
     paths:
       - .sonar/cache
   script:
-    - sonar-scanner \
-      -Dsonar.projectKey=$SONAR_PROJECT_KEY \
-      -Dsonar.host.url=$SONAR_HOST_URL \
+    - sonar-scanner 
+      -Dsonar.projectKey=$SONAR_PROJECT_KEY
+      -Dsonar.host.url=$SONAR_HOST_URL
       -Dsonar.login=$SONAR_TOKEN
   allow_failure: true
   only:
