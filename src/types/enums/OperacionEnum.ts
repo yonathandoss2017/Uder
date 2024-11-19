@@ -31,7 +31,7 @@ enum OperacionEnum {
     ALTA_FUNCIONALIDAD=27,
     MODIFICAR_FUNCIONALIDAD=29,
     BAJA_FUNCIONALIDAD=29,
-    ASIGNAR_FUNCIONALIDADES=30,
+    ASIGNAR_FUNCIONALIDAD=30,
     ASIGNAR_PERMISOS=31,
     ALTA_INTERVENCION = 32,
     TRABAJAR_INTERVENCION = 33
@@ -103,7 +103,7 @@ export function translateOperacionEnum(operacionEnum: OperacionEnum | string): s
             return "Modificación de funcionalidad";
         case OperacionEnum.BAJA_FUNCIONALIDAD:
             return "Baja de funcionalidad";
-        case OperacionEnum.ASIGNAR_FUNCIONALIDADES:
+        case OperacionEnum.ASIGNAR_FUNCIONALIDAD:
             return "Asignar funcionalidad";
         case OperacionEnum.ASIGNAR_PERMISOS:
             return "Asignar permisos";
