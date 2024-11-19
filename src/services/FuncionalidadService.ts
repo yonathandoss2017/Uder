@@ -1,3 +1,4 @@
+"use server";
 
 import FetchAPIError, {isFetchAPIError} from "@/types/errors/FetchAPIError";
 import {fetchBodyWithErrorHandling, fetchVoidWithErrorHandling} from "@/utils/ServiceMethods";
@@ -32,6 +33,7 @@ export async function listarFuncionalidades(
         sortDirectionAsc: sortDirectionAsc.toString()
     });
     const url: string = `${SERVICE_PATH}/listar?${queryParams}`; // URL de la petición a la API
+
     // Opciones de la petición
     const options: RequestInit = {
         method: 'GET',
