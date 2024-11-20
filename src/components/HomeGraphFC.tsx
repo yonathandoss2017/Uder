@@ -9,6 +9,7 @@ import DoughnutGraphFC from "@/components/DoughnutGraphFC";
 import {contarEquipos} from "@/services/EquiposService";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faHammer, faNotesMedical, faShieldHalved} from "@fortawesome/free-solid-svg-icons";
+import {useToken} from "@/app/hooks/TokenProvider";
 
 // Enumeración para los tipos de gráficos disponibles
 enum GraphType {
@@ -33,6 +34,10 @@ export interface HomeGraphFCProps {
  * @returns {ReactElement} - Elemento React que representa el componente.
  */
 const HomeGraphFC: React.FC<HomeGraphFCProps> = (props: HomeGraphFCProps): ReactElement => {
+
+    // Obtenemos el token de sesión del cliente
+    const {sessionAPIToken } = useToken();
+
     // Estados para almacenar la cantidad de equipos, equipos activos, equipos en garantía y equipos en intervención respectivamente
     const [cantEquipos, setCantEquipos]: [number, (value: number) => void] = useState<number>(0);
     const [cantEquiposActivos, setCantEquiposActivos]: [number, (value: number) => void] = useState<number>(0);
@@ -52,11 +57,14 @@ const HomeGraphFC: React.FC<HomeGraphFCProps> = (props: HomeGraphFCProps): React
 
         // Prócedimiento asíncrono autoinvocado que actualiza los datos y valores del gráfico
         (async (): Promise<void> => {
+
+            if(sessionAPIToken === undefined || sessionAPIToken==null) return;
+
             // Actualizar la cantidad de equipos, equipos activos, equipos en garantía y equipos en intervención
-            setCantEquipos(await contarEquipos(props.sessionAPIToken));
-            setCantEquiposActivos(await contarEquipos(props.sessionAPIToken, {activo: true}));
-            setCantEquiposEnGarantia(await contarEquipos(props.sessionAPIToken, {garantiaEnFecha: new Date()}));
-            setCantEquiposEnIntervencion(await contarEquipos(props.sessionAPIToken, {enIntervencion: true}));
+            setCantEquipos(await contarEquipos(sessionAPIToken));
+            setCantEquiposActivos(await contarEquipos(sessionAPIToken, {activo: true}));
+            setCantEquiposEnGarantia(await contarEquipos(sessionAPIToken, {garantiaEnFecha: new Date()}));
+            setCantEquiposEnIntervencion(await contarEquipos(sessionAPIToken, {enIntervencion: true}));
 
         })();
     }, []);
