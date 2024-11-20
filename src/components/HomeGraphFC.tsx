@@ -67,7 +67,7 @@ const HomeGraphFC: React.FC<HomeGraphFCProps> = (props: HomeGraphFCProps): React
             setCantEquiposEnIntervencion(await contarEquipos(sessionAPIToken, {enIntervencion: true}));
 
         })();
-    }, []);
+    }, [sessionAPIToken]);
 
 
     /**
