@@ -109,21 +109,8 @@ export async function agregarPerfil(perfil: PerfilDTO, token: string): Promise<P
             nivel: perfil.nivel      // Enviar solo el nivel del perfil
         })
     };
-
-    try {
-        const response = await fetch(url, options);
-
-        // Verifica si la respuesta fue exitosa
-        if (!response.ok) {
-            const errorData = await response.json();
-            return { errorMessage: errorData.message } as FetchAPIError;
-        }
-
-        const data = await response.json();
-        return data as PerfilDTO; // Devuelve el perfil actualizado
-    } catch (error) {
-        return { errorMessage: 'Error en la solicitud al servidor.' } as FetchAPIError;
-    }
+    // Realiza la petición a la API y retorna el resultado
+    return await fetchBodyWithErrorHandling<PerfilDTO>(url, options);
 }
 
 /**
