@@ -17,6 +17,8 @@ const SignOut = () => {
     // Obtiene la sesión del usuario (NextAuth)
     const {data: sessionData}: { data: Session | null } = useSession();
 
+    localStorage.removeItem('expiresTimeTimestamp');
+
     if(sessionData) sessionData.user.sessionAPIToken = undefined;
 
     if (document.cookie.includes('sessionToken')) {
