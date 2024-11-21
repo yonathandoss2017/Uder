@@ -57,6 +57,7 @@ function AuthLayout({children}: Readonly<{ children: ReactNode }>) {
         buttonsType: ModalButtonsType.CONFIRM_CANCEL,
         onConfirm: async (): Promise<void> => {
             expiresTimeTimestampRef.current = Date.now() + 300000;
+            localStorage.setItem('expiresTimeTimestamp', expiresTimeTimestampRef.current.toString());
             if (session?.user.sessionAPIToken) {
                 const response: string | FetchAPIError = await renovarToken(session?.user.sessionAPIToken);
                 if (isFetchAPIError(response)) {
@@ -72,9 +73,21 @@ function AuthLayout({children}: Readonly<{ children: ReactNode }>) {
         onCancel: (): void => {
             setSessionModalActive(false);
             document.cookie = `sessionToken=;max-age=0;path=/;samesite=strict;secure`;
+            localStorage.removeItem('expiresTimeTimestamp');
             signOut({redirect: true, callbackUrl: "/login"})
         }
     });
+
+    // Inicializar expiresTimeTimestampRef.current desde localStorage
+    useEffect(() => {
+        const storedExpirationTime = localStorage.getItem('expiresTimeTimestamp');
+        if (storedExpirationTime) {
+            expiresTimeTimestampRef.current = parseInt(storedExpirationTime, 10);
+        } else {
+            expiresTimeTimestampRef.current = Date.now() + 300000;
+            localStorage.setItem('expiresTimeTimestamp', expiresTimeTimestampRef.current.toString());
+        }
+    }, []);
 
 
     useEffect(() => {
@@ -94,6 +107,7 @@ function AuthLayout({children}: Readonly<{ children: ReactNode }>) {
                     if (session?.user?.sessionAPIToken && !session.user.error) {
                         console.log("Esta activo con token renovado")
                         expiresTimeTimestampRef.current = Date.now() + 300000;
+                        localStorage.setItem('expiresTimeTimestamp', expiresTimeTimestampRef.current.toString());
                         const response: string | FetchAPIError = await renovarToken(session?.user.sessionAPIToken);
                         if (isFetchAPIError(response)) {
                             console.error("ERROR - EquiposPage_renovarToken: ", response);
@@ -114,6 +128,7 @@ function AuthLayout({children}: Readonly<{ children: ReactNode }>) {
                 if(timeRemaining<=0){
                     if(pathname != "/login" && pathname != "/login/google" && pathname != "/signup" && pathname != "/signup/google" && pathname != "/signup/ad" ) {
                         document.cookie = `sessionToken=;max-age=0;path=/;samesite=strict;secure`;
+                        localStorage.removeItem('expiresTimeTimestamp');
                         signOut({redirect: true, callbackUrl: "/login"})
                     }
                 }
@@ -133,6 +148,7 @@ function AuthLayout({children}: Readonly<{ children: ReactNode }>) {
                 sessionModal.close();
                 setSessionModalActive(false);
                 setShowSessionExpiredError(true);
+                localStorage.removeItem('expiresTimeTimestamp');
             }
         }, 5000);
 
@@ -147,6 +163,7 @@ function AuthLayout({children}: Readonly<{ children: ReactNode }>) {
     // Muestra un mensaje de error si se produce un error de sesión
     if (showSessionExpiredError || session?.user?.error) {
         if(pathname != "/login" && pathname != "/login/google" && pathname != "/signup/google" && pathname != "/signup/ad" && pathname != "/signup") {
+            localStorage.removeItem('expiresTimeTimestamp');
             signOut({redirect: true, callbackUrl: "/login"})
         }
     }
