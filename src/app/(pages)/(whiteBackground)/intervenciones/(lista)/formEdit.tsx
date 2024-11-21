@@ -160,8 +160,8 @@ function TrabajarIntervencionForm(props: Readonly<EditIntervencionFormProps>): R
                 <div className={styles.inputBox}>
                     <label className={styles.details}>Comentarios</label>
                     <textarea {...register("comentarios")} defaultValue={props.editingIntervencion.comentarios || ""} />
-                    {errors.comentarios &&
-                        <label className={styles.error} style={{color: 'red'}}>{errors.comentarios.message}</label>}                </div>
+                    {errors.comentarios && <label className={styles.error} style={{color: 'red'}}>{errors.comentarios.message}</label>}
+                </div>
                 <div className={styles.inputBox}>
                     <label className={styles.details}>Tipo de Intervención<span className={styles.requiredField}>*</span>
                     <ComboBoxFC
