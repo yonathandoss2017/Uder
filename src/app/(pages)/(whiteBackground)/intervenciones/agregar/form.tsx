@@ -1,6 +1,6 @@
 'use client'
 import React, {useEffect, useState} from "react";
-import {SubmitHandler, useForm} from "react-hook-form";
+import {SubmitHandler, useForm, UseFormReturn} from "react-hook-form";
 import {agregarIntervencion} from "@/services/IntervencionService";
 import {buscarPorNumSerie, listarEquipos} from "@/services/EquiposService";
 import {listarTiposIntervencion} from "@/services/TipoIntervencionService";
@@ -11,12 +11,12 @@ import LoadingPage from "@/app/(pages)/loading";
 import ComboBoxFC from "@/components/ComboBoxFC";
 import {isFetchAPIError} from "@/types/errors/FetchAPIError";
 import {useToken} from "@/app/hooks/TokenProvider";
+import {zodResolver} from "@hookform/resolvers/zod";
+import SchemaIntervencion from "@/validations/SchemaIntervencion";
+import IntervencionDTO from "@/types/dtos/IntervencionDTO";
 
-interface FormValues {
-    fechaHora: string;
+interface FormValues extends IntervencionDTO{
     numSerieEquipo: string
-    motivo: string;
-    comentarios?: string;
 }
 
 interface RegisterIntervencionFormProps {
@@ -29,15 +29,19 @@ const RegisterIntervencionForm: React.FC<RegisterIntervencionFormProps> = (props
     const {sessionAPIToken } = useToken();
 
     const { createModal } = useModal();
-    const { register, handleSubmit, formState: { errors }, reset } = useForm<FormValues>();
+    const {
+        register,
+        handleSubmit,
+        formState: { errors },
+        reset } : UseFormReturn<FormValues> = useForm<FormValues>({
+            resolver: zodResolver(SchemaIntervencion),
+            mode: 'all'
+        }
+    );
 
     const [tiposIntervencion, setTiposIntervencion] = useState<any[]>([]);
     const [selectedTipoIntervencionId, setSelectedTipoIntervencionId] = useState<number | undefined>(undefined);
     const [loaded, setLoaded] = useState<boolean>(false);
-
-    // Paginación
-    const [paginaActual, setPaginaActual] = useState<number>(1);
-    const equiposPorPagina = 5;
 
     useEffect(() => {
 
@@ -76,6 +80,7 @@ const RegisterIntervencionForm: React.FC<RegisterIntervencionFormProps> = (props
             return;
         }
 
+        console.log(formValues.numSerieEquipo);
         const equipo = await buscarPorNumSerie(formValues.numSerieEquipo, sessionAPIToken);
         if (isFetchAPIError(equipo)) {
             createModal({
@@ -167,6 +172,7 @@ const RegisterIntervencionForm: React.FC<RegisterIntervencionFormProps> = (props
                         <span>Tipo de Intervención <span className={styles.requiredField}>*</span></span>
                         <ComboBoxFC
                             message="Seleccione un tipo de intervención"
+                            register={register("idTipoIntervencion")}
                             elements={tiposIntervencion.map(tipo => ({
                                 key: tipo.id,
                                 value: tipo.nombre
@@ -191,6 +197,7 @@ const RegisterIntervencionForm: React.FC<RegisterIntervencionFormProps> = (props
                     <label className={styles.details}>
                         <span>Comentarios</span>
                         <textarea {...register("comentarios")} placeholder="Comentarios adicionales" />
+                        {errors.comentarios && <label className={styles.error}>{errors.comentarios.message}</label>}
                     </label>
                 </div>
                 <div className={styles.buttomAe}>
