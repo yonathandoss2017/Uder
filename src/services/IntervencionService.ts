@@ -46,22 +46,7 @@ export async function agregarIntervencion(intervencion: IntervencionDTO, token: 
         body: JSON.stringify(intervencion) // Cuerpo de la petición con los datos de intervención
     };
 
-    try {
-        const response = await fetch(url, options); // Realiza la petición a la API
-        if (!response.ok) {
-            const errorText = await response.text();
-            return {
-                errorMessage: `Error en la solicitud: ${errorText}`,
-                status: response.status // Obtén el estado de la respuesta
-            } as FetchAPIError; // Retorna un objeto que cumple con la interfaz
-        }
-        return await response.json(); // Retorna la intervención agregada
-    } catch (error) {
-        return {
-            errorMessage: `Error de red: ${error instanceof Error ? error.message : 'Error desconocido'}`,
-            status: 500 // Código de error genérico para errores de red
-        } as FetchAPIError; // Retorna un objeto que cumple con la interfaz
-    }
+    return await fetchBodyWithErrorHandling<IntervencionDTO>(url, options);
 }
 
 /**
