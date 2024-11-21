@@ -214,19 +214,6 @@ const RegisterEquipoForm: React.FC<RegisterEquipoFormProps> = (props: RegisterEq
             return;
         }
 
-        if(!formValues.garantiaDePorVida && formValues.garantiaAnios === 0 && formValues.garantiaMeses === 0 && formValues.garantiaDias === 0){
-            createModal({
-                children: (
-                    <div>
-                        <h2>Error al registrar el equipo</h2>
-                        <p>Debe ingresar una garantía</p>
-                    </div>
-                ),
-                buttonsType: ModalButtonsType.CONFIRM
-            }).show();
-            return;
-        }
-
         // Se crea un nuevo objeto GarantiaDTO con los valores de garantía del formulario
         const nuevoGarantiaDTO: GarantiaDTO = {
             anios: formValues.garantiaAnios,
