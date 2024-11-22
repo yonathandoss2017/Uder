@@ -80,7 +80,6 @@ const RegisterIntervencionForm: React.FC<RegisterIntervencionFormProps> = (props
             return;
         }
 
-        console.log(formValues.numSerieEquipo);
         const equipo = await buscarPorNumSerie(formValues.numSerieEquipo, sessionAPIToken);
         if (isFetchAPIError(equipo)) {
             createModal({

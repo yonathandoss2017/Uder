@@ -131,6 +131,7 @@ function TableIntervencionFC(props: Readonly<TableIntervencionFCProps>): ReactEl
                 // Calcula el número de páginas
                 const total: number = Number(response);
                 const totalPages: number = Math.ceil(total / recordsPerPage);
+
                 setNpage(totalPages);
                 if (totalPages > 0 && currentPage > totalPages) {
                     setCurrentPage(totalPages);
