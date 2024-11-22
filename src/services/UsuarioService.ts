@@ -176,11 +176,18 @@ export async function generarNombreUsuario(primerNombre: string, segundoNombre: 
 }
 
 export async function verificarAD(nombreUsuario: string, password: string, dominio: string): Promise<boolean | FetchAPIError> {
+
+    console.log("NOMBRE USUARIO ", nombreUsuario);
+    console.log("PASSWORD ", password)
+    console.log("DOMINIO ", dominio);
+
     const queryParams: URLSearchParams = new URLSearchParams({
         ...(!!nombreUsuario && {nombreUsuario: nombreUsuario}),
         ...(!!password && {password: password}),
         ...(!!dominio && {dominio: dominio})
     })
+
+    console.log("QUERY PARAMS ", queryParams);
 
     const url: string = `${SERVICE_PATH}/verificar-ad?${queryParams}`; // URL de la petición a la API
 
