@@ -99,7 +99,11 @@ const RegisterFormClientAd = () => {
     // Función que se ejecuta al enviar el formulario
     const onSubmit: SubmitHandler<FormValues> = async (formValues: FormValues): Promise<void> => {
 
+        console.log("EN EL SUMBIT")
+
         const telefono: number = Number(formValues.telefono);
+
+        console.log("DESPUES DE TELEFONO ", telefono)
 
         const usuario: UsuarioDTO = {
             primerNombre: formValues.primerNombre,
@@ -115,7 +119,17 @@ const RegisterFormClientAd = () => {
             idInstitucion: idInstitucionSelected,
         };
 
+
+        console.log("Usuario ", usuario)
+
+        console.log("generar ", formValues.primerNombre, formValues?.segundoNombre, formValues.primerApellido, formValues?.segundoApellido)
+
+
+
         const nombreUsuario: string | FetchAPIError = await generarNombreUsuario(formValues.primerNombre, formValues?.segundoNombre, formValues.primerApellido, formValues?.segundoApellido);
+
+
+        console.log("Nombre de usuario ", nombreUsuario)
 
         if (isFetchAPIError(nombreUsuario)) {
             console.error("ERROR - Registro propio - onSubmit - generarNombreUsuario: ", nombreUsuario);
