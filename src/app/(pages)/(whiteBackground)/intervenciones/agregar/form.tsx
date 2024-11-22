@@ -181,6 +181,8 @@ const RegisterIntervencionForm: React.FC<RegisterIntervencionFormProps> = (props
                             onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setSelectedTipoIntervencionId(parseInt(e.target.value))}
                         />
                     </label>
+                    {errors.idTipoIntervencion &&
+                        <label className={styles.error} style={{color: 'red'}}>{errors.idTipoIntervencion.message}</label>}
                 </div>
                 <div className={styles.inputBoxRe}>
                     <label className={styles.details}>
