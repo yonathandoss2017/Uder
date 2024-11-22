@@ -70,7 +70,7 @@ function TrabajarIntervencionForm(props: Readonly<EditIntervencionFormProps>): R
             motivo: formValues.motivo,
             comentarios: formValues.comentarios,
             idTipoIntervencion: formValues.idTipoIntervencion,
-            idEquipo: props.editingIntervencion.idEquipo
+            equipoDTO: props.editingIntervencion.equipoDTO
         };
 
         if (!modifiedIntervencion.id) {

@@ -108,7 +108,7 @@ const RegisterIntervencionForm: React.FC<RegisterIntervencionFormProps> = (props
                 fechaHora: formValues.fechaHora,
                 motivo: formValues.motivo,
                 comentarios: formValues.comentarios,
-                idEquipo: equipo.id,
+                equipoDTO: equipo,
                 idTipoIntervencion: selectedTipoIntervencionId,
                 idUsuario: props.clientData.id
             };

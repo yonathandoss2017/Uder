@@ -16,7 +16,6 @@ import styles from "@public/styles/modules/table/table.tipoequipos.module.css";
 import {useToken} from "@/app/hooks/TokenProvider";
 import LoadingPage from "@/app/(pages)/loading";
 import ComboBoxFC from "@/components/ComboBoxFC";
-import TipoEquipoDTO from "@/types/dtos/TipoEquipoDTO";
 
 interface TableIntervencionFCProps {
     sessionAPIToken: string;
@@ -215,7 +214,7 @@ function TableIntervencionFC(props: Readonly<TableIntervencionFCProps>): ReactEl
                                 <th>Fecha</th>
                                 <th>Tipo Intervención</th>
                                 <th>Equipo</th>
-                                <th>Ver Datos</th> {/* Cambiado de Comentarios a Ver Datos */}
+                                <th>Ver Datos</th>
                                 <th></th>
                             </tr>
                             </thead>
@@ -227,6 +226,7 @@ function TableIntervencionFC(props: Readonly<TableIntervencionFCProps>): ReactEl
                                         return tipo.id === intervencion.idTipoIntervencion;
                                     })?.nombre
                                     }</td>
+                                    <td>{intervencion.equipoDTO.nombre}</td>
                                     <td><button onClick={() => handleViewDataClick(intervencion)}>Ver Datos</button> {/* Cambiado el texto del botón */}</td>
                                     <td>
                                         {props.hasPermissionEdit && !ID_TIPOS_INTERVENCION_RESOLUCION.includes(intervencion.idTipoIntervencion) ? (
