@@ -52,16 +52,29 @@ export async function agregarIntervencion(intervencion: IntervencionDTO, token: 
 /**
  * Función para listar todas las intervenciones.
  * @param token - Token de autenticación
+ * @param size
+ * @param page
+ * @param fieldsort
+ * @param sortDirectionAsc
  * @param filter - Filtro para buscar intervenciones
  * @returns Promise<IntervencionDTO[] | FetchAPIError> - Lista de intervenciones o error.
  */
-export async function listarIntervenciones(token: string, filter: IntervencionFilter = {}): Promise<IntervencionDTO[] | FetchAPIError> {
+export async function listarIntervenciones(
+    token: string,
+    size:number =0, page: number =1, fieldsort:string = "id", sortDirectionAsc:boolean = true,
+    filter: IntervencionFilter = {}): Promise<IntervencionDTO[] | FetchAPIError> {
     // Transformar los filtros agregando el prefijo "filter_"
     const queryParams: URLSearchParams = new URLSearchParams({
+
+        //Parámetros de paginación
+        size: size.toString(),
+        page: page.toString(),
+        fieldsort: fieldsort,
+        sortDirectionAsc: sortDirectionAsc.toString(),
+
         ...(filter.fechaDesde && { filter_fechaDesde: filter.fechaDesde.toISOString().split('T')[0] }),
         ...(filter.fechaHasta && { filter_fechaHasta: filter.fechaHasta.toISOString().split('T')[0] }),
-        ...(filter.idEquipo && { filter_idEquipo: filter.idEquipo.toString() }),
-        ...(filter.idTipoIntervencion && { filter_idTipoIntervencion: filter.idTipoIntervencion.toString() })
+        ...(filter.tipoIntervencion && { filter_tipoIntervencion: filter.tipoIntervencion})
     });
 
     // Construcción de la URL con los parámetros correctos
@@ -75,6 +88,30 @@ export async function listarIntervenciones(token: string, filter: IntervencionFi
     };
 
     return await fetchBodyWithErrorHandling<IntervencionDTO[]>(url, options);
+}
+
+export async function contarIntervenciones(token: string, filter: IntervencionFilter = {}): Promise<number> {
+    const queryParams: URLSearchParams = new URLSearchParams({
+        ...(filter.fechaDesde && { filter_fechaDesde: filter.fechaDesde.toISOString().split('T')[0] }),
+        ...(filter.fechaHasta && { filter_fechaHasta: filter.fechaHasta.toISOString().split('T')[0] }),
+        ...(filter.tipoIntervencion && { filter_tipoIntervencion: filter.tipoIntervencion.toString() })
+    });
+
+    const url: string = `${SERVICE_PATH}/contar?${queryParams.toString()}`;
+    const options: RequestInit = {
+        method: 'GET',
+        headers: {
+            'Authorization': 'Bearer ' + token, // Cabecera de autorización con el token de sesión
+            'Content-Type': 'application/json' // Tipo de contenido JSON
+        }
+    };
+
+    return await fetchBodyWithErrorHandling<number>(url, options).then((response: number | FetchAPIError): number => {
+        if (isFetchAPIError(response)) {
+            return 0;
+        }
+        return response;
+    });
 }
 
 /**
