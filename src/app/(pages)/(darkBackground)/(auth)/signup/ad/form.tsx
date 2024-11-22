@@ -132,7 +132,13 @@ const RegisterFormClientAd = () => {
             return;
         }
 
+        console.log("Nombre de usuario generado: ", nombreUsuario);
+        console.log("Contrasenia  ", formValues.contrasenia);
+        console.log("Dominio  ", formValues.dominio);
+
        const existeAd: boolean | FetchAPIError = await verificarAD(nombreUsuario, formValues.contrasenia, formValues.dominio);
+
+       console.log("Existe AD: ", existeAd);
 
         if (isFetchAPIError(existeAd)) {
             console.error("ERROR - Registro propio - onSubmit - verificarAD: ", existeAd);
@@ -150,6 +156,10 @@ const RegisterFormClientAd = () => {
         }
 
         if (existeAd && !isFetchAPIError(existeAd)) {
+
+            console.log("Usuario existe en AD ", existeAd);
+            console.log("Usuario a registrar: ", usuario);
+            console.log("Telefono: ", telefono);
 
             const response: UsuarioDTO | FetchAPIError = await registrarConAD(usuario, telefono);
             if (isFetchAPIError(response)) {
