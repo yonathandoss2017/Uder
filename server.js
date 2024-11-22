@@ -17,7 +17,7 @@ const httpsOptions = {
 app.prepare().then(() => {
     https.createServer(httpsOptions, (req, res) => {
         handle(req, res);
-    }).listen(3000, 'localhost', () => {
+    }).listen(3000, '172.16.20.8', () => {
         console.log("Funciona la web con HTTPS");
     });
 });
