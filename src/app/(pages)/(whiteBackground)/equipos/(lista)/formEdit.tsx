@@ -778,9 +778,6 @@ async function obtenerCambios(editingEquipo: EquipoDTO,
         });
     }
 
-    console.log("Garantia anios origen ", originalData.garantia.anios);
-    console.log("Garantia anios edit ", editingEquipo.garantia.anios);
-
     // Verifica si hay cambios en la garantía del equipo
     // Años
     if (originalData.garantia.anios != editingEquipo.garantia.anios) {
@@ -791,9 +788,6 @@ async function obtenerCambios(editingEquipo: EquipoDTO,
         });
     }
 
-    console.log("Garantia meses origen ", originalData.garantia.meses);
-    console.log("Garantia meses edit ", editingEquipo.garantia.meses);
-
     // Meses
     if (originalData.garantia.meses != editingEquipo.garantia.meses) {
         changes.push({
@@ -802,9 +796,6 @@ async function obtenerCambios(editingEquipo: EquipoDTO,
             nextValue: editingEquipo.garantia.meses + " meses"
         });
     }
-
-    console.log("Garantia dias origen ", originalData.garantia.dias);
-    console.log("Garantia dias edit ", editingEquipo.garantia.dias);
 
     // Días
     if (originalData.garantia.dias != editingEquipo.garantia.dias) {

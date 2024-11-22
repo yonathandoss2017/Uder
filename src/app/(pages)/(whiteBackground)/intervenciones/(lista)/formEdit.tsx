@@ -42,8 +42,6 @@ function TrabajarIntervencionForm(props: Readonly<EditIntervencionFormProps>): R
         defaultValues: {...props.editingIntervencion}
     });
 
-    console.log("ERRORES TRABAJAR INTERVENCION ",errors);
-
     useEffect(() => {
 
         if(sessionAPIToken == null) return;
@@ -102,8 +100,6 @@ function TrabajarIntervencionForm(props: Readonly<EditIntervencionFormProps>): R
             children: ModalChangesFC(changes),
             buttonsType: ModalButtonsType.CONFIRM_CANCEL,
             async onConfirm(): Promise<void> {
-
-                console.log("Voy a modificar la intervencion", modifiedIntervencion)
 
                 const response: void | FetchAPIError = await modificarIntervencion(modifiedIntervencion, sessionAPIToken);
 

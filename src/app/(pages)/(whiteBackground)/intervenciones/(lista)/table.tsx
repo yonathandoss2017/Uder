@@ -4,18 +4,19 @@ import React, { ChangeEvent, MutableRefObject, ReactElement, useEffect, useRef, 
 import { useModal } from "@/app/hooks/modals/useModal";
 import IntervencionDTO from "@/types/dtos/IntervencionDTO";
 import FetchAPIError, { isFetchAPIError } from "@/types/errors/FetchAPIError";
-import { listarIntervenciones } from "@/services/IntervencionService";
-import { listarEquipos } from "@/services/EquiposService";
+import {contarIntervenciones, listarIntervenciones} from "@/services/IntervencionService";
 import { listarTiposIntervencion } from "@/services/TipoIntervencionService";
 import IntervencionFilter from "@/types/filters/IntervencionFilter";
 import stylesTable from "@public/styles/modules/table/table.tipoequipos.module.css";
 import { ModalInstance } from "@/app/hooks/modals/ModalProvider";
 import { ModalButtonsType } from "@/components/ModalFC";
 import TrabajarIntervencionForm from "@/app/(pages)/(whiteBackground)/intervenciones/(lista)/formEdit";
-import EquipoDTO from "@/types/dtos/EquipoDTO";
 import TipoIntervencionDTO from "@/types/dtos/TipoIntervencionDTO";
 import styles from "@public/styles/modules/table/table.tipoequipos.module.css";
 import {useToken} from "@/app/hooks/TokenProvider";
+import LoadingPage from "@/app/(pages)/loading";
+import ComboBoxFC from "@/components/ComboBoxFC";
+import TipoEquipoDTO from "@/types/dtos/TipoEquipoDTO";
 
 interface TableIntervencionFCProps {
     sessionAPIToken: string;
@@ -24,6 +25,10 @@ interface TableIntervencionFCProps {
 }
 
 interface TableSearchTermsProps {
+    size: number;
+    page: number;
+    fieldSort: string;
+    sortDirectionAsc: boolean;
     filter: IntervencionFilter;
 }
 
@@ -35,71 +40,107 @@ function TableIntervencionFC(props: Readonly<TableIntervencionFCProps>): ReactEl
 
     const { createModal } = useModal();
 
-    const [searchTerms, setSearchTerms] = useState<TableSearchTermsProps>({ filter: {} });
-    const [appliedSearchTerms, setAppliedSearchTerms] = useState<TableSearchTermsProps>(searchTerms);
-    const refSearchTermsTimer = useRef<NodeJS.Timeout | null>(null);
+    // ----------------------- Términos de paginación -----------------------
 
-    useEffect(() => {
-        if (refSearchTermsTimer.current !== null) {
-            clearTimeout(refSearchTermsTimer.current);
-        }
-
-        refSearchTermsTimer.current = setTimeout(() => {
-            setAppliedSearchTerms(searchTerms);
-        }, 500);
-    }, [searchTerms]);
-
-    const [intervenciones, setIntervenciones] = useState<IntervencionDTO[]>([]);
-    const [equipos, setEquipos] = useState<EquipoDTO[]>([]);
-    const [tiposIntervencion, setTiposIntervencion] = useState<TipoIntervencionDTO[]>([]);
     const [currentPage, setCurrentPage] = useState<number>(1);
-    const [itemsPerPage] = useState<number>(5);
+    const [npage, setNpage] = useState<number>(1);
+    const recordsPerPage: number = 5;
 
-    const indexOfLastIntervencion = currentPage * itemsPerPage;
-    const indexOfFirstIntervencion = indexOfLastIntervencion - itemsPerPage;
-    const currentIntervenciones = intervenciones.slice(indexOfFirstIntervencion, indexOfLastIntervencion);
-    const totalPages = Math.ceil(intervenciones.length / itemsPerPage);
+    //Define si ha cargado
+    const [loading, setLoading] = useState<boolean>(false);
 
-    const handleNextPage = () => {
-        if (currentPage < totalPages) {
-            setCurrentPage(currentPage + 1);
-        }
-    };
-
-    const handlePreviousPage = () => {
-        if (currentPage > 1) {
-            setCurrentPage(currentPage - 1);
-        }
-    };
+    const tiposIntervencion: MutableRefObject<TipoIntervencionDTO[]> = useRef<TipoIntervencionDTO[]>([]);
 
     useEffect(() => {
 
         if(!sessionAPIToken) return;
 
         (async () => {
-            const intervResponse = await listarIntervenciones(sessionAPIToken, appliedSearchTerms.filter);
-            if (isFetchAPIError(intervResponse)) {
-                console.error("ERROR - lista de intervenciones", intervResponse.errorMessage);
-                return;
-            }
 
-            const equiposResponse = await listarEquipos(sessionAPIToken);
-            if (isFetchAPIError(equiposResponse)) {
-                console.error("ERROR - lista de equipos", equiposResponse.errorMessage);
-                return;
-            }
-
-            const tiposResponse = await listarTiposIntervencion(sessionAPIToken);
-            if (isFetchAPIError(tiposResponse)) {
-                console.error("ERROR - lista de tipos de intervención", tiposResponse.errorMessage);
-                return;
-            }
-
-            setIntervenciones(intervResponse);
-            setEquipos(equiposResponse);
-            setTiposIntervencion(tiposResponse);
+            await listarTiposIntervencion(sessionAPIToken).then((response: TipoIntervencionDTO[] | FetchAPIError) => {
+                if (isFetchAPIError(response)) {
+                    console.error("ERROR - tipos de intervención", response.errorMessage);
+                    return;
+                }
+                tiposIntervencion.current = response;
+            });
+            setLoading(true);
         })();
-    }, [appliedSearchTerms, props.sessionAPIToken, sessionAPIToken]);
+    }, [props, sessionAPIToken]);
+
+    // Define los términos de búsqueda introducidos por el usuario en tiempo real (searchTerms)
+    // y la función para modificarlos (setSearchTerms)
+    const [searchTerms, setSearchTerms]: [TableSearchTermsProps, (value: TableSearchTermsProps) => void]
+        = useState<TableSearchTermsProps>({
+        size: recordsPerPage,
+        page: currentPage,
+        fieldSort: 'fechaHora',
+        sortDirectionAsc: true,
+        filter: {}
+    });
+
+    const [appliedSearchTerms, setAppliedSearchTerms]: [TableSearchTermsProps, (value: TableSearchTermsProps) => void]
+        = useState<TableSearchTermsProps>(searchTerms);
+
+    // Define un ref (Referencia mutable) para el temporizador que actualiza los términos de búsqueda aplicados
+    // (Ejecuta una acción después de un tiempo determinado)
+    const refSearchTermsTimer: MutableRefObject<NodeJS.Timeout | null> = useRef<NodeJS.Timeout | null>(null);
+
+    // Efecto que se ejecuta cuando cambian los términos de búsqueda introducidos por el usuario
+    // Reinicia el temporizador para actualizar los términos de búsqueda aplicados con los introducidos por el usuario
+    // (Esto evita que se realicen múltiples actualizaciones en un corto período de tiempo, por ejemplo por cada letra que se escribe o borra)
+    useEffect((): void => {
+        // Si hay un temporizador en ejecución, lo cancela para evitar múltiples ejecuciones
+        if (refSearchTermsTimer.current !== null) {
+            clearTimeout(refSearchTermsTimer.current);
+        }
+
+        // Crea un nuevo temporizador usando requestIdleCallback
+        refSearchTermsTimer.current = setTimeout((): void => {
+            setAppliedSearchTerms(searchTerms); // Actualiza los términos de búsqueda
+        }, 500); // Establece un temporizador de 0.5 segundos
+
+    }, [searchTerms]);
+
+    const [intervenciones, setIntervenciones] = useState<IntervencionDTO[]>([]);
+
+    useEffect(() => {
+
+            if (!sessionAPIToken) return;
+
+            (async () => {
+                const response:IntervencionDTO[] | FetchAPIError = await listarIntervenciones(sessionAPIToken, appliedSearchTerms.size, appliedSearchTerms.page, appliedSearchTerms.fieldSort, appliedSearchTerms.sortDirectionAsc, appliedSearchTerms.filter);
+                if (isFetchAPIError(response)) {
+                    console.error("ERROR - lista de intervenciones", response.errorMessage);
+                    return;
+                }
+                setIntervenciones(response);
+                calcularPaginas();
+            })();
+    }, [appliedSearchTerms, sessionAPIToken]);
+
+    function calcularPaginas(): void {
+        if (!sessionAPIToken) return;
+
+        contarIntervenciones(sessionAPIToken, appliedSearchTerms.filter)
+            .then((response: number | FetchAPIError) => {
+                if (isFetchAPIError(response)) {
+                    console.error("ERROR - contar intervenciones", response.errorMessage);
+                    return 0;
+                }
+                // Calcula el número de páginas
+                const total: number = Number(response);
+                const totalPages: number = Math.ceil(total / recordsPerPage);
+
+                setNpage(totalPages);
+                if (totalPages > 0 && currentPage > totalPages) {
+                    setCurrentPage(totalPages);
+                }
+            })
+            .catch(error => {
+                console.error("ERROR - contar intervenciones", error);
+            });
+    }
 
     async function handleEditClick(intervencion: IntervencionDTO): Promise<void> {
 
@@ -137,16 +178,6 @@ function TableIntervencionFC(props: Readonly<TableIntervencionFCProps>): ReactEl
 
     const ID_TIPOS_INTERVENCION_RESOLUCION = [3, 6];
 
-    const getEquipoNombre = (idEquipo: number): string => {
-        const equipo = equipos.find(e => e.id === idEquipo);
-        return equipo ? equipo.nombre : 'Desconocido';
-    };
-
-    const getTipoIntervencionNombre = (idTipoIntervencion: number): string => {
-        const tipoIntervencion = tiposIntervencion.find(t => t.id === idTipoIntervencion);
-        return tipoIntervencion ? tipoIntervencion.nombre : 'Desconocido';
-    };
-
     const handleViewDataClick = (intervencion: IntervencionDTO): void => {
         createModal({
             children: (
@@ -165,11 +196,19 @@ function TableIntervencionFC(props: Readonly<TableIntervencionFCProps>): ReactEl
         return date.toLocaleDateString();
     };
 
+    useEffect(() => {
+        setSearchTerms({
+            ...searchTerms,
+            page: currentPage
+        })
+    }, [currentPage]);
+
+    if(!loading) return <LoadingPage/>
     return (
         <div className={stylesTable.containerPage}>
             <div className={stylesTable.containerTable}>
                 <div className={stylesTable.scroll}>
-                    {currentIntervenciones.length > 0 ? (
+                    {intervenciones.length > 0 ? (
                         <table style={{ width: "100%" }}>
                             <thead>
                             <tr>
@@ -181,11 +220,13 @@ function TableIntervencionFC(props: Readonly<TableIntervencionFCProps>): ReactEl
                             </tr>
                             </thead>
                             <tbody>
-                            {currentIntervenciones.map((intervencion: IntervencionDTO) => (
+                            {intervenciones.map((intervencion: IntervencionDTO) => (
                                 <tr key={intervencion.id}>
                                     <td>{formatDate(intervencion.fechaHora)}</td>
-                                    <td>{getTipoIntervencionNombre(intervencion.idTipoIntervencion)}</td>
-                                    <td>{getEquipoNombre(intervencion.idEquipo)}</td>
+                                    <td>{tiposIntervencion.current.find((tipo:TipoIntervencionDTO):boolean =>{
+                                        return tipo.id === intervencion.idTipoIntervencion;
+                                    })?.nombre
+                                    }</td>
                                     <td><button onClick={() => handleViewDataClick(intervencion)}>Ver Datos</button> {/* Cambiado el texto del botón */}</td>
                                     <td>
                                         {props.hasPermissionEdit && !ID_TIPOS_INTERVENCION_RESOLUCION.includes(intervencion.idTipoIntervencion) ? (
@@ -203,23 +244,69 @@ function TableIntervencionFC(props: Readonly<TableIntervencionFCProps>): ReactEl
                 {intervenciones.length > 0 && (
                     <div className={styles.pagination}>
                         <button
-                            className={styles.paginationButton}
-                            onClick={handlePreviousPage}
-                            disabled={currentPage === 1}>
+                            onClick={() => setCurrentPage(currentPage - 1)}
+                            disabled={currentPage === 1}
+
+                        >
                             Anterior
                         </button>
-                        {Array.from({ length: totalPages }, (_, index) => (
-                            <button
-                                key={index + 1}
-                                className={`${styles.paginationButton} ${currentPage === index + 1 ? styles.activePage : ''}`}
-                                onClick={() => setCurrentPage(index + 1)}>
-                                {index + 1}
-                            </button>
-                        ))}
+
+                        {currentPage > 4 && (
+                            <>
+                                <button
+                                    key={1}
+                                    onClick={() => setCurrentPage(1)}
+                                >
+                                    {1}
+                                </button>
+                                <span>...</span>
+                            </>
+                        )}
+                        {Array.from({length: 3}, (_, index) => {
+                            const num = currentPage - (index + 1);
+                            if (num < 1 || currentPage == 1) return;
+                            return (
+                                <button
+                                    key={num}
+                                    onClick={() => setCurrentPage(num)}
+                                >
+                                    {num}
+                                </button>
+                            )
+                        }).reverse()}
                         <button
-                            className={styles.paginationButton}
-                            onClick={handleNextPage}
-                            disabled={currentPage === totalPages}>
+                            key={currentPage}
+                            className={stylesTable.activePage}
+                        >
+                            {currentPage}
+                        </button>
+                        {Array.from({length: 3}, (_, index) => {
+                            const num = currentPage + (index + 1);
+                            if (num > npage) return;
+                            return (
+                                <button
+                                    key={num}
+                                    onClick={() => setCurrentPage(num)}
+                                >
+                                    {num}
+                                </button>
+                            )
+                        })}
+                        {currentPage < npage - 3 && (
+                            <>
+                                <span>...</span>
+                                <button
+                                    key={npage}
+                                    onClick={() => setCurrentPage(npage)}
+                                >
+                                    {npage}
+                                </button>
+                            </>
+                        )}
+                        <button
+                            onClick={() => setCurrentPage(currentPage + 1)}
+                            disabled={currentPage === npage}
+                        >
                             Siguiente
                         </button>
                     </div>
@@ -255,23 +342,27 @@ function TableIntervencionFC(props: Readonly<TableIntervencionFCProps>): ReactEl
                                 });
                             }}
                         />
-                         <select
-                            name="idTipoIntervencion"
-                            value={searchTerms.filter.idTipoIntervencion || ''}
-                            onChange={(event: ChangeEvent<HTMLSelectElement>): void => {
+                        <ComboBoxFC
+                            message={"Todos los tipos de intervencion"}
+                            messageSelectable={true}
+                            elements={tiposIntervencion.current.map((tipoIntervencion: TipoIntervencionDTO): {
+                                key: number,
+                                value: string
+                            } => ({
+                                key: tipoIntervencion.id as number,
+                                value: tipoIntervencion.nombre
+                            }))}
+                            onChange={(e: React.ChangeEvent<HTMLSelectElement>): void => {
                                 setSearchTerms({
                                     ...searchTerms,
                                     filter: {
                                         ...searchTerms.filter,
-                                        idTipoIntervencion: event.target.value ? parseInt(event.target.value) : undefined
+                                        tipoIntervencion: e.target.value !== "" ? tiposIntervencion.current.find((tipo: TipoIntervencionDTO):
+                                        boolean => tipo.id === Number(e.target.value))?.nombre : undefined
                                     }
                                 });
-                            }}>
-                            <option value="">Tipo de Intervencion</option>
-                            {tiposIntervencion.map((tipo) => (
-                                <option key={tipo.id} value={tipo.id}>{tipo.nombre}</option>
-                            ))}
-                        </select>
+                            }}
+                        />
                     </div>
                 </div>
             </div>
