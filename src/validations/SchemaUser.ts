@@ -11,6 +11,7 @@ const SchemaUser: ZodObject<any> = z.object({
     cedula: z
         .preprocess((val) => val ? String(val) : '', // Convierte el valor a string
             z.string()
+                .min(1, "La cédula no puede estar vacía")
                 .regex(/^\d+$/, 'La CI debe contener solo números')
                 .refine((value: string) => !value.includes(" "), {
                     message: "No debe contener espacios en blanco",
