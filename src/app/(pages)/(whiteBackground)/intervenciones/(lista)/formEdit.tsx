@@ -14,6 +14,7 @@ import ComboBoxFC from "@/components/ComboBoxFC";
 import styles from "@public/styles/modules/table/table.editformequipo.module.css";
 import {useToken} from "@/app/hooks/TokenProvider";
 import TipoIntervencionDTO from "@/types/dtos/TipoIntervencionDTO";
+import SchemaTrabajarIntervencion from "@/validations/SchemaTrabajarIntervencion";
 
 interface EditIntervencionFormProps {
     sessionAPIToken: string;
@@ -34,13 +35,14 @@ function TrabajarIntervencionForm(props: Readonly<EditIntervencionFormProps>): R
     const {
         register,
         handleSubmit,
-        setValue,
         formState: { errors }
-    }: UseFormReturn<IntervencionDTO> = useForm<IntervencionDTO>({
-        resolver: zodResolver(SchemaIntervencion),
+    }: UseFormReturn<FormValues> = useForm<FormValues>({
+        resolver: zodResolver(SchemaTrabajarIntervencion),
         mode: "all",
         defaultValues: {...props.editingIntervencion}
     });
+
+    console.log("ERRORES TRABAJAR INTERVENCION ",errors);
 
     useEffect(() => {
 
@@ -165,13 +167,14 @@ function TrabajarIntervencionForm(props: Readonly<EditIntervencionFormProps>): R
                 <div className={styles.inputBox}>
                     <label className={styles.details}>Tipo de Intervención<span className={styles.requiredField}>*</span>
                     <ComboBoxFC
+                        message="Seleccione un tipo de intervención"
                         register={register("idTipoIntervencion")}
                         selectedKey={props.editingIntervencion.idTipoIntervencion}
                         elements={tiposIntervencion.map((tipo: TipoIntervencionDTO):{key:number, value:string} => ({
                             key: tipo.id as number,
                             value: tipo.nombre
                         }))}
-                        message={"Seleccione un tipo de intervención"} /> </label>
+                        /> </label>
                     {errors.idTipoIntervencion &&
                         <label className={styles.error} style={{color: 'red'}}>{errors.idTipoIntervencion.message}</label>}
                 </div>
