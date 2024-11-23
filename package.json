@@ -10,6 +10,7 @@
     "start-https": "set NODE_ENV=production&& node server.js"
   },
   "dependencies": {
+    "@eslint/config-array": "^0.19.0",
     "@fortawesome/fontawesome-svg-core": "^6.6.0",
     "@fortawesome/free-brands-svg-icons": "^6.6.0",
     "@fortawesome/free-regular-svg-icons": "^6.6.0",
@@ -35,8 +36,8 @@
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "cross-env": "^7.0.3",
-    "eslint": "^8",
-    "eslint-config-next": "14.2.3",
+    "eslint": "^8.0.0",
+    "eslint-config-next": "^15.0.3",
     "typescript": "^5"
   }
 }
