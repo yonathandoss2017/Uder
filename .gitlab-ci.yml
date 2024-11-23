@@ -40,12 +40,12 @@ sonarqube-check:
     paths:
       - .sonar/cache
   script:
-    - sonar-scanner \
-      -D"sonar.projectKey=PFT-WEB-SONARQUBE" \
-      -D"sonar.host.url=${SONAR_HOST_URL}" \
-      -D"sonar.login=${SONAR_LOGIN}" \
-      -D"sonar.sources=src" \
-      -D"sonar.inclusions=**/*.ts,**/*.tsx,**/*.js,**/*.jsx" \
+    - sonar-scanner `
+      -D"sonar.projectKey=PFT-WEB-SONARQUBE" `
+      -D"sonar.host.url=${SONAR_HOST_URL}" `
+      -D"sonar.login=${SONAR_LOGIN}" `
+      -D"sonar.sources=src" `
+      -D"sonar.inclusions=**/*.ts,**/*.tsx,**/*.js,**/*.jsx" `
       -D"sonar.exclusions=node_modules/**,public/**,out/**"
   allow_failure: true
   only:
