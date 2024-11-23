@@ -175,7 +175,7 @@ function FormEditUser(props: Readonly<EditUserFormProps>): ReactElement {
                 if (nuevaContrasenia.length>0) {
                     // Verifica que la nueva contraseña cumpla con las validaciones del esquema de Zod (SchemaUserPassword)
                     try {
-                        !schemaUserPassword.parse({contrasenia: nuevaContrasenia});
+                        schemaUserPassword.parse({contrasenia: nuevaContrasenia});
                     } catch (err) { // Sí hay un error entonces la validación falló
                         if (err instanceof z.ZodError) { // Si el error es de tipo ZodError (Error de validación de Zod)
                             // Muestra un mensaje con los errores de validación

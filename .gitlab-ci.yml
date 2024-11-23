@@ -1,13 +1,55 @@
+image: node:18
+
 stages:
   - build
-  - deploy
   - sonarqube
+  - deploy
+
+variables:
+  SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"  # Cache location for SonarQube
+  GIT_DEPTH: "0"  # Fetch full history for accurate analysis
+  SONAR_HOST_URL: "http://localhost:9000"
+  SONAR_LOGIN: "${SONAR_TOKEN}"
+
+cache:
+  paths:
+    - node_modules/
+    - .sonar/cache
+
+before_script:
+  - npm install
 
 build-job:
   stage: build
   script:
     - echo "Compiling the code..."
     - echo "Compile complete."
+  tags:
+    - web
+
+sonarqube-check:
+  stage: sonarqube
+  image:
+    name: sonarsource/sonar-scanner-cli:latest
+    entrypoint: [""]
+  variables:
+    SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"
+    GIT_DEPTH: "0"
+  cache:
+    key: "${CI_JOB_NAME}"
+    paths:
+      - .sonar/cache
+  script:
+    - sonar-scanner \
+      -D"sonar.projectKey=PFT-WEB-SONARQUBE" \
+      -D"sonar.host.url=${SONAR_HOST_URL}" \
+      -D"sonar.login=${SONAR_LOGIN}" \
+      -D"sonar.sources=src" \
+      -D"sonar.inclusions=**/*.ts,**/*.tsx,**/*.js,**/*.jsx" \
+      -D"sonar.exclusions=node_modules/**,public/**,out/**"
+  allow_failure: true
+  only:
+    - master
   tags:
     - web
 
@@ -19,28 +61,3 @@ deploy-job:
     - echo "Application successfully deployed."
   tags:
     - web
-
-sonarqube-check:
-  stage: sonarqube
-  image:
-    name: sonarsource/sonar-scanner-cli:latest
-    entrypoint: [""]
-  variables:
-    SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"  # Defines the location of the analysis task cache
-    GIT_DEPTH: "0"  # Tells git to fetch all the branches of the project, required by the analysis task
-  cache:
-    key: "${CI_JOB_NAME}"
-    paths:
-      - .sonar/cache
-  script:
-    - sonar-scanner `
-      -D"sonar.projectKey=PFT-WEB-SONARQUBE" `
-      -D"sonar.host.url=http://localhost:9000" `
-      -D"sonar.login=sqp_fc65f0e7d3e3e1ca7f30b2a449aad0dec3fb08ae"
-      -X
-  allow_failure: true
-  only:
-    - master
-  tags:
-    - web
-
