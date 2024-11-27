@@ -25,7 +25,7 @@ build-job:
     - echo "Compiling the code..."
     - echo "Compile complete."
   tags:
-    - web
+    - defensa
 
 sonarqube-check:
   stage: sonarqube
@@ -41,17 +41,18 @@ sonarqube-check:
       - .sonar/cache
   script:
     - sonar-scanner `
-      -D"sonar.projectKey=PFT-WEB-SONARQUBE" `
-      -D"sonar.host.url=${SONAR_HOST_URL}" `
-      -D"sonar.login=${SONAR_LOGIN}" `
+      -D"sonar.projectKey=$env:SONAR_PROJECT_WEB" `
+      -D"sonar.host.url=$env:SONAR_HOST_URL" `
+      -D"sonar.login=$env:SONAR_TOKEN_WEB" `
       -D"sonar.sources=src" `
       -D"sonar.inclusions=**/*.ts,**/*.tsx,**/*.js,**/*.jsx" `
       -D"sonar.exclusions=node_modules/**,public/**,out/**"
+
   allow_failure: true
   only:
     - master
   tags:
-    - web
+    - defensa
 
 deploy-job:
   stage: deploy
@@ -60,4 +61,4 @@ deploy-job:
     - echo "Deploying application..."
     - echo "Application successfully deployed."
   tags:
-    - web
+    - defensa
