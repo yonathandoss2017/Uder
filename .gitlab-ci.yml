@@ -12,8 +12,7 @@ variables:
   SONAR_LOGIN: "${SONAR_TOKEN}"
 
 cache:
-  paths:
-    - node_modules/
+  policy: none
 
 before_script:
   - npm install
