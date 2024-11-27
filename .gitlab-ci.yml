@@ -38,7 +38,7 @@ sonarqube-check:
   cache:
     key: "${CI_JOB_NAME}"
     paths:
-      - .sonar/cache
+      - node_modules/
   script:
     - sonar-scanner `
       -D"sonar.projectKey=$env:SONAR_PROJECT_WEB" `
