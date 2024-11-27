@@ -25,7 +25,7 @@ build-job:
     - echo "Compiling the code..."
     - echo "Compile complete."
   tags:
-    - defensa
+    - defensaweb
 
 sonarqube-check:
   stage: sonarqube
@@ -52,7 +52,7 @@ sonarqube-check:
   only:
     - master
   tags:
-    - defensa
+    - defensaweb
 
 deploy-job:
   stage: deploy
@@ -61,4 +61,4 @@ deploy-job:
     - echo "Deploying application..."
     - echo "Application successfully deployed."
   tags:
-    - defensa
+    - defensaweb
