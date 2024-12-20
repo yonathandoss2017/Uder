@@ -2,8 +2,8 @@ export default {
     files: ["**/*.js", "**/*.jsx", "**/*.ts", "**/*.tsx"], // Archivos que se analizarán
     languageOptions: {
         parserOptions: {
-            ecmaVersion: "latest",
-            sourceType: "module",
+            ecmaVersion: "latest", // Última versión de ECMAScript (estandar)
+            sourceType: "module", // Permite import/export
         },
     },
     rules: {

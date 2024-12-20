@@ -21,6 +21,7 @@ import {existeCorreo} from "@/services/UsuarioService";
 
 // Página de autenticación con Google
 const GoogleAuthPage = () => {
+
     const router: AppRouterInstance = useRouter(); // Inicializa el hook de enrutamiento de Next.js
 
     const {createModal} = useModal();
@@ -37,16 +38,17 @@ const GoogleAuthPage = () => {
     // Efecto secundario que se ejecuta montar el componente y cuando cambia la sesión del usuario,
     // los parámetros de búsqueda o la función de actualización
     useEffect((): void => {
+
         if (standby.current) return; // Si está en espera, no hace nada
 
-        // Procedimiento auto-ejecutable para ejecutar de forma asíncrona
         (async (): Promise<void> => {
 
             // Si no hay una sesión activa, inicia sesión con Google
             if (!sessionData) {
                 await signIn("google", {redirect: false});
             } else { // Si hay una sesión activa
-                standby.current = true; // Pone en espera el estado
+
+                standby.current = true;
 
                 // Sí tiene un token de sesión en la API, no hace nada, ya que ya está autenticado y será redirigido a la página principal
                 // Esto evita que se vuelva a ejecutar el componente por el update de la sesión
@@ -80,7 +82,7 @@ const GoogleAuthPage = () => {
                     // Enviamos el token de Google a la API para autenticar al usuario y obtener un token de sesión (JWT)
                     const response: string | FetchAPIError = await loginGoogle(sessionGoogleToken);
 
-                    if (isFetchAPIError(response)) {// Sí hay un error en la autenticación
+                    if (isFetchAPIError(response)) {
 
                         createModal({
                             children: (<p>Usuario no verificado. Vuelva a intentarlo</p>
@@ -94,7 +96,7 @@ const GoogleAuthPage = () => {
                         document.cookie = `sessionToken=${response};path=/;max-age=300;samesite=strict;secure`;
                         if (document.cookie.includes('sessionToken')) {
                             window.location.href = "/";
-                            sessionData.user.sessionAPIToken = response; // Asigna el token de sesión al usuario
+                            sessionData.user.sessionAPIToken = response;
 
                         }
                     }

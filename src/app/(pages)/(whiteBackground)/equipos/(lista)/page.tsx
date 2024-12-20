@@ -17,6 +17,7 @@ export const metadata: Metadata = {
 
 // Define la página de lista de equipos ("/equipos")
 const EquiposPage = async (): Promise<ReactElement> => {
+
     // Obtiene la información de la sesión del cliente desde el servidor front (NextAuth)
     const sessionData: Session | null = await getServerSession(authOptions);
 

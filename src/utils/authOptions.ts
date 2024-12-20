@@ -11,7 +11,7 @@ import {NextAuthOptions, User} from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import CredentialsProvider from "next-auth/providers/credentials";
 import FetchAPIError, {isFetchAPIError} from "@/types/errors/FetchAPIError";
-import {buscarClientePorToken, loginCredentials, renovarToken} from "@/services/SessionService";
+import {buscarClientePorToken, loginCredentials} from "@/services/SessionService";
 import {cookies} from "next/headers";
 
 // Opciones de configuración para NextAuth
@@ -119,7 +119,6 @@ const authOptions: NextAuthOptions = {
                 session.user.sessionGoogleToken = token.user.sessionGoogleToken;
             }
 
-            // session.user.error = token.user.error;
             const sessionToken = cookies().get('sessionToken')?.value
             // Si el JWT (JSON Web Token) tiene el token de sesión del cliente en la API, lo guardamos en la sesión y obtenemos los datos del cliente
             if (sessionToken) {

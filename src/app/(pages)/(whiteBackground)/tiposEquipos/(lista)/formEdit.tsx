@@ -20,8 +20,6 @@ interface EditTipoEquipoFormProps {
     onCancel?: () => void;
 }
 
-
-
 function EditTipoEquipoForm(props: Readonly<EditTipoEquipoFormProps>): ReactElement {
 
     // Obtiene el token de la sesión

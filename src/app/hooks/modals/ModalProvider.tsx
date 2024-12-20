@@ -46,11 +46,12 @@ export interface ModalInstance {
 }
 
 export const ModalProvider: React.FC<ModalProviderProps> = ({children}) => {
-    const [listModals, setListModals]: [
+    const [listModals, setListModals]: [ // Estado para almacenar la lista de modales.
         (ModalFCProps & { id: number })[],
         React.Dispatch<React.SetStateAction<(ModalFCProps & { id: number })[]>>
     ] = useState<Array<ModalFCProps & { id: number }>>([]);
 
+    // Asigna un número único a cada modal.
     const nextId: MutableRefObject<number> = useRef(1); // Referencia mutable para almacenar el siguiente ID de modal. (Longitud de la lista + 1)
 
     /**

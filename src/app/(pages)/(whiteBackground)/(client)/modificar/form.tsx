@@ -57,8 +57,7 @@ function FormEditUser(props: Readonly<EditUserFormProps>): ReactElement {
     const [clientDataOriginal]: [UsuarioDTO, (value: UsuarioDTO) => void] = useState<UsuarioDTO>({...props.clientData});
 
     // Define el estado de los datos del cliente (clientData) y la función para modificarlo (setClientData)
-    const [clientData, setClientData]: [UsuarioDTO, (value: UsuarioDTO) => void]
-        = useState<UsuarioDTO>({...props.clientData});
+    const [clientData, setClientData]: [UsuarioDTO, (value: UsuarioDTO) => void] = useState<UsuarioDTO>({...props.clientData});
 
     // Define el estado de la contraseña actual y la función para modificarla (setContrasenia)
     let [contrasenia, setContrasenia]: [string, (value: string) => void] = useState<string>("");

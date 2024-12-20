@@ -126,14 +126,10 @@ const sidebarConfig = [
         key: "funcionalidades",
         submenus: [
             {
-                title: "Ingreso Funcionalidad",
-                path: "/funcionalidades/agregar",
-                permission: PermisoEnum.ALTA_FUNCIONALIDAD
+                title: "Ingreso Funcionalidad", path: "/funcionalidades/agregar", permission: PermisoEnum.ALTA_FUNCIONALIDAD
             },
             {
-                title: "Listado Funcionalidades",
-                path: "/funcionalidades",
-                permission: PermisoEnum.OBTENER_FUNCIONALIDADES
+                title: "Listado Funcionalidades", path: "/funcionalidades", permission: PermisoEnum.OBTENER_FUNCIONALIDADES
             },
         ]
     }

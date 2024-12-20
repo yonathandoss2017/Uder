@@ -1,7 +1,6 @@
 import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { useSession } from 'next-auth/react';
 
-// Definir el tipo de los valores del contexto
 interface TokenContextProps {
     sessionAPIToken: string | null;
     setSessionAPIToken: (token: string | null) => void;

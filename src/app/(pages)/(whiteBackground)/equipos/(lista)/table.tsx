@@ -261,8 +261,6 @@ function TableEquiposFC(props: Readonly<TableEquiposFCProps>): ReactElement {
             });
     }
 
-
-
     // ----------------------- Eventos de la tabla de equipos -----------------------
 
     // Procedimiento que se ejecuta al hacer click en el boton "Ver"

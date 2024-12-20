@@ -48,8 +48,8 @@ const RegisterFormClientAd = () => {
                 .preprocess(((val): string => val ? String(val) : ''), // Convierte el valor a string
                     z.string()
                         .min(1, "Debe seleccionar una institución")),
-        }))), // Validación con Zod (basado en el esquema SchemaUserRegister)
-        mode: 'all', // Estrátegia de validación: 'all', utiliza todas las estrátegias de validación ('onBlur' al salir del campo, 'onChange' al cambiar el valor, 'onSubmit' al enviar el formulario)
+        }))),
+        mode: 'all',
         defaultValues: {
         }
     });
@@ -63,9 +63,8 @@ const RegisterFormClientAd = () => {
     // Define un estado que guarda la institución seleccionada
     const [idInstitucionSelected, setIdInstitucionSelected]: [number, (value: number) => void] = useState<number>(0);
 
-    // Efecto secundario que se ejecuta montar el componente
-    useEffect((): void => {
 
+    useEffect((): void => {
         // Prócedimiento asíncrono autoinvocado que actualiza la lista de instituciones
         (async (): Promise<void> => {
             // Obtiene la lista de instituciones de la API
@@ -83,7 +82,6 @@ const RegisterFormClientAd = () => {
 
     // Efecto secundario que se ejecuta montar el componente y cuando se actualiza la institución seleccionada
     useEffect((): void => {
-        // Prócedimiento asíncrono autoinvocado que actualiza la lista de perfiles y de instituciones
         (async (): Promise<void> => {
             // Obtiene la lista de perfiles de la API
             const response: PerfilDTO[] | FetchAPIError = await listarPorInstitucion(idInstitucionSelected);

@@ -20,22 +20,31 @@ export function mapEnumElements(enumObj: object, valueModifier?: (value: any) =>
  * @returns Promise que resuelve en una cadena base64 representando los bytes de la imagen
  */
 export function imageToBase64(image: File): Promise<string> {
+
+    // Se retorna una promesa para manejar la operación asíncrona
     return new Promise((resolve, reject) => {
         if (!(image instanceof Blob)) {
             reject(new Error("El objeto proporcionado no es un archivo válido."));
             return;
         }
 
+        // FileReader es una clase que permite leer archivos de forma asíncrona
         const reader = new FileReader();
+
+        // Cuando el archivo se ha leído correctamente
         reader.onload = () => {
             // FileReader.readAsDataURL ya devuelve la imagen en formato base64 como parte de una data URL
             const base64 = reader.result as string;
-            resolve(base64);
+            resolve(base64); // Se resuelve la promesa con la cadena base64
         };
+
+        // Cuando ocurre un error al leer el archivo
         reader.onerror = (error) => {
             console.error("Error de FileReader: ", error);
-            reject(new Error("Error de FileReader"));
+            reject(new Error("Error de FileReader")); // Se rechaza la promesa con un error
         };
-        reader.readAsDataURL(image); // Cambiado de readAsArrayBuffer a readAsDataURL
+
+        // Se inicia la lectura del archivo
+        reader.readAsDataURL(image);
     });
 }

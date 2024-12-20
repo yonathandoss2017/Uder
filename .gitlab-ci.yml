@@ -1,62 +1,66 @@
 image: node:18
 
+# etapas de la pipeline
 stages:
-  - build
-  - sonarqube
-  - deploy
+  - build # se realiza la compilación del código
+  - sonarqube # se realiza el análisis de código
+  - deploy # se realiza el despliegue de la aplicación
 
 variables:
-  SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"  # Cache location for SonarQube
-  GIT_DEPTH: "0"  # Fetch full history for accurate analysis
-  SONAR_HOST_URL: "http://localhost:9000"
-  SONAR_LOGIN: "${SONAR_TOKEN}"
+  SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"  # Lugar del cache de sonar
+  GIT_DEPTH: "0"  # Se clona to do el repositorio
+  SONAR_HOST_URL: "http://localhost:9000" # URL de sonarqube
+  SONAR_LOGIN: "${SONAR_TOKEN}" # Token de sonarqube
 
 cache:
   paths:
-    - node_modules/
-  policy: pull-push
+    - node_modules/ # Se define la carpeta de cache
+  policy: pull-push # Se restaura el cache al inicio y se actualiza al final del job
 
+# Antes de ejecutar el job
 before_script:
-  - npm install
+  - npm install # Se instalan las dependencias
 
+# Configura un job dentro de la etapa build
 build-job:
-  stage: build
-  script:
+  stage: build # Se define la etapa del job
+  script: # Se define el script a ejecutar
     - echo "Compiling the code..."
     - echo "Compile complete."
   tags:
-    - defensaweb
+    - defensaweb # Se define el tag del runner
 
+# Configura un job dentro de la etapa sonarqube
 sonarqube-check:
-  stage: sonarqube
-  image:
+  stage: sonarqube # Se define la etapa del job
+  image: # Utiliza una imagen de Docker específica
     name: sonarsource/sonar-scanner-cli:latest
     entrypoint: [""]
   variables:
-    SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"
-    GIT_DEPTH: "0"
-  cache:
+    SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar" # Lugar donde sonar guarda sys archivos temporales
+    GIT_DEPTH: "0" # Se clona to do el repositorio
+  cache: # No hay cache adicional
     paths: []
-  script:
+  script: # Se define el script a ejecutar
     - sonar-scanner `
-      -D"sonar.projectKey=$env:SONAR_PROJECT_WEB" `
-      -D"sonar.host.url=$env:SONAR_HOST_URL" `
-      -D"sonar.login=$env:SONAR_TOKEN_WEB" `
-      -D"sonar.sources=src" `
-      -D"sonar.inclusions=**/*.ts,**/*.tsx,**/*.js,**/*.jsx" `
-      -D"sonar.exclusions=node_modules/**,public/**,out/**"
+      -D"sonar.projectKey=$env:SONAR_PROJECT_WEB" ` # Identifica el proyecto en SonarQube
+      -D"sonar.host.url=$env:SONAR_HOST_URL" ` # URL de SonarQube
+      -D"sonar.login=$env:SONAR_TOKEN_WEB" ` # Token de SonarQube
+      -D"sonar.sources=src" ` # Carpeta de código fuente
+      -D"sonar.inclusions=**/*.ts,**/*.tsx,**/*.js,**/*.jsx" ` # Extensiones de los archivos a analizar
+      -D"sonar.exclusions=node_modules/**,public/**,out/**" # Exclusiones de los archivos a analizar
 
-  allow_failure: true
-  only:
+  allow_failure: true # Permite que el pipeline continúe si el job falla
+  only: # Se ejecuta solo en la rama master
     - master
-  tags:
+  tags: # Se define el tag del runner
     - defensaweb
 
-deploy-job:
+deploy-job: # Configura un job dentro de la etapa deploy
   stage: deploy
-  environment: production
-  script:
+  environment: production # Se define el ambiente de producción
+  script: # Se define el script a ejecutar
     - echo "Deploying application..."
     - echo "Application successfully deployed."
-  tags:
+  tags: # Se define el tag del runner
     - defensaweb

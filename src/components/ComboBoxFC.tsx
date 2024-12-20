@@ -26,6 +26,7 @@ interface ComboBoxEntitiesProps {
  * @returns {ReactElement} - Elemento React que representa el combobox.
  */
 const ComboBoxFC = (props: ComboBoxEntitiesProps): ReactElement => {
+
     // Determina el valor por defecto
     const defaultValue: string | number | undefined = props.selectedKey ?? (props.message ? "" : undefined);
 

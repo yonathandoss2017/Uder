@@ -243,7 +243,7 @@ function EditEquipoForm(props: Readonly<EditEquipoFormProps>): ReactElement {
 
         })();
 
-    }, [props.sessionAPIToken, props.editingEquipo.idModelo, sessionAPIToken]); // Se ejecuta solo al montar el componente o si cambia el sessionAPIToken
+    }, [props.sessionAPIToken, props.editingEquipo.idModelo, sessionAPIToken]);
 
 
     useEffect(() => {

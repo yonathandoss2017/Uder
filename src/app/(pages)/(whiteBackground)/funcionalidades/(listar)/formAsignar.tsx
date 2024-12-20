@@ -20,7 +20,6 @@ interface AsignarFuncionalidadesFormProps {
 }
 
 interface FormValues extends FuncionalidadDTO{
-
 }
 
 function AsignarFuncionalidadesForm(props: Readonly<AsignarFuncionalidadesFormProps>): ReactElement {

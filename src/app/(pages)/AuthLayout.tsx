@@ -28,7 +28,6 @@ function AuthLayout({children}: Readonly<{ children: ReactNode }>) {
 
     const pathname = usePathname();
 
-
     const onUserIdle = () => {
         console.log('IDLE');
     };
@@ -80,6 +79,7 @@ function AuthLayout({children}: Readonly<{ children: ReactNode }>) {
     });
 
     // Inicializar expiresTimeTimestampRef.current desde localStorage
+
     useEffect(() => {
         if (pathname === "/login" || pathname === "/login/google" || pathname === "/signup/google" || pathname === "/signup/ad" || pathname === "/signup") {
             localStorage.removeItem('expiresTimeTimestamp');
@@ -87,6 +87,7 @@ function AuthLayout({children}: Readonly<{ children: ReactNode }>) {
         }
         const storedExpirationTime = localStorage.getItem('expiresTimeTimestamp');
         if (storedExpirationTime) {
+            // Convierte el tiempo de expiración almacenado en localStorage a un número entero
             expiresTimeTimestampRef.current = parseInt(storedExpirationTime, 10);
         } else {
             expiresTimeTimestampRef.current = Date.now() + SESSION_EXPIRED_TIME;
@@ -101,11 +102,12 @@ function AuthLayout({children}: Readonly<{ children: ReactNode }>) {
             return;
         }
 
+        // Inicializa el intervalo para comprobar la sesión del usuario
         const checkUserSession = setInterval(async () => {
             const currentTimestamp = Date.now();
             const timeRemaining = expiresTimeTimestampRef.current - currentTimestamp;
-            console.log("Time Remaining:", timeRemaining); // Agrega este log
-            console.log("isIdle:", isIdle()); // Agrega este log
+            console.log("Time Remaining:", timeRemaining);
+            console.log("isIdle:", isIdle());
             if (document.cookie.includes('sessionToken')) {
                 setHayToken(true)
                 if (!isIdle() && timeRemaining < RENEW_TOKEN) {

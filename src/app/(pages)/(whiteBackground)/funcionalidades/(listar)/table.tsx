@@ -121,7 +121,7 @@ function TableFuncionalidadFC(props: Readonly<TableFuncionalidadFCProps>): React
     useEffect(() => {
         setSearchTerms({
             ...searchTerms,
-            page: currentPage //Sea actualizan los parametros de búsqueda
+            page: currentPage
         });
 
     }, [currentPage]); //Cuando cambia la página
