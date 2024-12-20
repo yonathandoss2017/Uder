@@ -19,10 +19,10 @@ function AuthLayout({children}: Readonly<{ children: ReactNode }>) {
     const { sessionAPIToken, setSessionAPIToken } = useToken();
 
     const {data: session, status, update} = useSession();
-    const CHECK_SESSION_EXP_TIME = 15000;
-    const RENEW_TOKEN = 60000;
-    const SESSION_IDLE_TIME = 30000;
-    const SESSION_EXPIRED_TIME = 300000;
+    const CHECK_SESSION_EXP_TIME = 3000;
+    const RENEW_TOKEN = 10000;
+    const SESSION_IDLE_TIME = 5000;
+    const SESSION_EXPIRED_TIME = 30000;
     const [hayToken, setHayToken] = useState<boolean>(false);
     const expiresTimeTimestampRef = useRef<number>(Date.now() + SESSION_EXPIRED_TIME);
 
@@ -64,7 +64,7 @@ function AuthLayout({children}: Readonly<{ children: ReactNode }>) {
                     console.error("ERROR - EquiposPage_renovarToken: ", response);
                     throw new Error(response.errorMessage);
                 }
-                document.cookie = `sessionToken=${response};path=/;max-age=300;samesite=strict;secure`;
+                document.cookie = `sessionToken=${response};path=/;max-age=30;samesite=strict;secure`;
                 session.user.sessionAPIToken = response;
                 setSessionAPIToken(response);
                 setSessionModalActive(false);
@@ -111,7 +111,7 @@ function AuthLayout({children}: Readonly<{ children: ReactNode }>) {
             if (document.cookie.includes('sessionToken')) {
                 setHayToken(true)
                 if (!isIdle() && timeRemaining < RENEW_TOKEN) {
-                    console.log("El tiempo restante es menor a 60 segundos y se encuentra activo")
+                    console.log("El tiempo restante es menor a 10 segundos y se encuentra activo")
                     if (session?.user?.sessionAPIToken && !session.user.error) {
                         console.log("Esta activo con token renovado")
                         expiresTimeTimestampRef.current = Date.now() + SESSION_EXPIRED_TIME;
@@ -122,7 +122,7 @@ function AuthLayout({children}: Readonly<{ children: ReactNode }>) {
                             sessionModal.close();
                             return;
                         }
-                        document.cookie = `sessionToken=${response};path=/;max-age=300;samesite=strict;secure`;
+                        document.cookie = `sessionToken=${response};path=/;max-age=30;samesite=strict;secure`;
                         session.user.sessionAPIToken = response;
                         setSessionAPIToken(response);
                     }
